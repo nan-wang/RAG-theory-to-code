@@ -8,25 +8,23 @@
 运行本脚本前，请先执行 01_index.py 构建向量索引。
 """
 
-import os
-from pprint import pprint
+import asyncio
 import json
 from pathlib import Path
-from tqdm import tqdm
 
+import click
 import dotenv
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langgraph.graph import START, StateGraph
+from loguru import logger
 from typing_extensions import List, TypedDict
 
 # 加载环境变量
 dotenv.load_dotenv()
-
-VECTOR_DB_DIR = os.getenv("VECTOR_DB_DIR")
-COLLECTION_NAME = os.getenv("COLLECTION_NAME")
 
 
 class State(TypedDict):
@@ -41,17 +39,6 @@ class State(TypedDict):
     context: List[Document]
     answer: str
 
-
-# 连接已有的 Chroma 向量数据库（由 01_index.py 构建）
-vector_store = Chroma(
-    persist_directory=VECTOR_DB_DIR,
-    embedding_function=OpenAIEmbeddings(
-        model=os.getenv("EMBEDDING_MODEL"),
-        chunk_size=16,
-        check_embedding_ctx_length=False
-    ),
-    create_collection_if_not_exists=False,  # 不自动创建，确保索引已存在
-    collection_name=COLLECTION_NAME)
 
 # 定义 RAG 提示模板：指导 LLM 基于检索到的上下文回答问题
 prompt_template = ChatPromptTemplate.from_template(
@@ -101,25 +88,67 @@ def generate(state: State):
     return {"answer": response_message.content}
 
 
-# 使用 StateGraph 构建 RAG 管道：retrieve -> generate
-graph_builder = StateGraph(State).add_sequence([retrieve, generate])
-graph_builder.add_edge(START, "retrieve")
-graph = graph_builder.compile()
+async def main(input_fn: str, index_dir: str, collection_name: str, output_dir: str, max_concurrency: int):
+    global vector_store
 
-results = []
-with open("data_eval/demo/keypoints.json", "r") as f:
-    qa_pairs = json.load(f)
-    for doc in tqdm(qa_pairs):
-        query = doc["query"]
-        result = graph.invoke({"question": query})
+    # 连接已有的 Chroma 向量数据库（由 01_index.py 构建）
+    vector_store = Chroma(
+        persist_directory=index_dir,
+        embedding_function=OpenAIEmbeddings(
+            model="Qwen/Qwen3-Embedding-0.6B",
+            chunk_size=16,
+            check_embedding_ctx_length=False
+        ),
+        create_collection_if_not_exists=False,
+        collection_name=collection_name,
+    )
+
+    # 使用 StateGraph 构建 RAG 管道：retrieve -> generate
+    graph_builder = StateGraph(State).add_sequence([retrieve, generate])
+    graph_builder.add_edge(START, "retrieve")
+    graph = graph_builder.compile()
+
+    with open(input_fn, "r") as f:
+        qa_pairs = json.load(f)
+
+    inputs = [{"question": doc["query"]} for doc in qa_pairs]
+    logger.info(f"Processing {len(inputs)} queries with max_concurrency={max_concurrency}...")
+
+    outputs = await graph.abatch(inputs, config=RunnableConfig(max_concurrency=max_concurrency))
+    logger.info("Complete generation")
+
+    results = []
+    for doc, result in zip(qa_pairs, outputs):
         doc["response"] = {
             "content": result["answer"],
-            "contexts": [result["context"],]
+            "contexts": [d.page_content for d in result["context"]],
         }
         results.append(doc)
 
-output_path = "data_eval/demo/response.json"
+    output_path = f"{output_dir}/response.json"
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w") as f:
+        json.dump(results, f, indent=4, ensure_ascii=False)
+    logger.info(f"Wrote {len(results)} results to {output_path}")
 
-Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-with open(output_path, "w") as f:
-    json.dump(results, f, indent=4, ensure_ascii=False)
+
+@click.command()
+@click.argument("input_fn")
+@click.option("--index_dir", required=True, type=str, help="Directory where the vector index is stored.")
+@click.option("--collection_name", required=True, type=str, help="Name of the Chroma collection.")
+@click.option("--output_dir", required=True, type=str, help="Directory where response.json will be written.")
+@click.option("--max_concurrency", default=8, type=int, help="Maximum number of concurrent batch runs.")
+def cli(input_fn, index_dir, collection_name, output_dir, max_concurrency):
+    asyncio.run(
+        main(
+            input_fn=input_fn,
+            index_dir=index_dir,
+            collection_name=collection_name,
+            output_dir=output_dir,
+            max_concurrency=max_concurrency,
+        )
+    )
+
+
+if __name__ == "__main__":
+    cli()
