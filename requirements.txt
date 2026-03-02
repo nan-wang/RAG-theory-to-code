@@ -31,6 +31,7 @@ loguru>=0.7.3,<0.8
 requests<3
 numpy>=1.26.4,<1.27  # pkuseg 构建时依赖 numpy，需先安装：pip install numpy
 socksio==1.0.0
+posthog<6.0.0  # fix the warnings when running ChromaDB, https://github.com/chroma-core/chroma/issues/4966
 
 # Web 框架（部署章节）
 fastapi>=0.112.0,<0.113
