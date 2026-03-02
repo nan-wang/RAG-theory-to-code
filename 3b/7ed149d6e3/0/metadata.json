@@ -1,0 +1,50 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "3b7ed149d6e3",
+  "session_id": "4e2fa5b8-755f-4ef0-b37b-0232edff554c",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-02T10:03:11.915106Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "README.md",
+    "ch05/03_langchain_core_and_langgraph/.env.example",
+    "ch05/03_langchain_core_and_langgraph/README.md",
+    "ch05/04_evaluation/.env.example",
+    "ch05/04_evaluation/README.md",
+    "ch05/05_chunking/.env.example",
+    "ch05/05_chunking/README.md",
+    "ch05/06_embeddings/.env.example",
+    "ch05/06_embeddings/README.md",
+    "ch05/07_hybrid_indexing/.env.example",
+    "ch05/07_hybrid_indexing/README.md",
+    "ch05/08_reranking/.env.example",
+    "ch05/08_reranking/README.md",
+    "ch05/09_generative_optimization/.env.example",
+    "ch05/09_generative_optimization/README.md",
+    "ch05/10_query_preprocessing/.env.example",
+    "ch05/10_query_preprocessing/README.md",
+    "ch05/11_agentic_rag/.env.example",
+    "ch05/11_agentic_rag/README.md",
+    "ch05/12_deployment/README.md",
+    "setup/README.md"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "63ce79ad-fdf8-4243-af1a-9b3bb62c32e5",
+  "token_usage": {
+    "input_tokens": 934,
+    "cache_creation_tokens": 135060,
+    "cache_read_tokens": 3909581,
+    "output_tokens": 14427,
+    "api_call_count": 57
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-02T10:03:11.816843Z",
+    "agent_lines": 0,
+    "human_added": 358,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 358,
+    "agent_percentage": 0
+  }
+}

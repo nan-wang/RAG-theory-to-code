@@ -1,0 +1,46 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "3b7ed149d6e3",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "README.md",
+    "ch05/03_langchain_core_and_langgraph/.env.example",
+    "ch05/03_langchain_core_and_langgraph/README.md",
+    "ch05/04_evaluation/.env.example",
+    "ch05/04_evaluation/README.md",
+    "ch05/05_chunking/.env.example",
+    "ch05/05_chunking/README.md",
+    "ch05/06_embeddings/.env.example",
+    "ch05/06_embeddings/README.md",
+    "ch05/07_hybrid_indexing/.env.example",
+    "ch05/07_hybrid_indexing/README.md",
+    "ch05/08_reranking/.env.example",
+    "ch05/08_reranking/README.md",
+    "ch05/09_generative_optimization/.env.example",
+    "ch05/09_generative_optimization/README.md",
+    "ch05/10_query_preprocessing/.env.example",
+    "ch05/10_query_preprocessing/README.md",
+    "ch05/11_agentic_rag/.env.example",
+    "ch05/11_agentic_rag/README.md",
+    "ch05/12_deployment/README.md",
+    "setup/README.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/3b/7ed149d6e3/0/metadata.json",
+      "transcript": "/3b/7ed149d6e3/0/full.jsonl",
+      "context": "/3b/7ed149d6e3/0/context.md",
+      "content_hash": "/3b/7ed149d6e3/0/content_hash.txt",
+      "prompt": "/3b/7ed149d6e3/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 934,
+    "cache_creation_tokens": 135060,
+    "cache_read_tokens": 3909581,
+    "output_tokens": 14427,
+    "api_call_count": 57
+  }
+}
