@@ -75,7 +75,7 @@ prompt_template = ChatPromptTemplate.from_messages(
     ]
 )
 
-llm = ChatOpenAI(model="moonshotai/Kimi-K2-Thinking").with_structured_output(QAPair)
+llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(QAPair)
 
 
 async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: str, max_concurrency: int=8):

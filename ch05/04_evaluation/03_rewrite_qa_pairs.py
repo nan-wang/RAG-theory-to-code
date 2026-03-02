@@ -41,7 +41,7 @@ class State(TypedDict):
     context: str
 
 
-llm = ChatOpenAI(model="moonshotai/Kimi-K2-Thinking").with_structured_output(QAPair)
+llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(QAPair)
 
 
 def generate(state: State):

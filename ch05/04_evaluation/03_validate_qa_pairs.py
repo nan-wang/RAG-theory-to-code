@@ -32,7 +32,7 @@ class QAFeedback(BaseModel):
     verdict: int = Field(..., description="Score for the question.")
 
 
-llm = ChatOpenAI(model="moonshotai/Kimi-K2-Thinking").with_structured_output(QAFeedback)
+llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(QAFeedback)
 
 
 class State(TypedDict):
@@ -97,7 +97,7 @@ async def main(input_path: str, output_path: str, max_concurrency: int = 8):
 
 
 if __name__ == '__main__':
-    # python 03_validate_qa_pairs.py --input_path data_eval/v20250501/qa_pairs.json --output_path data_eval/v20250501/qa_pairs.validate.json
+    # python 03_validate_qa_pairs.py --input_path data_eval/demo/qa_pairs.raw.json --output_path data_eval/demo/qa_pairs.validated.json
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_path", type=str, required=True)
     parser.add_argument("--output_path", type=str, required=True)

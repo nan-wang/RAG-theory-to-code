@@ -55,7 +55,7 @@ def main(num_docs, output_path, ground_truth, response, input_fn):
         ]
     )
 
-    llm = ChatOpenAI(model="moonshotai/Kimi-K2-Thinking").with_structured_output(KeyPoints)
+    llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(KeyPoints)
 
     chain = (prompt | llm)
 
