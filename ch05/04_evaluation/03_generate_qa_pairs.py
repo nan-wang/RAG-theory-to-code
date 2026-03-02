@@ -13,7 +13,7 @@ from langgraph.graph import StateGraph, START, END
 from pydantic import BaseModel, Field
 from typing_extensions import TypedDict
 
-from synthetic_data_prompt import SYSTEM_PROMPT, USER_PROMPT
+from prompts.synthetic_data_prompt import SYSTEM_PROMPT, USER_PROMPT
 from loguru import logger
 
 dotenv.load_dotenv()

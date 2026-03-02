@@ -12,7 +12,7 @@ from loguru import logger
 from pydantic import BaseModel, Field
 from typing_extensions import TypedDict
 
-from rewrite_question_prompt import SYSTEM_PROMPT, USER_PROMPT
+from prompts.rewrite_question_prompt import SYSTEM_PROMPT, USER_PROMPT
 
 dotenv.load_dotenv(".oai.env")
 

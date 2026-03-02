@@ -12,7 +12,7 @@ from langgraph.graph import START, END, StateGraph
 from typing_extensions import TypedDict
 from pydantic import BaseModel, Field
 
-from validate_question_answer_prompt import SYSTEM_PROMPT, USER_PROMPT
+from prompts.validate_question_answer_prompt import SYSTEM_PROMPT, USER_PROMPT
 
 dotenv.load_dotenv(".oai.env")
 

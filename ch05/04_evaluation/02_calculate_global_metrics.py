@@ -9,7 +9,7 @@ from datamodels import KeyPoint
 
 from langchain_openai.chat_models import ChatOpenAI
 from langchain_core.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate, ChatPromptTemplate
-from keypoints_verify_prompt import SYSTEM_PROMPT, USER_PROMPT
+from prompts.keypoints_verify_prompt import SYSTEM_PROMPT, USER_PROMPT
 from langchain_core.output_parsers import StrOutputParser
 
 

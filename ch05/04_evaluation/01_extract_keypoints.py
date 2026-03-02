@@ -4,7 +4,7 @@ import tqdm
 import json
 from loguru import logger
 
-from keypoints_extract_prompt import SYSTEM_PROMPT, USER_PROMPT
+from prompts.keypoints_extract_prompt import SYSTEM_PROMPT, USER_PROMPT
 from langchain_core.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate, ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from pathlib import Path
