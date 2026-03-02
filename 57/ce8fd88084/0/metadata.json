@@ -1,0 +1,38 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "57ce8fd88084",
+  "session_id": "4e2fa5b8-755f-4ef0-b37b-0232edff554c",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-02T09:15:23.023799Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/04_evaluation/answer_keypoints_verify_prompt.py",
+    "ch05/04_evaluation/groundtruth_keypoints_verify_prompt.py",
+    "ch05/04_evaluation/keypoints_extract_prompt.py",
+    "ch05/04_evaluation/rewrite_question_prompt.py",
+    "ch05/04_evaluation/synthetic_data_prompt.lite.py",
+    "ch05/04_evaluation/synthetic_data_prompt.py",
+    "ch05/04_evaluation/validate_question_answer_prompt.py"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "18547334-e95e-49e5-a3cc-82d3e84a6544",
+  "checkpoint_transcript_start": 486,
+  "transcript_lines_at_start": 486,
+  "token_usage": {
+    "input_tokens": 5,
+    "cache_creation_tokens": 3696,
+    "cache_read_tokens": 306541,
+    "output_tokens": 231,
+    "api_call_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-02T09:15:22.95833Z",
+    "agent_lines": 0,
+    "human_added": 605,
+    "human_modified": 383,
+    "human_removed": 0,
+    "total_committed": 605,
+    "agent_percentage": 0
+  }
+}

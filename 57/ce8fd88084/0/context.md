@@ -1,0 +1,56 @@
+# Session Context
+
+## User Prompts
+
+### Prompt 1
+
+this is a repo for offering the supplement sample codes in a book. Please give some suggestions for improving the usability and readability. The target audients are junior students in the colledge with little AI backgrounds.
+
+### Prompt 2
+
+Improve the @README.md with the following requirements.
+
+- Add an Overview section with the title ``简介`` and add a short introduction in Chinese.
+- Add a Setup section with the title ``环境配置`` and add a short description in Chinese and a link to @setup/README.md. Create the folder and the file @setup/README.md. 
+- Add an Outline section with the title ``内容提纲`` and add a table with three columns, ``标题``, ``描述``, ``文件夹``. Each row corresponds to the subfolders unde...
+
+### Prompt 3
+
+good. add the new files and commit.
+
+### Prompt 4
+
+in the outline table in @README.md, remove the prefix `ch05/` from all the rows under the column ``文件夹`` and keep the links untouched.
+
+### Prompt 5
+
+good. add and co
+
+### Prompt 6
+
+i've updated the outline table according to the book. Please make a git commit.
+
+### Prompt 7
+
+For each subfolder under a @ch05 except @ch05/data, add a README.md. Each README.md includes three parts.
+- An introduction section with the name of ``简介``. 
+- An outline section with the name of ``内容提纲``. add a table with three columns, ``标题``, ``描述``, ``文件夹``. Each row corresponds to the subfolders under @ch05. Add links to each subfolder in the ``文件夹`` column.
+
+### Prompt 8
+
+[Request interrupted by user for tool use]
+
+### Prompt 9
+
+For each subfolder under a @ch05 except @ch05/data, add a README.md. Each README.md includes three parts.
+- An introduction section with the name of ``简介``. 
+- An outline section with the name of ``内容提纲``. add a table with three columns, ``标题``, ``描述``, ``文件``. Each row corresponds to the files under this folder. Add links to each file in the ``文件`` column.
+
+### Prompt 10
+
+i have updated @ch05/03_langchain_core_and_langgraph/README.md. please add and commit.
+
+### Prompt 11
+
+i have updated @ch05/04_evaluation/README.md. please add and commit.
+
