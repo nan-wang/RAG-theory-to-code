@@ -46,10 +46,10 @@ def warn(msg):
 
 print("\n1. 检查 Python 版本")
 v = sys.version_info
-if (v.major, v.minor) >= (3, 10):
+if (v.major, v.minor) >= (3, 10) and (v.minor < 11):
     ok(f"Python {v.major}.{v.minor}.{v.micro}")
 else:
-    fail(f"Python {v.major}.{v.minor}.{v.micro}（需要 3.10+）")
+    fail(f"Python {v.major}.{v.minor}.{v.micro}（需要 >= 3.10, < 3.11）")
 
 
 # ── 2. 核心依赖包 ──────────────────────────────────────────────────

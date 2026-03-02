@@ -2,7 +2,7 @@
 
 ## Python 版本
 
-本项目需要 Python 3.10 或更高版本。
+本项目需要 Python 3.10。注意如果使用pkuseg，请避免使用Python 3.12。
 
 ## 安装依赖
 
@@ -16,7 +16,8 @@ source .venv/bin/activate
 # Windows
 .venv\Scripts\activate
 
-# 安装依赖
+# 安装依赖（pkuseg 构建时依赖 numpy，需先安装）
+pip install 'numpy<1.27'
 pip install -r requirements.txt
 ```
 
@@ -60,8 +61,8 @@ python setup/test_setup.py
 
 1. Python 版本是否满足要求（3.10+）
 2. 核心依赖包是否已安装
-3. 环境变量是否已配置
-4. LLM API 是否可正常调用
-5. 示例数据文件是否存在
+3. 示例数据文件是否存在
+
+各章节的环境变量配置请在对应文件夹中运行 `python test_env_setup.py` 进行检查。
 
 所有检查项通过后即可开始运行示例代码。
