@@ -7,7 +7,7 @@
 
 # --- Usage Function ---
 usage() {
-    echo "Usage: $0 --index-dir <path> --collection-name <name> --output-dir <path> --num-generate <int> --num-metric <int>"
+    echo "Usage: $0 --index-dir <path> --collection-name <name> --output-dir <path> --num-generate <int>"
     echo ""
     echo "Options:"
     echo "  --index-dir <path>      : Directory containing the document index (e.g., ./data_chroma_multi)"
