@@ -8,6 +8,6 @@
 
 | 标题 | 描述 | 文件 |
 | --- | --- | --- |
-| 按章节分块 | 基于中文 Wiki 文档的章节标记（`==`）进行结构化分块，并结合 RecursiveCharacterTextSplitter 进行二次切分 | [chunking_zh_section.py](chunking_zh_section.py) |
-| 添加元信息分块 | 在分块内容中添加文章标题、章节标题等元信息，补充背景语义 | [chunking_add_meta_info.py](chunking_add_meta_info.py) |
+| 5.5.1 语义截断与语义溢出| 基于中文 Wiki 文档的章节标记（`==`）进行结构化分块，并结合 RecursiveCharacterTextSplitter 进行二次切分 | [chunking_zh_section.py](chunking_zh_section.py) |
+| 5.5.2 背景语义缺失 | 在分块内容中添加文章标题、章节标题等元信息，补充背景语义 | [chunking_add_meta_info.py](chunking_add_meta_info.py) |
 | 工具函数 | 文档加载、章节解析、分块等通用工具函数 | [utils.py](utils.py) |
