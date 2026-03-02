@@ -2,7 +2,13 @@
 
 ## Python 版本
 
-本项目需要 Python 3.10。注意如果使用pkuseg，请避免使用Python 3.12。
+本项目需要 Python 3.10。注意如果使用pkuseg，请避免使用Python>=3.11。
+
+```bash
+# 检查Python版本
+python --version
+# Python 3.10.13
+```
 
 ## 安装依赖
 
