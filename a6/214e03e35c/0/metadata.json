@@ -1,0 +1,39 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "a6214e03e35c",
+  "session_id": "4e2fa5b8-755f-4ef0-b37b-0232edff554c",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-02T08:53:20.399065Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/03_langchain_core_and_langgraph/05_messages_placeholder.py",
+    "ch05/03_langchain_core_and_langgraph/06_add_conditional_edges.py",
+    "ch05/03_langchain_core_and_langgraph/06_graph_state_node.py",
+    "ch05/03_langchain_core_and_langgraph/06_send_for_adding_nodes_dynamically.py",
+    "ch05/03_langchain_core_and_langgraph/06_state_add.py",
+    "ch05/03_langchain_core_and_langgraph/06_state_add_messages.py",
+    "ch05/03_langchain_core_and_langgraph/10_naive_rag/01_index.py",
+    "ch05/03_langchain_core_and_langgraph/10_naive_rag/01_query.py"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "6ef2ff75-3329-411b-8453-f861a2172fac",
+  "checkpoint_transcript_start": 476,
+  "transcript_lines_at_start": 476,
+  "token_usage": {
+    "input_tokens": 5,
+    "cache_creation_tokens": 4773,
+    "cache_read_tokens": 293872,
+    "output_tokens": 134,
+    "api_call_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-02T08:53:20.335944Z",
+    "agent_lines": 0,
+    "human_added": 591,
+    "human_modified": 339,
+    "human_removed": 0,
+    "total_committed": 591,
+    "agent_percentage": 0
+  }
+}

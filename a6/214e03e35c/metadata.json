@@ -1,0 +1,33 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "a6214e03e35c",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/03_langchain_core_and_langgraph/05_messages_placeholder.py",
+    "ch05/03_langchain_core_and_langgraph/06_add_conditional_edges.py",
+    "ch05/03_langchain_core_and_langgraph/06_graph_state_node.py",
+    "ch05/03_langchain_core_and_langgraph/06_send_for_adding_nodes_dynamically.py",
+    "ch05/03_langchain_core_and_langgraph/06_state_add.py",
+    "ch05/03_langchain_core_and_langgraph/06_state_add_messages.py",
+    "ch05/03_langchain_core_and_langgraph/10_naive_rag/01_index.py",
+    "ch05/03_langchain_core_and_langgraph/10_naive_rag/01_query.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/a6/214e03e35c/0/metadata.json",
+      "transcript": "/a6/214e03e35c/0/full.jsonl",
+      "context": "/a6/214e03e35c/0/context.md",
+      "content_hash": "/a6/214e03e35c/0/content_hash.txt",
+      "prompt": "/a6/214e03e35c/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 5,
+    "cache_creation_tokens": 4773,
+    "cache_read_tokens": 293872,
+    "output_tokens": 134,
+    "api_call_count": 3
+  }
+}
