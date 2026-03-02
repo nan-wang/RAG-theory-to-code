@@ -1,12 +1,12 @@
 {
   "cli_version": "0.4.2",
   "checkpoint_id": "9f6164a1e5ac",
+  "session_id": "865557b5-b84d-47b7-b6a3-d8f50bb01db3",
   "strategy": "manual-commit",
+  "created_at": "2026-03-02T13:50:14.274513Z",
   "branch": "main",
   "checkpoints_count": 1,
   "files_touched": [
-    "CLAUDE.md",
-    "ch05/03_langchain_core_and_langgraph/.env.example",
     "ch05/03_langchain_core_and_langgraph/02_runnable_batch.py",
     "ch05/03_langchain_core_and_langgraph/02_runnable_batch_async.py",
     "ch05/03_langchain_core_and_langgraph/02_runnable_invoke.py",
@@ -25,42 +25,25 @@
     "ch05/03_langchain_core_and_langgraph/07_state_add.py",
     "ch05/03_langchain_core_and_langgraph/07_state_add_messages.py",
     "ch05/03_langchain_core_and_langgraph/08_checkpoint_memory_saver.py",
-    "ch05/03_langchain_core_and_langgraph/09_naive_rag/.env.example",
     "ch05/03_langchain_core_and_langgraph/09_naive_rag/01_index.py",
     "ch05/03_langchain_core_and_langgraph/09_naive_rag/01_query.py",
-    "ch05/03_langchain_core_and_langgraph/09_naive_rag/README.md",
-    "ch05/04_evaluation/.env.example",
-    "ch05/05_chunking/.env.example",
-    "ch05/06_embeddings/.env.example",
-    "ch05/07_hybrid_indexing/.env.example",
-    "ch05/08_reranking/.env.example",
-    "ch05/09_generative_optimization/.env.example",
-    "ch05/10_query_preprocessing/.env.example",
-    "ch05/11_agentic_rag/src/.env.example",
-    "ch05/12_deployment/.env.example",
-    "setup/README.md"
+    "ch05/03_langchain_core_and_langgraph/09_naive_rag/README.md"
   ],
-  "sessions": [
-    {
-      "metadata": "/9f/6164a1e5ac/0/metadata.json",
-      "transcript": "/9f/6164a1e5ac/0/full.jsonl",
-      "context": "/9f/6164a1e5ac/0/context.md",
-      "content_hash": "/9f/6164a1e5ac/0/content_hash.txt",
-      "prompt": "/9f/6164a1e5ac/0/prompt.txt"
-    },
-    {
-      "metadata": "/9f/6164a1e5ac/1/metadata.json",
-      "transcript": "/9f/6164a1e5ac/1/full.jsonl",
-      "context": "/9f/6164a1e5ac/1/context.md",
-      "content_hash": "/9f/6164a1e5ac/1/content_hash.txt",
-      "prompt": "/9f/6164a1e5ac/1/prompt.txt"
-    }
-  ],
+  "agent": "Claude Code",
   "token_usage": {
-    "input_tokens": 26,
-    "cache_creation_tokens": 70625,
-    "cache_read_tokens": 881086,
-    "output_tokens": 17191,
-    "api_call_count": 18
+    "input_tokens": 18,
+    "cache_creation_tokens": 43526,
+    "cache_read_tokens": 622312,
+    "output_tokens": 13986,
+    "api_call_count": 14
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-02T13:50:14.250558Z",
+    "agent_lines": 594,
+    "human_added": 1,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 595,
+    "agent_percentage": 99.83193277310924
   }
 }

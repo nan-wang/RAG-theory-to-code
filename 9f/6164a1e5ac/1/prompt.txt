@@ -1,0 +1,95 @@
+Implement the following plan:
+
+# Plan: Add Chinese Docstrings and Comments to ch05/03_langchain_core_and_langgraph/
+
+## Context
+
+The Python scripts in `ch05/03_langchain_core_and_langgraph/` are example code for a Chinese-language RAG book. They currently have minimal or no docstrings/comments, making them hard for beginners to follow. This plan adds Chinese module docstrings, function/class docstrings, and inline code explanations to all 18 scripts, plus creates a README.md for `09_naive_rag/`.
+
+## Scope
+
+- **18 Python scripts** in the main directory (excluding `test_env_setup.py`)
+- **2 Python scripts** in `09_naive_rag/`
+- **1 new file**: `09_naive_rag/README.md`
+- **No code logic changes** — only add docstrings and comments
+
+## What to add per file
+
+For every `.py` file:
+1. **Module docstring** (top of file, before imports): what concept this script demonstrates, 3-5 lines in Chinese
+2. **Function/class docstrings**: Chinese description, Args, Returns/Yields
+3. **Inline comments**: explain key LangChain/LangGraph concepts for beginners
+
+## File-by-file plan
+
+### Group 1: Runnable interface (6 files)
+
+| File | Add |
+|------|-----|
+| `02_runnable_invoke.py` | Module docstring (invoke概念), `gen_regards` docstring, comment on RunnableGenerator |
+| `02_runnable_invoke_async.py` | Module docstring (ainvoke概念), `agen_regards` + `main` docstrings, async comments |
+| `02_runnable_batch.py` | Module docstring (batch概念), `gen_regards` docstring, comment on batch input |
+| `02_runnable_batch_async.py` | Module docstring (abatch概念), `agen_regards` + `main` docstrings |
+| `02_runnable_stream.py` | Module docstring (stream概念), `gen_regards` docstring, comment on stream iteration |
+| `02_runnable_stream_async.py` | Module docstring (astream概念), `agen_regards` + `main` docstrings |
+
+### Group 2: ChatModel (3 files)
+
+| File | Add |
+|------|-----|
+| `03_chatmodel.py` | Module docstring (ChatModel基础), comments on ChatOpenAI and base_url |
+| `03_chatmodel_siliconflow.py` | Module docstring (响应结构), comments on dotenv and to_json() |
+| `03_chatmodel_with_ratelimiter.py` | Module docstring (速率限制), comments on token bucket algorithm |
+
+### Group 3: Prompts & Documents (3 files)
+
+| File | Add |
+|------|-----|
+| `04_messages_placeholder.py` | Module docstring (MessagesPlaceholder), comments on template structure and message types |
+| `05_prompt_template.py` | Module docstring (PromptTemplate), comments on variable substitution |
+| `06_document_embedding_vectorstore.py` | Module docstring (Document/Embedding/VectorStore三大组件), comments on each component |
+
+### Group 4: LangGraph StateGraph (6 files)
+
+| File | Add |
+|------|-----|
+| `07_graph_state_node.py` | Module docstring (State/Node/Edge基础), `State` class docstring, `node_1`/`node_2` docstrings, graph building comments |
+| `07_state_add.py` | Module docstring (Annotated归约器), `State` class docstring (explain `Annotated[list, add]`), node docstrings |
+| `07_state_add_messages.py` | Module docstring (add_messages), `State` class docstring, node docstrings, message type comments |
+| `07_add_conditional_edges.py` | Module docstring (条件边), `State`/node/`routing_function` docstrings |
+| `07_send_for_adding_nodes_dynamically.py` | Module docstring (Send动态并行), `OverallState` docstring, `continue_to_jokes` docstring, replace English comment with Chinese |
+| `08_checkpoint_memory_saver.py` | Module docstring (检查点机制), `State` docstring, node docstrings, comments on MemorySaver/thread_id/get_state_history |
+
+### Group 5: Naive RAG (2 files + 1 new README)
+
+| File | Add |
+|------|-----|
+| `09_naive_rag/01_index.py` | Module docstring (索引构建流程), `load_documents` + `get_chunks` docstrings, comments on chunking params and Chroma.from_documents |
+| `09_naive_rag/01_query.py` | Module docstring (检索问答流程), `State` class docstring, `retrieve` + `generate` docstrings, comments on retriever/prompt/StateGraph |
+| `09_naive_rag/README.md` | **New file**: RAG概念介绍, 前置条件, 环境变量表格, 运行步骤, 预期输出, 核心概念说明, 常见问题 |
+
+## Chinese terminology glossary (for consistency)
+
+- Runnable = Runnable（可运行对象）
+- invoke/ainvoke = 同步/异步调用
+- stream/astream = 同步/异步流式输出
+- batch/abatch = 同步/异步批量调用
+- State = 状态, Node = 节点, Edge = 边
+- Conditional Edge = 条件边
+- Checkpoint = 检查点
+- Reducer = 归约器
+- Document = 文档, Embedding = 嵌入, VectorStore = 向量存储
+
+## Verification
+
+After implementation:
+1. Run `python -c "import py_compile; py_compile.compile('filename.py')"` on each modified file to verify no syntax errors
+2. Spot-check that existing code logic is unchanged (no functional modifications)
+3. Verify `09_naive_rag/README.md` renders correctly
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+good. make a git add and commit.
