@@ -17,15 +17,14 @@
 | 5.3.3 ChatModel 基本使用 | 调用 OpenAI 和硅基流动的大语言模型 | [03_chatmodel.py](03_chatmodel.py) |
 | ChatModel 详细输出 | 通过硅基流动调用 DeepSeek-R1 并查看完整的响应结构 | [03_chatmodel_siliconflow.py](03_chatmodel_siliconflow.py) |
 | 5.3.3 ChatModel 速率限制 | 使用 InMemoryRateLimiter 控制模型调用频率 | [03_chatmodel_with_ratelimiter.py](03_chatmodel_with_ratelimiter.py) |
-| 5.3.3 输出解析器 | 使用 JsonOutputParser 将模型输出解析为结构化 JSON | [03_output_parser.py](03_output_parser.py) |
 | 5.3.4 消息占位符 | 使用 MessagesPlaceholder 在提示中插入多轮对话消息 | [04_messages_placeholder.py](04_messages_placeholder.py) |
 | 5.3.5 提示词模板 | 使用 PromptTemplate 构建动态提示 | [05_prompt_template.py](05_prompt_template.py) |
+| 5.3.6 Document 与向量存储 | 使用 Document、Embedding 和 InMemoryVectorStore 进行相似度搜索 | [06_document_embedding_vectorstore.py](06_document_embedding_vectorstore.py) |
 | 5.3.7 StateGraph 基础 | 定义状态和节点，构建简单的 LangGraph 状态图 | [07_graph_state_node.py](07_graph_state_node.py) |
 | 5.3.7 更新State状态 | 使用 Annotated 和 add 操作符实现状态的累加更新 | [07_state_add.py](07_state_add.py) |
 | 5.3.7 更新Message状态 | 使用 add_messages 管理对话消息列表 | [07_state_add_messages.py](07_state_add_messages.py) |
 | 5.3.7 条件边 | 使用 `add_conditional_edges` 根据状态动态路由到不同节点 | [07_add_conditional_edges.py](07_add_conditional_edges.py) |
 | 5.3.7 动态节点 | 使用 Send 动态创建并行节点 | [07_send_for_adding_nodes_dynamically.py](07_send_for_adding_nodes_dynamically.py) |
-| Document 与向量存储 | 使用 Document、Embedding 和 InMemoryVectorStore 进行相似度搜索 | [06_document_embedding_vectorstore.py](06_document_embedding_vectorstore.py) |
 | 5.3.8 检查点 | 使用 MemorySaver 保存和查看图的执行历史 | [08_checkpoint_memory_saver.py](08_checkpoint_memory_saver.py) |
 | 5.3.9 朴素RAG系统 - 索引构建 | 加载文档、分块并构建 Chroma 向量索引 | [09_naive_rag/01_index.py](09_naive_rag/01_index.py) |
 | 5.3.9 朴素RAG系统 - 检索问答 | 基于 LangGraph 实现完整的检索-生成 RAG 流程 | [09_naive_rag/01_query.py](09_naive_rag/01_query.py) |
