@@ -8,24 +8,24 @@
 
 | 标题 | 描述 | 文件 |
 | --- | --- | --- |
-| Runnable invoke | 使用 RunnableGenerator 的 invoke 方法进行同步调用 | [02_runnable_invoke.py](02_runnable_invoke.py) |
-| Runnable batch | 使用 RunnableGenerator 的 batch 方法进行批量调用 | [02_runnable_batch.py](02_runnable_batch.py) |
-| Runnable stream | 使用 RunnableGenerator 的 stream 方法进行流式输出 | [02_runnable_stream.py](02_runnable_stream.py) |
-| Runnable invoke（异步） | 使用 ainvoke 方法进行异步调用 | [02_runnable_invoke_async.py](02_runnable_invoke_async.py) |
-| Runnable batch（异步） | 使用 abatch 方法进行异步批量调用 | [02_runnable_batch_async.py](02_runnable_batch_async.py) |
-| Runnable stream（异步） | 使用 astream 方法进行异步流式输出 | [02_runnable_stream_async.py](02_runnable_stream_async.py) |
-| ChatModel 基本使用 | 调用 OpenAI 和硅基流动的大语言模型 | [03_chatmodel.py](03_chatmodel.py) |
+| 5.3.2 Runnable类的invoke方法 | 使用 RunnableGenerator 的 invoke 方法进行同步调用 | [02_runnable_invoke.py](02_runnable_invoke.py) |
+| 5.3.2 Runnable类的batch方法 | 使用 RunnableGenerator 的 batch 方法进行批量调用 | [02_runnable_batch.py](02_runnable_batch.py) |
+| 5.3.2 Runnable类的stream方法 | 使用 RunnableGenerator 的 stream 方法进行流式输出 | [02_runnable_stream.py](02_runnable_stream.py) |
+| 5.3.2 Runnable类的ainvoke异步方法 | 使用 ainvoke 方法进行异步调用 | [02_runnable_invoke_async.py](02_runnable_invoke_async.py) |
+| 5.3.2 Runnable类的abatch异步方法 | 使用 abatch 方法进行异步批量调用 | [02_runnable_batch_async.py](02_runnable_batch_async.py) |
+| 5.3.2 Runnable类的astream异步方法 | 使用 astream 方法进行异步流式输出 | [02_runnable_stream_async.py](02_runnable_stream_async.py) |
+| 5.3.3 ChatModel 基本使用 | 调用 OpenAI 和硅基流动的大语言模型 | [03_chatmodel.py](03_chatmodel.py) |
 | ChatModel 详细输出 | 通过硅基流动调用 DeepSeek-R1 并查看完整的响应结构 | [03_chatmodel_siliconflow.py](03_chatmodel_siliconflow.py) |
-| ChatModel 速率限制 | 使用 InMemoryRateLimiter 控制模型调用频率 | [03_chatmodel_with_ratelimiter.py](03_chatmodel_with_ratelimiter.py) |
-| 输出解析器 | 使用 JsonOutputParser 将模型输出解析为结构化 JSON | [03_output_parser.py](03_output_parser.py) |
-| 提示模板 | 使用 PromptTemplate 构建动态提示 | [05_prompt_template.py](05_prompt_template.py) |
-| 消息占位符 | 使用 MessagesPlaceholder 在提示中插入多轮对话消息 | [05_messages_placeholder.py](05_messages_placeholder.py) |
-| StateGraph 基础 | 定义状态和节点，构建简单的 LangGraph 状态图 | [06_graph_state_node.py](06_graph_state_node.py) |
-| 状态累加器 | 使用 Annotated 和 add 操作符实现状态的累加更新 | [06_state_add.py](06_state_add.py) |
-| 消息状态管理 | 使用 add_messages 管理对话消息列表 | [06_state_add_messages.py](06_state_add_messages.py) |
-| 条件边 | 使用 add_conditional_edges 根据状态动态路由到不同节点 | [06_add_conditional_edges.py](06_add_conditional_edges.py) |
-| 动态节点 | 使用 Send 动态创建并行节点 | [06_send_for_adding_nodes_dynamically.py](06_send_for_adding_nodes_dynamically.py) |
+| 5.3.3 ChatModel 速率限制 | 使用 InMemoryRateLimiter 控制模型调用频率 | [03_chatmodel_with_ratelimiter.py](03_chatmodel_with_ratelimiter.py) |
+| 5.3.3 输出解析器 | 使用 JsonOutputParser 将模型输出解析为结构化 JSON | [03_output_parser.py](03_output_parser.py) |
+| 5.3.4 消息占位符 | 使用 MessagesPlaceholder 在提示中插入多轮对话消息 | [04_messages_placeholder.py](04_messages_placeholder.py) |
+| 5.3.5 提示词模板 | 使用 PromptTemplate 构建动态提示 | [05_prompt_template.py](05_prompt_template.py) |
+| 5.3.7 StateGraph 基础 | 定义状态和节点，构建简单的 LangGraph 状态图 | [07_graph_state_node.py](07_graph_state_node.py) |
+| 5.3.7 更新State状态 | 使用 Annotated 和 add 操作符实现状态的累加更新 | [07_state_add.py](07_state_add.py) |
+| 5.3.7 更新Message状态 | 使用 add_messages 管理对话消息列表 | [07_state_add_messages.py](07_state_add_messages.py) |
+| 5.3.7 条件边 | 使用 `add_conditional_edges` 根据状态动态路由到不同节点 | [07_add_conditional_edges.py](07_add_conditional_edges.py) |
+| 5.3.7 动态节点 | 使用 Send 动态创建并行节点 | [07_send_for_adding_nodes_dynamically.py](07_send_for_adding_nodes_dynamically.py) |
 | Document 与向量存储 | 使用 Document、Embedding 和 InMemoryVectorStore 进行相似度搜索 | [06_document_embedding_vectorstore.py](06_document_embedding_vectorstore.py) |
-| 检查点 | 使用 MemorySaver 保存和查看图的执行历史 | [08_checkpoint_memory_saver.py](08_checkpoint_memory_saver.py) |
-| Naive RAG - 索引构建 | 加载文档、分块并构建 Chroma 向量索引 | [10_naive_rag/01_index.py](10_naive_rag/01_index.py) |
-| Naive RAG - 检索问答 | 基于 LangGraph 实现完整的检索-生成 RAG 流程 | [10_naive_rag/01_query.py](10_naive_rag/01_query.py) |
+| 5.3.8 检查点 | 使用 MemorySaver 保存和查看图的执行历史 | [08_checkpoint_memory_saver.py](08_checkpoint_memory_saver.py) |
+| 5.3.9 朴素RAG系统 - 索引构建 | 加载文档、分块并构建 Chroma 向量索引 | [09_naive_rag/01_index.py](09_naive_rag/01_index.py) |
+| 5.3.9 朴素RAG系统 - 检索问答 | 基于 LangGraph 实现完整的检索-生成 RAG 流程 | [09_naive_rag/01_query.py](09_naive_rag/01_query.py) |
