@@ -4,6 +4,13 @@
 
 本章介绍不同嵌入模型的使用与微调方法。内容涵盖 Jina Embeddings、BGE、本地 HuggingFace 模型等多种嵌入方案的接入，以及如何通过生成训练数据和 SentenceTransformer 框架对嵌入模型进行领域微调，以提升检索效果。
 
+## 环境配置检查
+
+```bash
+cd ch05/06_embeddings
+python test_env_setup.py
+```
+
 ## 内容提纲
 
 | 标题 | 描述 | 文件 |

@@ -4,6 +4,13 @@
 
 本章演示如何将 RAG 系统部署到生产环境。采用前后端分离架构：后端使用 FastAPI 提供 RESTful API，前端使用 Streamlit 构建交互式聊天界面。RAG 流水线基于腾讯云向量数据库实现混合检索（向量 + BM25）和 Jina Reranker 重排序。支持 Docker 容器化一键部署。
 
+## 环境配置检查
+
+```bash
+cd ch05/12_deployment
+python test_env_setup.py
+```
+
 ## 内容提纲
 
 | 标题 | 描述 | 文件 |

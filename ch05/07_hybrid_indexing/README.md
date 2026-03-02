@@ -4,6 +4,13 @@
 
 本章实现向量相似度检索与 BM25 关键词检索的混合检索策略。使用 pkuseg 进行中文分词以构建 BM25 检索器，结合 Jina Embeddings 向量检索器，通过 EnsembleRetriever 融合两种检索结果，并使用 Jina Reranker 进行重排序，从而提升检索质量。
 
+## 环境配置检查
+
+```bash
+cd ch05/07_hybrid_indexing
+python test_env_setup.py
+```
+
 ## 内容提纲
 
 | 标题 | 描述 | 文件 |

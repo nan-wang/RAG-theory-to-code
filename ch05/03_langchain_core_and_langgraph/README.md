@@ -4,6 +4,13 @@
 
 本章介绍 LangChain 框架的核心概念和 LangGraph 的状态图编程模型。内容涵盖 Runnable 接口的同步与异步调用方式、ChatModel 的使用、提示模板与输出解析器，以及 LangGraph 中状态图（StateGraph）的构建方法。最后通过一个完整的 Naive RAG 示例，演示如何将这些组件组合起来构建一个基础的检索增强生成系统。
 
+## 环境配置检查
+
+```bash
+cd ch05/03_langchain_core_and_langgraph
+python test_env_setup.py
+```
+
 ## 内容提纲
 
 | 标题 | 描述 | 文件 |

@@ -7,9 +7,7 @@
 检查内容：
   1. Python 版本（需要 3.10+）
   2. 核心依赖包是否已安装
-  3. 环境变量是否已配置
-  4. LLM API 是否可用
-  5. 示例数据是否存在
+  3. 示例数据是否存在
 """
 
 import sys
@@ -99,89 +97,11 @@ for import_name, pip_name, desc in OPTIONAL_PACKAGES:
         warn(f"{pip_name} 未安装（{desc}，按需安装：pip install {pip_name}）")
 
 
-# ── 3. 环境变量 ────────────────────────────────────────────────────
+# ── 3. 示例数据 ────────────────────────────────────────────────────
 
-print("\n3. 检查环境变量")
+print("\n3. 检查示例数据")
 
-import os
 from pathlib import Path
-
-# 尝试加载 .env 文件
-env_locations = [
-    Path(__file__).resolve().parent.parent / ".env",
-    Path.cwd() / ".env",
-]
-
-env_loaded = False
-try:
-    import dotenv
-    for env_path in env_locations:
-        if env_path.exists():
-            dotenv.load_dotenv(env_path)
-            ok(f"已加载 .env 文件：{env_path}")
-            env_loaded = True
-            break
-    if not env_loaded:
-        warn("未找到 .env 文件（请参考 setup/README.md 创建）")
-except ImportError:
-    warn("python-dotenv 未安装，跳过 .env 文件加载")
-
-REQUIRED_VARS = [
-    ("OPENAI_API_KEY", "LLM API 密钥"),
-    ("OPENAI_BASE_URL", "LLM API 地址"),
-]
-
-OPTIONAL_VARS = [
-    ("JINA_API_KEY", "Jina AI（嵌入模型和重排序）"),
-    ("TAVILY_API_KEY", "Tavily（智能体 RAG 网络搜索）"),
-]
-
-for var, desc in REQUIRED_VARS:
-    val = os.getenv(var)
-    if val:
-        # 只显示前几个字符
-        masked = val[:8] + "***"
-        ok(f"{var}={masked}（{desc}）")
-    else:
-        fail(f"{var} 未设置（{desc}）")
-
-for var, desc in OPTIONAL_VARS:
-    val = os.getenv(var)
-    if val:
-        masked = val[:8] + "***"
-        ok(f"{var}={masked}（{desc}）")
-    else:
-        warn(f"{var} 未设置（{desc}，按需配置）")
-
-
-# ── 4. LLM API 连通性 ──────────────────────────────────────────────
-
-print("\n4. 检查 LLM API 连通性")
-
-api_key = os.getenv("OPENAI_API_KEY")
-base_url = os.getenv("OPENAI_BASE_URL")
-
-if api_key and base_url:
-    try:
-        from langchain_openai import ChatOpenAI
-
-        llm = ChatOpenAI(model="Qwen/Qwen2.5-7B-Instruct", max_tokens=16)
-        response = llm.invoke("你好")
-        if response.content:
-            ok(f"LLM API 调用成功：{response.content[:30]}...")
-        else:
-            fail("LLM API 返回空内容")
-    except ImportError:
-        warn("langchain-openai 未安装，跳过 API 检查")
-    except Exception as e:
-        fail(f"LLM API 调用失败：{e}")
-else:
-    warn("OPENAI_API_KEY 或 OPENAI_BASE_URL 未设置，跳过 API 检查")
-
-
-# ── 5. 示例数据 ────────────────────────────────────────────────────
-
-print("\n5. 检查示例数据")
 
 data_dir = Path(__file__).resolve().parent.parent / "ch05" / "data"
 if data_dir.exists():
@@ -202,8 +122,11 @@ print(f"  {GREEN}通过：{passed}{RESET}  "
       f"{YELLOW}警告：{warned}{RESET}")
 
 if failed == 0:
-    print(f"\n  {GREEN}环境配置检查通过！{RESET}\n")
+    print(f"\n  {GREEN}环境配置检查通过！{RESET}")
 else:
-    print(f"\n  {RED}请修复上述失败项后重新运行此脚本。{RESET}\n")
+    print(f"\n  {RED}请修复上述失败项后重新运行此脚本。{RESET}")
+
+print(f"\n  提示：各章节的环境变量配置请在对应文件夹中运行：")
+print(f"  python test_env_setup.py\n")
 
 sys.exit(1 if failed else 0)
