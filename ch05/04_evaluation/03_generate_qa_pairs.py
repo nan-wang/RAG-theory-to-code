@@ -75,7 +75,7 @@ prompt_template = ChatPromptTemplate.from_messages(
     ]
 )
 
-llm = ChatOpenAI(model="Qwen/Qwen3-8B").with_structured_output(QAPair)
+llm = ChatOpenAI(model="moonshotai/Kimi-K2-Thinking").with_structured_output(QAPair)
 
 
 async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: str, max_concurrency: int=8):
@@ -113,7 +113,7 @@ async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: 
     ]
 
     qa_pairs = []
-    logger.info(f"Total number of documents: {len(inputs)}")
+    logger.info(f"Total number of selected documents: {len(inputs)}")
 
     outputs = await graph.abatch(inputs, config=RunnableConfig(max_concurrency=max_concurrency))
     logger.info(f"Complete generation")
@@ -133,7 +133,7 @@ async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: 
         }
         qa_pairs.append(qa_doc)
 
-    output_path = f"{output_dir}/qa_pairs.json"
+    output_path = f"{output_dir}/qa_pairs.raw.json"
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w") as f:
         json.dump(qa_pairs, f, indent=4, ensure_ascii=False)
@@ -141,7 +141,7 @@ async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: 
 
 
 if __name__ == "__main__":
-    # python 03_generate_qa_pairs.py --index_dir ./data_chroma_multi  --collection_name test_db --output_dir data_eval/v20250501 --num_docs 64
+    # python 03_generate_qa_pairs.py --index_dir ../03_langchain_core_and_langgraph/09_naive_rag/data_chroma  --collection_name olympic_games --output_dir data_eval/demo --num_docs 8
     parser = argparse.ArgumentParser()
     parser.add_argument("--num_docs", type=int, help="Number of documents to generate.")
     parser.add_argument("--index_dir", type=str, help="Directory where the index is stored.")

@@ -11,6 +11,13 @@ cd ch05/04_evaluation
 python test_env_setup.py
 ```
 
+## 运行步骤
+
+### 生成评估数据
+```bash
+bash generate_synthetic_qa_pairs.sh --index-dir ../03_langchain_core_and_langgraph/09_naive_rag/data_chroma --collection-name olympic_games --output-dir data_eval/demo --num-generate 8
+```
+
 ## 内容提纲
 
 | 标题 | 描述 | 文件 |

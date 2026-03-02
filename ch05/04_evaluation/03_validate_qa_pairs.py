@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 
 from prompts.validate_question_answer_prompt import SYSTEM_PROMPT, USER_PROMPT
 
-dotenv.load_dotenv(".oai.env")
+dotenv.load_dotenv(".env")
 
 QUESTION_VALIDATE_SYS_TMPL = SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT)
 QUESTION_VALIDATE_USER_TMPL = HumanMessagePromptTemplate.from_template(USER_PROMPT)
@@ -32,7 +32,7 @@ class QAFeedback(BaseModel):
     verdict: int = Field(..., description="Score for the question.")
 
 
-llm = ChatOpenAI(model="gpt-4o-mini").with_structured_output(QAFeedback)
+llm = ChatOpenAI(model="moonshotai/Kimi-K2-Thinking").with_structured_output(QAFeedback)
 
 
 class State(TypedDict):

@@ -14,7 +14,7 @@ from typing_extensions import TypedDict
 
 from prompts.rewrite_question_prompt import SYSTEM_PROMPT, USER_PROMPT
 
-dotenv.load_dotenv(".oai.env")
+dotenv.load_dotenv()
 
 QUESTION_REWRITE_SYS_TMPL = SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT)
 QUESTION_REWRITE_USER_TMPL = HumanMessagePromptTemplate.from_template(USER_PROMPT)
@@ -41,7 +41,7 @@ class State(TypedDict):
     context: str
 
 
-llm = ChatOpenAI(model="gpt-4.1-mini").with_structured_output(QAPair)
+llm = ChatOpenAI(model="moonshotai/Kimi-K2-Thinking").with_structured_output(QAPair)
 
 
 def generate(state: State):
@@ -70,7 +70,7 @@ async def main(input_path: str, output_dir: str, max_concurrency: int = 8):
 
     inputs = []
     qa_pair_dict = {}
-    logger.info(f"{len(data)} documents loaded")
+    logger.info(f"{len(data)} documents loaded from {input_path}")
     for doc in data:
         if not doc["metadatas"]["verdict"]:
             continue
@@ -84,7 +84,7 @@ async def main(input_path: str, output_dir: str, max_concurrency: int = 8):
             "context": doc['ground_truth']['contexts'][0],
         })
         qa_pair_dict[doc_id] = doc
-    logger.info(f"{len(qa_pair_dict)} documents processed")
+    logger.info(f"{len(qa_pair_dict)} documents are valid and will be rewritten")
 
     outputs = await graph.abatch(inputs, config=RunnableConfig(max_concurrency=max_concurrency))
     logger.info(f"{len(outputs)} documents generated")
@@ -98,7 +98,6 @@ async def main(input_path: str, output_dir: str, max_concurrency: int = 8):
         doc["metadatas"]["original_answer"] = result["original_answer"]
         qa_pairs.append(doc)
 
-    # output_path = "data_eval/qa_pairs.v20241219.rewrite.json"
     output_path = Path(output_dir) / "qa_pairs.rewritten.json"
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w") as f:
@@ -107,7 +106,7 @@ async def main(input_path: str, output_dir: str, max_concurrency: int = 8):
 
 
 if __name__ == '__main__':
-    # python 03_rewrite_qa_pairs.py --input_path data_eval/v20250501/qa_pairs.validate.json --output_dir data_eval/v20250501
+    # python 03_rewrite_qa_pairs.py --input_path data_eval/demo/qa_pairs.validated.json --output_dir data_eval/demo
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_path", type=str, required=True)
     parser.add_argument("--output_dir", type=str, required=True)

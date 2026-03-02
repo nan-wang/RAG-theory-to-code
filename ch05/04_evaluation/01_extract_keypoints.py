@@ -11,7 +11,7 @@ from pathlib import Path
 from datamodels import KeyPoints
 
 
-dotenv.load_dotenv(".oai.env")
+dotenv.load_dotenv()
 
 
 @click.command()
@@ -55,7 +55,7 @@ def main(num_docs, output_path, ground_truth, response, input_fn):
         ]
     )
 
-    llm = ChatOpenAI(model="gpt-4.1-mini").with_structured_output(KeyPoints)
+    llm = ChatOpenAI(model="moonshotai/Kimi-K2-Thinking").with_structured_output(KeyPoints)
 
     chain = (prompt | llm)
 
