@@ -18,13 +18,13 @@
 
 | 标题 | 描述 | 文件夹 |
 | --- | --- | --- |
-| LangChain 核心与 LangGraph | 介绍 LangChain 的核心概念（Runnable、提示模板、输出解析器）和 LangGraph 的状态图编程模型，并实现一个基础 RAG 流程 | [03_langchain_core_and_langgraph](ch05/03_langchain_core_and_langgraph) |
-| RAG 评估 | 构建 RAG 系统的评估流水线，包括合成问答对生成、检索指标（精确率、召回率）和生成指标（忠实度、幻觉率等）的计算 | [04_evaluation](ch05/04_evaluation) |
-| 文档分块 | 探索不同的文档分块策略，包括针对中文文本的按章节分块方法 | [05_chunking](ch05/05_chunking) |
-| 嵌入模型 | 介绍嵌入模型的使用与微调，涵盖 Jina Embeddings、BGE 等多语言嵌入模型 | [06_embeddings](ch05/06_embeddings) |
-| 混合检索 | 实现向量相似度检索与 BM25 关键词检索的混合检索策略，提升检索质量 | [07_hybrid_indexing](ch05/07_hybrid_indexing) |
-| 重排序 | 使用 Jina Reranker 对检索结果进行重排序，优化检索结果的相关性排序 | [08_reranking](ch05/08_reranking) |
-| 生成优化 | 介绍提示工程优化技术，提升 RAG 系统的生成质量 | [09_generative_optimization](ch05/09_generative_optimization) |
+| 使用LangChain搭建RAG系统 | 介绍 LangChain 的核心概念（Runnable、提示模板、输出解析器）和 LangGraph 的状态图编程模型，并实现一个基础 RAG 流程 | [03_langchain_core_and_langgraph](ch05/03_langchain_core_and_langgraph) |
+| 效果评估 | 构建 RAG 系统的评估流水线，包括合成问答对生成、检索指标（精确率、召回率）和生成指标（忠实度、幻觉率等）的计算 | [04_evaluation](ch05/04_evaluation) |
+| 优化检索模块：语义截断与背景语义缺失 | 探索不同的文档分块策略，包括针对中文文本的按章节分块方法 | [05_chunking](ch05/05_chunking) |
+| 优化检索模块：嵌入模型 | 介绍嵌入模型的使用与微调，涵盖 Jina Embeddings、BGE 等多语言嵌入模型 | [06_embeddings](ch05/06_embeddings) |
+| 优化检索模块：混合检索 | 实现向量相似度检索与 BM25 关键词检索的混合检索策略，提升检索质量 | [07_hybrid_indexing](ch05/07_hybrid_indexing) |
+| 优化检索模块：添加重排序 | 使用 Jina Reranker 对检索结果进行重排序，优化检索结果的相关性排序 | [08_reranking](ch05/08_reranking) |
+| 优化生成模块 | 介绍提示工程优化技术，提升 RAG 系统的生成质量 | [09_generative_optimization](ch05/09_generative_optimization) |
 | 查询预处理 | 实现查询分解、查询路由和回退提示等查询预处理技术 | [10_query_preprocessing](ch05/10_query_preprocessing) |
-| 智能体 RAG | 基于 LangGraph 构建智能体 RAG 工作流，支持多步检索、反思和迭代搜索 | [11_agentic_rag](ch05/11_agentic_rag) |
+| 基于智能体的RAG | 基于 LangGraph 构建智能体 RAG 工作流，支持多步检索、反思和迭代搜索 | [11_agentic_rag](ch05/11_agentic_rag) |
 | 部署 | 使用 FastAPI 和 Streamlit 构建 RAG 应用的生产级部署方案，支持 Docker 容器化部署 | [12_deployment](ch05/12_deployment) |
