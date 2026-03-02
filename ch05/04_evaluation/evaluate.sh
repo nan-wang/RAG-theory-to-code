@@ -65,32 +65,32 @@ RAG_KEYPOINTS_PATH="${RAG_OUTPUT_DIR}/keypoints.json"
 
 # --- Execute Steps (Part 2) ---
 
-# Step 5a: run the RAG system (Index)
-echo "--- Step 0a: Running RAG index step ---"
-# Assuming naive_rag.index.py doesn't need parameters based on the original script
-python naive_rag.index.py || { echo "Error during Step 5a. Aborting."; exit 1; }
+# # Step 5a: run the RAG system (Index)
+# echo "--- Step 0a: Running RAG index step ---"
+# # Assuming naive_rag.index.py doesn't need parameters based on the original script
+# python naive_rag.index.py || { echo "Error during Step 5a. Aborting."; exit 1; }
 
-# Step 5b: run the RAG system (Query)
-echo "--- Step 0b: Running RAG query step ---"
-# The RAG query step needs the rewritten questions from Part 1 as input,
-# and saves its raw output, which will then be processed for keypoints.
-# Assuming naive_rag.query.py takes the rewritten questions path.
-# Output goes to a temporary file within the RAG output dir.
+# # Step 5b: run the RAG system (Query)
+# echo "--- Step 0b: Running RAG query step ---"
+# # The RAG query step needs the rewritten questions from Part 1 as input,
+# # and saves its raw output, which will then be processed for keypoints.
+# # Assuming naive_rag.query.py takes the rewritten questions path.
+# # Output goes to a temporary file within the RAG output dir.
 
-if [ ! -f "$KEYPOINTS_PATH" ]; then
-    echo "Error: Rewritten questions file not found at '$KEYPOINTS_PATH'. Make sure Part 1 was run successfully."
-    exit 1
-fi
+# if [ ! -f "$KEYPOINTS_PATH" ]; then
+#     echo "Error: Rewritten questions file not found at '$KEYPOINTS_PATH'. Make sure Part 1 was run successfully."
+#     exit 1
+# fi
 
-python naive_rag.query.py \
-    --questions_path "$KEYPOINTS_PATH" \
-    --output_path "$RAG_RAW_OUTPUT_PATH" || { echo "Error during Step 5b. Aborting."; exit 1; }
+# python naive_rag.query.py \
+#     --questions_path "$KEYPOINTS_PATH" \
+#     --output_path "$RAG_RAW_OUTPUT_PATH" || { echo "Error during Step 5b. Aborting."; exit 1; }
 
 echo "--- Step 1: Extracting keypoints from RAG output ---"
 
 python 01_extract_keypoints.py \
     --response \
-    --input_path "$RAG_RAW_OUTPUT_PATH" \
+    --input_fn "$RAG_RAW_OUTPUT_PATH" \
     --output_path "$RAG_KEYPOINTS_PATH" || { echo "Error during RAG keypoint extraction step. Aborting."; exit 1; }
 
 # Validate that RAG keypoints file was created before proceeding
