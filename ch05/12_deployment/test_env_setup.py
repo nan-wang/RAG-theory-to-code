@@ -48,7 +48,7 @@ print("\n检查环境变量（12_deployment）\n")
 
 REQUIRED = [
     ("OPENAI_API_KEY", "LLM API 密钥"),
-    ("OPENAI_BASE_URL", "LLM API 地址"),
+    ("OPENAI_API_BASE", "LLM API 地址"),
     ("JINA_API_KEY", "Jina AI（向量检索和重排序）"),
     ("DB_URL", "腾讯云向量数据库地址"),
     ("DB_KEY", "腾讯云向量数据库密钥"),

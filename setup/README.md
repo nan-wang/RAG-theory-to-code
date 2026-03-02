@@ -28,7 +28,7 @@ pip install -r requirements.txt
 ```bash
 # LLM API（OpenAI 兼容接口）
 OPENAI_API_KEY=<你的 API Key>
-OPENAI_BASE_URL=<API 地址，例如 https://api.siliconflow.cn/v1>
+OPENAI_API_BASE=<API 地址，例如 https://api.siliconflow.cn/v1>
 
 # Jina AI（用于嵌入模型和重排序）
 JINA_API_KEY=<你的 Jina API Key>

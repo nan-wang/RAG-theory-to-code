@@ -48,7 +48,7 @@ print("\n检查环境变量（10_query_preprocessing）\n")
 
 REQUIRED = [
     ("OPENAI_API_KEY", "LLM API 密钥"),
-    ("OPENAI_BASE_URL", "LLM API 地址"),
+    ("OPENAI_API_BASE", "LLM API 地址"),
     ("JINA_API_KEY", "Jina AI（向量检索）"),
     ("VECTOR_DB_DIR", "向量数据库目录"),
     ("COLLECTION_NAME", "向量数据库集合名称"),
@@ -65,7 +65,7 @@ for var, desc in REQUIRED:
 # 检查 LLM API 连通性
 print()
 api_key = os.getenv("OPENAI_API_KEY")
-base_url = os.getenv("OPENAI_BASE_URL")
+base_url = os.getenv("OPENAI_API_BASE")
 if api_key and base_url:
     try:
         from langchain_openai import ChatOpenAI
