@@ -1,8 +1,19 @@
+"""ChatModel 速率限制 - 使用 InMemoryRateLimiter 控制请求频率
+
+本脚本演示如何使用 LangChain 内置的速率限制器来控制 LLM 调用频率。
+InMemoryRateLimiter 基于令牌桶（Token Bucket）算法：
+- 桶中有"令牌"，每次请求消耗一个令牌
+- 令牌按固定速率（requests_per_second）补充
+- 桶的容量（max_bucket_size）限制了突发请求的上限
+当桶为空时，请求会被阻塞，直到有新的令牌可用。
+"""
+
 from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_core.language_models import ParrotFakeChatModel
 from time import time
 
 
+# 配置速率限制器参数
 rate_limiter = InMemoryRateLimiter(
     requests_per_second=0.25,  # 每4秒发送一个请求
     check_every_n_seconds=10,  # 每个0.1秒检查一次是否可以继续发送新的请求
@@ -10,7 +21,8 @@ rate_limiter = InMemoryRateLimiter(
 )
 
 
-# 调用硅基流动提供的DeepSeek-R1模型
+# ParrotFakeChatModel 是测试用的假模型，直接返回输入内容
+# 这里用它来演示速率限制效果，避免消耗真实 API 额度
 llm = ParrotFakeChatModel(rate_limiter=rate_limiter)
 
 for _ in range(5):

@@ -22,7 +22,7 @@ python test_env_setup.py
 | 5.3.2 Runnable类的abatch异步方法 | 使用 abatch 方法进行异步批量调用 | [02_runnable_batch_async.py](02_runnable_batch_async.py) |
 | 5.3.2 Runnable类的astream异步方法 | 使用 astream 方法进行异步流式输出 | [02_runnable_stream_async.py](02_runnable_stream_async.py) |
 | 5.3.3 ChatModel 基本使用 | 调用 OpenAI 和硅基流动的大语言模型 | [03_chatmodel.py](03_chatmodel.py) |
-| ChatModel 详细输出 | 通过硅基流动调用 DeepSeek-R1 并查看完整的响应结构 | [03_chatmodel_siliconflow.py](03_chatmodel_siliconflow.py) |
+| 5.3.3 ChatModel 详细输出 | 通过硅基流动调用 DeepSeek-R1 并查看完整的响应结构 | [03_chatmodel_siliconflow.py](03_chatmodel_siliconflow.py) |
 | 5.3.3 ChatModel 速率限制 | 使用 InMemoryRateLimiter 控制模型调用频率 | [03_chatmodel_with_ratelimiter.py](03_chatmodel_with_ratelimiter.py) |
 | 5.3.4 消息占位符 | 使用 MessagesPlaceholder 在提示中插入多轮对话消息 | [04_messages_placeholder.py](04_messages_placeholder.py) |
 | 5.3.5 提示词模板 | 使用 PromptTemplate 构建动态提示 | [05_prompt_template.py](05_prompt_template.py) |
