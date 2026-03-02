@@ -253,5 +253,5 @@ builder.add_conditional_edges("reflect_on_summary", route_search)
 builder.add_edge("finalize_summary", END)
 
 graph = builder.compile(debug=True)
-output = graph.invoke({"search_topic": "北京申办过几次奥运会?"})
+output = graph.invoke({"user_query": "2014年冬奥会的吉祥物是什么?是如何被选出的？"})
 print(output["running_summary"])
