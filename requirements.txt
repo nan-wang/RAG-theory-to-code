@@ -30,6 +30,7 @@ click>=8.1.7,<8.2
 loguru>=0.7.3,<0.8
 requests<3
 numpy>=1.26.4,<1.27  # pkuseg 构建时依赖 numpy，需先安装：pip install numpy
+socksio==1.0.0
 
 # Web 框架（部署章节）
 fastapi>=0.112.0,<0.113
