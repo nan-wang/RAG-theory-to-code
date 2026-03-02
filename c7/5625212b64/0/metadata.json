@@ -1,0 +1,30 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "c75625212b64",
+  "session_id": "3e9e3bea-133b-441e-9b9b-3ce0c0dc697c",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-02T16:49:23.591464Z",
+  "branch": "feat-fix-04-evaluation-0303",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/04_evaluation/naive_rag.query.py"
+  ],
+  "agent": "Claude Code",
+  "transcript_identifier_at_start": "7e743c8e-70de-4dc9-a501-5a6bf792d840",
+  "token_usage": {
+    "input_tokens": 21,
+    "cache_creation_tokens": 21387,
+    "cache_read_tokens": 445465,
+    "output_tokens": 2984,
+    "api_call_count": 15
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-02T16:49:23.566904Z",
+    "agent_lines": 0,
+    "human_added": 5793,
+    "human_modified": 32,
+    "human_removed": 0,
+    "total_committed": 5793,
+    "agent_percentage": 0
+  }
+}

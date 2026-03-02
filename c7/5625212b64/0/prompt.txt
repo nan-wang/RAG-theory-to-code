@@ -1,0 +1,58 @@
+Implement the following plan:
+
+# Plan: Refactor `naive_rag.query.py` CLI and async batch processing
+
+## Context
+
+The current `naive_rag.query.py` uses hardcoded paths and environment variables for configuration, and processes queries sequentially via `graph.invoke()`. The user wants to:
+1. Replace hardcoded values with CLI arguments using `click`
+2. Switch to async batch processing using `graph.abatch()` (following the pattern in `03_generate_qa_pairs.py`)
+
+## Changes
+
+### File: `ch05/04_evaluation/naive_rag.query.py`
+
+1. **Replace imports**: Remove `os`, `tqdm`; add `asyncio`, `click`, `loguru.logger`, `RunnableConfig`
+
+2. **Add `click` CLI**: Define a click command with:
+   - `--index_dir` (required, `str`) — replaces `os.getenv("VECTOR_DB_DIR")`
+   - `--collection_name` (required, `str`) — replaces `os.getenv("COLLECTION_NAME")`
+   - `--output_dir` (required, `str`) — replaces hardcoded `"data_eval/demo/response.json"`; output file will be `{output_dir}/response.json`
+   - `--max_concurrency` (optional, `int`, default 8) — controls `abatch` concurrency
+   - `input_fn` (positional click argument) — replaces hardcoded `"data_eval/demo/keypoints.json"`
+
+3. **Move initialization into `main()`**: Move `vector_store`, `graph_builder`, and `graph` construction inside an `async def main(...)` so they are parameterized by `index_dir` and `collection_name`.
+
+4. **Switch to async `abatch`**:
+   - Prepare all inputs as a list of `{"question": query}` dicts
+   - Call `await graph.abatch(inputs, config=RunnableConfig(max_concurrency=max_concurrency))`
+   - Map results back to the QA pair structure after batch completes
+
+5. **Keep**: `State`, `retrieve`, `generate`, `prompt_template`, `llm` definitions unchanged (except `vector_store` moves into `main`). The `VECTOR_DB_DIR` and `COLLECTION_NAME` global variables are removed.
+
+### No changes to `evaluate.sh`
+
+The user will update `evaluate.sh` separately.
+
+## Verification
+
+```bash
+cd ch05/04_evaluation
+python naive_rag.query.py --help
+# Should show click-generated help with --index_dir, --collection_name, --output_dir, --max_concurrency, and input_fn
+```
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+[Request interrupted by user for tool use]
+
+---
+
+when running the codes, it fails with the following error. TypeError: Object of type Document is not JSON serializable
+
+---
+
+good. make a commit.
