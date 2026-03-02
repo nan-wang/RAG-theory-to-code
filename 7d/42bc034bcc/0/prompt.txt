@@ -1,0 +1,9 @@
+update CLAUDE.md based on the lastest codes.
+
+---
+
+There is a typo in the current code base. The environment variable should be ``OPENAI_API_BASE`` instead of ``OPENAI_BASE_URL``. Fix this typo.
+
+---
+
+good. Make a git add and commit
