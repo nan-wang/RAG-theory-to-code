@@ -59,18 +59,18 @@ def generate(state: State):
     }
 
 
-async def main(input_path: str, output_dir: str, max_concurrency: int = 8):
+async def main(input_fn: str, output_dir: str, max_concurrency: int = 8):
     graph_builder = StateGraph(State)
     graph_builder.add_node(generate)
     graph_builder.add_edge(START, "generate")
     graph = graph_builder.compile()
 
-    with open(input_path, 'r') as f:
+    with open(input_fn, 'r') as f:
         data = json.load(f)
 
     inputs = []
     qa_pair_dict = {}
-    logger.info(f"{len(data)} documents loaded from {input_path}")
+    logger.info(f"{len(data)} documents loaded from {input_fn}")
     for doc in data:
         if not doc["metadatas"]["verdict"]:
             continue
@@ -106,12 +106,14 @@ async def main(input_path: str, output_dir: str, max_concurrency: int = 8):
 
 
 if __name__ == '__main__':
-    # python 03_rewrite_qa_pairs.py --input_path data_eval/demo/qa_pairs.validated.json --output_dir data_eval/demo
+    # python 03_rewrite_qa_pairs.py --input_fn data_eval/demo/qa_pairs.validated.json --output_dir data_eval/demo
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_path", type=str, required=True)
+    parser.add_argument("--input_fn", "-i", default=None)
     parser.add_argument("--output_dir", type=str, required=True)
     parser.add_argument("--max-concurrency", type=int, default=8)
     args = parser.parse_args()
+    if args.input_fn is None:
+        raise RuntimeError("Missing required argument: --input_fn/-i")
     asyncio.run(
-        main(input_path=args.input_path, output_dir=args.output_dir, max_concurrency=args.max_concurrency)
+        main(input_fn=args.input_fn, output_dir=args.output_dir, max_concurrency=args.max_concurrency)
     )

@@ -77,7 +77,7 @@ python 03_validate_qa_pairs.py \
 # Step 3: rewrite the Questions
 echo "--- Step 3: Rewriting Questions ---"
 python 03_rewrite_qa_pairs.py \
-    --input_path "${VALIDATED_OUTPUT_PATH}" \
+    --input_fn "${VALIDATED_OUTPUT_PATH}" \
     --output_dir "${BASE_OUTPUT_DIR}" || { echo "Error during Step 3. Aborting."; exit 1; }
 
 # Step 4: extract the keypoints for the groundtruth
