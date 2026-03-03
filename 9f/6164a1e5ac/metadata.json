@@ -3,7 +3,7 @@
   "checkpoint_id": "9f6164a1e5ac",
   "strategy": "manual-commit",
   "branch": "feat-add-cli-11-agentic-rag-0303",
-  "checkpoints_count": 3,
+  "checkpoints_count": 2,
   "files_touched": [
     "CLAUDE.md",
     "ch05/03_langchain_core_and_langgraph/.env.example",
@@ -36,8 +36,7 @@
     "ch05/08_reranking/.env.example",
     "ch05/09_generative_optimization/.env.example",
     "ch05/10_query_preprocessing/.env.example",
-    "ch05/11_agentic_rag/.env.example",
-    "ch05/11_agentic_rag/graph.py",
+    "ch05/11_agentic_rag/README.md",
     "ch05/11_agentic_rag/src/.env.example",
     "ch05/12_deployment/.env.example",
     "setup/README.md"
@@ -66,10 +65,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 47,
-    "cache_creation_tokens": 105649,
-    "cache_read_tokens": 1454568,
-    "output_tokens": 25172,
-    "api_call_count": 33
+    "input_tokens": 33,
+    "cache_creation_tokens": 72720,
+    "cache_read_tokens": 1144537,
+    "output_tokens": 18034,
+    "api_call_count": 23
   }
 }

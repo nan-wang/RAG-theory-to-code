@@ -100,3 +100,7 @@ in @ch05/11_agentic_rag/graph.py, when `load_documents`, use `--index_input_dir`
 ---
 
 make a commit
+
+---
+
+rename @ch05/11_agentic_rag/graph.py to main.py. Update @ch05/11_agentic_rag/README.md accordingly.
