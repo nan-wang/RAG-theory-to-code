@@ -1,0 +1,32 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "5371b9888efc",
+  "session_id": "85f259b0-9025-46c5-8d47-a6f309eaac28",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-03T14:14:23.240276Z",
+  "branch": "feat-add-cli-10-query-0303",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "ch05/10_query_preprocessing/01_query_decomposition.py",
+    "ch05/10_query_preprocessing/03_query_stepback.py",
+    "ch05/10_query_preprocessing/04_query_routing.py",
+    "ch05/10_query_preprocessing/README.md"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 26,
+    "cache_creation_tokens": 31898,
+    "cache_read_tokens": 572790,
+    "output_tokens": 10193,
+    "api_call_count": 16
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-03T14:14:23.2094Z",
+    "agent_lines": 217,
+    "human_added": 106177,
+    "human_modified": 16,
+    "human_removed": 0,
+    "total_committed": 106402,
+    "agent_percentage": 0.2039435348959606
+  }
+}

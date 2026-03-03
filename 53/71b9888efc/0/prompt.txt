@@ -1,0 +1,124 @@
+Implement the following plan:
+
+# Plan: Add argparse CLI and Chinese Docstrings to ch05/10_query_preprocessing
+
+## Context
+
+Three scripts in `ch05/10_query_preprocessing/` currently read `VECTOR_DB_DIR` and `COLLECTION_NAME` from environment variables at module-level. The goal is to:
+1. Replace those env-var reads with `argparse` CLI arguments (`--index_dir`, `--collection_name`) to match the established pattern in ch05/06, 08, 09.
+2. Add Chinese docstrings and inline explanations to make the code easier to understand (the audience is Chinese-speaking readers of the book).
+3. Wrap module-level execution inside a `main()` function with `if __name__ == "__main__": main()`.
+
+**Note on `04_query_routing.py`:** This file does NOT use a vector store, so `--index_dir` and `--collection_name` are not applicable. It will only get Chinese docstrings, a `--question` CLI argument, and a `main()` wrapper.
+
+---
+
+## Reference Pattern (from ch05/09_generative_optimization/prompt_optimization.py)
+
+```python
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser(description="...")
+    parser.add_argument('--index_dir', required=True, type=str,
+                        help='Chroma 向量数据库的本地存储路径。')
+    parser.add_argument('--collection_name', required=True, type=str,
+                        help='Chroma 集合名称。')
+    parser.add_argument('--question', required=True, type=str,
+                        help='用户查询问题。')
+    args = parser.parse_args()
+    # ... use args.index_dir, args.collection_name, args.question
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+## Files to Modify
+
+### 1. `ch05/10_query_preprocessing/01_query_decomposition.py`
+
+**Changes:**
+- Remove module-level `VECTOR_DB_DIR = os.getenv(...)` and `COLLECTION_NAME = os.getenv(...)`
+- Remove module-level `vector_store`, `retriever`, `llm`, `graph` initialization
+- Add `import argparse`
+- Move all initialization + graph execution into `main()`
+- Add `--index_dir` (required), `--collection_name` (required), `--question` (required) argparse arguments
+- Keep `EMBEDDING_MODEL` from env via `os.getenv("EMBEDDING_MODEL")` (consistent with other files)
+- Add Chinese module-level docstring and per-function docstrings explaining the decompose_query, retrieve, generate steps
+
+**Argparse args:**
+```
+--index_dir        required  Chroma 向量数据库的本地存储路径（替代环境变量 VECTOR_DB_DIR）
+--collection_name  required  Chroma 集合名称（替代环境变量 COLLECTION_NAME）
+--question         required  用户输入的查询问题
+```
+
+---
+
+### 2. `ch05/10_query_preprocessing/03_query_stepback.py`
+
+**Changes:** Same pattern as above.
+
+- Remove module-level `VECTOR_DB_DIR` and `COLLECTION_NAME` reads
+- Move all initialization into `main()`
+- Add `--index_dir`, `--collection_name`, `--question` argparse arguments
+- Keep `EMBEDDING_MODEL` from env
+- Add Chinese module docstring + per-function docstrings for stepback, retrieve, generate
+
+---
+
+### 3. `ch05/10_query_preprocessing/04_query_routing.py`
+
+**Changes:**
+- No vector store args (not applicable)
+- Add `--question` argparse argument
+- Move `llm`, `graph`, `graph.invoke` into `main()`
+- Keep `dotenv.load_dotenv(".oai.env")` at module level (uses different env file)
+- Add Chinese module docstring + per-function docstrings for route
+
+---
+
+## Verification
+
+Run each script from the `ch05/10_query_preprocessing/` directory:
+
+```bash
+# 01_query_decomposition.py
+python 01_query_decomposition.py \
+  --index_dir ./data_chroma \
+  --collection_name olympic_games \
+  --question "过去5届夏季奥运会都是在哪里举办的?"
+
+# 03_query_stepback.py
+python 03_query_stepback.py \
+  --index_dir ./data_chroma \
+  --collection_name olympic_games \
+  --question "北京申办过几次奥运会?"
+
+# 04_query_routing.py
+python 04_query_routing.py \
+  --question "里约奥运会哪个国家获得的金牌最多?"
+```
+
+Expected: each script prints results via `pprint()` without errors.
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+in these three files, replace the `JinaEmbeddings` with `OpenAIEmbeddings` and use the model "Qwen/Qwen3-Embedding-0.6B". Don't read the model from the environment variables.
+
+---
+
+when using `OpenAIEmbeddings`, we must set the other two parameters,        chunk_size=16, check_embedding_ctx_length=False,
+
+---
+
+update @ch05/10_query_preprocessing/README.md. Create a new section with the name ``运行步骤`` to incluce the example shell scripts for running the python scripts. Add minimal explaination in Chinese.
+
+---
+
+make a commit
