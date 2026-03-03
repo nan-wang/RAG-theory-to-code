@@ -16,14 +16,14 @@ python test_env_setup.py
 ### 生成评估数据
 
 ```bash
-bash generate_synthetic_qa_pairs.sh --index-dir ../03_langchain_core_and_langgraph/09_naive_rag/data_chroma --collection-name olympic_games --output-dir data_eval/demo --num-generate 8
+bash generate_synthetic_qa_pairs.sh --index-dir ../03_langchain_core_and_langgraph/09_naive_rag/data_chroma --collection-name olympic_games --output-dir data_eval/demo_v2 --num-generate 8
 ```
 
 在这个过程中，`generate_synthetic_qa_pairs.sh`脚本会依次执行以下Python脚本，
 
-- `python 03_generate_qa_pairs.py --index_dir ../03_langchain_core_and_langgraph/09_naive_rag/data_chroma  --collection_name olympic_games --output_dir data_eval/demo --num_docs 8`
-- `python 03_validate_qa_pairs.py --input_path data_eval/demo/qa_pairs.raw.json --output_path data_eval/demo/qa_pairs.validated.json`
-- `python 03_rewrite_qa_pairs.py --input_path data_eval/demo/qa_pairs.validated.json --output_dir data_eval/demo`
+- `python 03_generate_qa_pairs.py --index_dir ../03_langchain_core_and_langgraph/09_naive_rag/data_chroma  --collection_name olympic_games --output_dir data_eval/demo --num_docs 8`。使用上一章节产生的索引作为输出，随机选择8条文本块用于生成问题和答案对。结果保存在`data_eval/demo/qa_pairs.raw.json`
+- `python 03_validate_qa_pairs.py --input_path data_eval/demo/qa_pairs.raw.json --output_path data_eval/demo/qa_pairs.validated.json`。读取`data_eval/demo/qa_pairs.raw.json`中的QA对，使用大模型进行验证，将验证结果保存在`data_eval/demo/qa_pairs.validated.json`
+- `python 03_rewrite_qa_pairs.py --input_path data_eval/demo/qa_pairs.validated.json --output_dir data_eval/demo`。读取`data_eval/demo/qa_pairs.validated.json`中的QA对，使用大模型进行重写，将重写的结果保存在`data_eval/demo/qa_pairs.rewritten.json`
 
 ### 抽取标准答案的信息点
 使用``qa_pairs.rewritten.json``，对标准答案抽取细颗粒度关键信息，保存在``data_eval/demo/keypoints.json``中。
@@ -33,17 +33,17 @@ python 01_extract_keypoints.py --ground-truth --output_path data_eval/demo/ data
 ```
 
 ### 测试评估数据
-使用目标RAG系统对评估数据进行回答，结果保存在``data_eval/naive_rag/response.json``。为了保持标准答案的细颗粒度关键信息，使用上一步得到的输出文件``data_eval/demo/keypoints.json``作为输入。
+使用目标RAG系统对评估数据进行回答，结果保存在``data_eval/naive_rag/response.json``。为了保持标准答案的细颗粒度关键信息，使用上一步得到的输出文件``data_eval/demo/keypoints.json``作为输入。参考`naive_rag.py`。
 
 ```bash
-python naive_rag.py --index --query --index_dir ../03_langchain_core_and_langgraph/09_naive_rag/data_chroma  --collection_name olympic_games --output_dir data_eval/naive_rag data_eval/demo/keypoints.json
+python naive_rag.py --index --query --index_dir data_chroma  --collection_name olympic_games --output_dir data_eval/naive_rag --index_input_dir ../data --output_dir --query_input_path data_eval/demo/keypoints.json
 ```
 
 
 ### 评估效果
 
 ```bash
-bash evaluate.sh --input-dir ./data_eval/naive_rag --num-docs 6
+bash evaluate.sh --input-dir data_eval/naive_rag --num-docs 6 --output-dir data_eval/naive_rag
 ```
 
 这个过程中，依次运行了以下代码，

@@ -52,7 +52,6 @@ fi
 RAW_OUTPUT_PATH="${BASE_OUTPUT_DIR}/qa_pairs.raw.json"
 VALIDATED_OUTPUT_PATH="${BASE_OUTPUT_DIR}/qa_pairs.validated.json"
 REWRITTEN_OUTPUT_PATH="${BASE_OUTPUT_DIR}/qa_pairs.rewritten.json"
-KEYPOINTS_OUTPUT_PATH="${BASE_OUTPUT_DIR}/keypoints.json"
 
 
 # Create necessary output directories
@@ -79,17 +78,15 @@ python 03_validate_qa_pairs.py \
 echo "--- Step 3: Rewriting Questions ---"
 python 03_rewrite_qa_pairs.py \
     --input_path "${VALIDATED_OUTPUT_PATH}" \
-    --output_path "${REWRITTEN_OUTPUT_PATH}" || { echo "Error during Step 3. Aborting."; exit 1; }
+    --output_dir "${BASE_OUTPUT_DIR}" || { echo "Error during Step 3. Aborting."; exit 1; }
 
 # Step 4: extract the keypoints for the groundtruth
 echo "--- Step 4: Extracting keypoints for groundtruth ---"
 python 01_extract_keypoints.py \
     --num_docs "$NUM_GENERATE_DOCS" \
-    --groundtruth \
-    --input_path "${REWRITTEN_OUTPUT_PATH}" \
-    --output_path "${KEYPOINTS_OUTPUT_PATH}" || { echo "Error during Step 4. Aborting."; exit 1; }
-
-# Step 5: filter the keypoints that are not related to the question
+    --ground-truth \
+    --output_path "${BASE_OUTPUT_DIR}" \
+    "${REWRITTEN_OUTPUT_PATH}" || { echo "Error during Step 4. Aborting."; exit 1; }
 
 echo "--- All steps completed successfully! ---"
 
