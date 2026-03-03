@@ -1,13 +1,14 @@
 import json
+import asyncio
 
 import click
-from tqdm import tqdm
 from pathlib import Path
 import dotenv
 import re
 
 from langchain_openai.chat_models import ChatOpenAI
 from langchain_core.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate, ChatPromptTemplate
+from langchain_core.runnables import RunnableConfig
 from prompts.keypoints_verify_prompt import SYSTEM_PROMPT, USER_PROMPT
 from langchain_core.output_parsers import StrOutputParser
 from langchain import QAWithSourcesChain
@@ -47,11 +48,21 @@ dotenv.load_dotenv()
     '--context-utility-ratio/--no-context-utility-ratio',
     default=False
 )
+@click.option(
+    '--max_concurrency',
+    default=8,
+    type=int,
+    help='Max concurrent batch runs.'
+)
 @click.argument(
     'input_fn',
     type=click.Path(exists=True, dir_okay=False, readable=True)
 )
-def main(num_docs, output_path, loyalty, hallucination, noise_sensitivity, context_utility_ratio, input_fn):
+def main(num_docs, output_path, loyalty, hallucination, noise_sensitivity, context_utility_ratio, max_concurrency, input_fn):
+    asyncio.run(_main(num_docs, output_path, loyalty, hallucination, noise_sensitivity, context_utility_ratio, max_concurrency, input_fn))
+
+
+async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity, context_utility_ratio, max_concurrency, input_fn):
     with open(input_fn) as f:
         docs = json.load(f)
         response_loyalty_kp = []
@@ -109,22 +120,19 @@ def main(num_docs, output_path, loyalty, hallucination, noise_sensitivity, conte
     match = re.compile(r'\[\[\[([^\]]+)\]\]\]')
 
     chain = (prompt | llm | StrOutputParser())
+    config = RunnableConfig(max_concurrency=max_concurrency)
 
     if loyalty:
-        response_loyalty_list = []
-        for kp in tqdm(response_loyalty_kp):
-            result = chain.invoke({
-                "question": kp.question,
-                "answer": kp.answer,
-                "keypoint": kp.keypoint
-            })
+        inputs = [{"question": kp.question, "answer": kp.answer, "keypoint": kp.keypoint} for kp in response_loyalty_kp]
+        outputs = await chain.abatch(inputs, config=config)
+        for kp, result in zip(response_loyalty_kp, outputs):
             rsp = match.search(result)
             if rsp:
                 kp.label = rsp.group(1)
             else:
                 print(f"Failed to extract the label for the keypoint: {result}")
-            response_loyalty_list.append(kp)
 
+        response_loyalty_list = response_loyalty_kp
         output_fn = Path(output_path) / "metrics" / "generation_loyalty.json"
         Path(output_fn).parent.mkdir(parents=True, exist_ok=True)
         with open(output_fn, 'w') as f:
@@ -134,23 +142,31 @@ def main(num_docs, output_path, loyalty, hallucination, noise_sensitivity, conte
         print(f"response_loyalty ↑: {response_loyalty:.3f}")
 
     if hallucination:
+        # Flatten all keypoints from all groups into a single list
+        flat_kps = []
+        flat_indices = []  # (group_idx, position_in_group)
+        for group_idx, kp_group in enumerate(response_hallucination_kp):
+            for pos, kp in enumerate(kp_group):
+                flat_kps.append(kp)
+                flat_indices.append((group_idx, pos))
+
+        inputs = [{"question": kp.question, "answer": kp.answer, "keypoint": kp.keypoint} for kp in flat_kps]
+        outputs = await chain.abatch(inputs, config=config)
+
+        for kp, result in zip(flat_kps, outputs):
+            rsp = match.search(result)
+            if rsp:
+                kp.label = rsp.group(1)
+            else:
+                print(f"Failed to extract the label for the keypoint: {result}")
+
+        # Reconstruct: a group is hallucination=True unless any kp is "Relevant"
         result_list = []
-        for kp_group in tqdm(response_hallucination_kp):
-            # as long as one of the kp in the group is supported, the group is supported
+        for group_idx, kp_group in enumerate(response_hallucination_kp):
             label = True
-            for kp in tqdm(kp_group, leave=False):
-                result = chain.invoke({
-                    "question": kp.question,
-                    "answer": kp.answer,
-                    "keypoint": kp.keypoint
-                })
-                rsp = match.search(result)
-                if rsp:
-                    kp.label = rsp.group(1)
-                    if kp.label == "Relevant":
-                        label = False
-                else:
-                    print(f"Failed to extract the label for the keypoint: {result}")
+            for kp in kp_group:
+                if kp.label == "Relevant":
+                    label = False
             result_list.append((kp_group, label))
 
         output_fn = Path(output_path) / "metrics" / "generation_hallucination.json"
@@ -162,35 +178,33 @@ def main(num_docs, output_path, loyalty, hallucination, noise_sensitivity, conte
         print(f"hallucination score ↓: {hallucination_score:.3f}")
 
     if noise_sensitivity:
+        # Flatten all (claim_context, claim_ans) pairs
+        flat_kps = []
+        flat_indices = []  # (pair_idx, 0=context/1=ans)
+        for pair_idx, (claim_context, claim_ans) in enumerate(response_noise_sensitivity_kp):
+            flat_kps.append(claim_context)
+            flat_indices.append((pair_idx, 0))
+            flat_kps.append(claim_ans)
+            flat_indices.append((pair_idx, 1))
+
+        inputs = [{"question": kp.question, "answer": kp.answer, "keypoint": kp.keypoint} for kp in flat_kps]
+        outputs = await chain.abatch(inputs, config=config)
+
+        for kp, result in zip(flat_kps, outputs):
+            rsp = match.search(result)
+            if rsp:
+                kp.label = rsp.group(1)
+            else:
+                print(f"Failed to extract the label for the keypoint: {result}")
+
+        # Reconstruct with original logic
         result_list = []
-        for claim_context, claim_ans in tqdm(response_noise_sensitivity_kp):
+        for claim_context, claim_ans in response_noise_sensitivity_kp:
             label = False
-            # check if the keypoint is supported by the context
-            result = chain.invoke({
-                "question": claim_context.question,
-                "answer": claim_context.answer,
-                "keypoint": claim_context.keypoint
-            })
-            rsp = match.search(result)
-            if rsp:
-                claim_context.label = rsp.group(1)
-                if claim_context.label == "Relevant":
-                    label = True
-            else:
-                print(f"Failed to extract the label for the keypoint: {result}")
-            # check if the keypoint is supported by the answer
-            result = chain.invoke({
-                "question": claim_ans.question,
-                "answer": claim_ans.answer,
-                "keypoint": claim_ans.keypoint
-            })
-            rsp = match.search(result)
-            if rsp:
-                claim_ans.label = rsp.group(1)
-                if claim_ans.label == "Relevant":
-                    label = False
-            else:
-                print(f"Failed to extract the label for the keypoint: {result}")
+            if claim_context.label == "Relevant":
+                label = True
+            if claim_ans.label == "Relevant":
+                label = False
             result_list.append(((claim_context, claim_ans), label))
 
         output_fn = Path(output_path) / "metrics" / "generation_noise_sensitivity.json"
@@ -207,39 +221,33 @@ def main(num_docs, output_path, loyalty, hallucination, noise_sensitivity, conte
         print(f"noise sensitivity score ↓: {noise_sensitivity_score:.3f} ({noise_sensitivity_kp}/{len(result_list)})")
 
     if context_utility_ratio:
+        # Flatten all (claim_context, claim_ans) pairs
+        flat_kps = []
+        for claim_context, claim_ans in response_context_utility_ratio_kp:
+            flat_kps.append(claim_context)
+            flat_kps.append(claim_ans)
+
+        inputs = [{"question": kp.question, "answer": kp.answer, "keypoint": kp.keypoint} for kp in flat_kps]
+        outputs = await chain.abatch(inputs, config=config)
+
+        for kp, result in zip(flat_kps, outputs):
+            rsp = match.search(result)
+            if rsp:
+                kp.label = rsp.group(1)
+            else:
+                print(f"Failed to extract the label for the keypoint: {result}")
+
+        # Reconstruct with original logic
         result_list = []
-        for claim_context, claim_ans in tqdm(response_context_utility_ratio_kp):
-            # label used for calculating
+        for claim_context, claim_ans in response_context_utility_ratio_kp:
             supported_by_cxt = True
             supported_by_cxt_and_ans = False
-            # check if the keypoint is supported by the context
-            result = chain.invoke({
-                "question": claim_context.question,
-                "answer": claim_context.answer,
-                "keypoint": claim_context.keypoint
-            })
-            rsp = match.search(result)
-            if rsp:
-                claim_context.label = rsp.group(1)
-                if claim_context.label != "Relevant":
-                    supported_by_cxt = False
-                elif claim_context.label == "Relevant":
-                    supported_by_cxt_and_ans = True
-            else:
-                print(f"Failed to extract the label for the keypoint: {result}")
-            # check if the keypoint is supported by the answer
-            result = chain.invoke({
-                "question": claim_ans.question,
-                "answer": claim_ans.answer,
-                "keypoint": claim_ans.keypoint
-            })
-            rsp = match.search(result)
-            if rsp:
-                claim_ans.label = rsp.group(1)
-                if claim_ans.label != "Relevant":
-                    supported_by_cxt_and_ans = False
-            else:
-                print(f"Failed to extract the label for the keypoint: {result}")
+            if claim_context.label != "Relevant":
+                supported_by_cxt = False
+            elif claim_context.label == "Relevant":
+                supported_by_cxt_and_ans = True
+            if claim_ans.label != "Relevant":
+                supported_by_cxt_and_ans = False
             result_list.append(((claim_context, claim_ans), supported_by_cxt, supported_by_cxt_and_ans))
 
         output_fn = Path(output_path) / "metrics" / "generation_context_utility_ratio.json"
