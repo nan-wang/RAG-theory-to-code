@@ -2,7 +2,7 @@
 环境变量检查脚本
 
 运行方式：
-  cd ch05/04_evaluation
+  cd ch05/04_evaluation/01_extract_keypoints
   python test_env_setup.py
 """
 
@@ -44,7 +44,7 @@ try:
 except ImportError:
     pass
 
-print("\n检查环境变量（04_evaluation）\n")
+print("\n检查环境变量（01_extract_keypoints）\n")
 
 REQUIRED = [
     ("OPENAI_API_KEY", "LLM API 密钥"),

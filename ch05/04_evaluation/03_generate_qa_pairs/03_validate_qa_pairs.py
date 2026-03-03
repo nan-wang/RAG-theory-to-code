@@ -60,16 +60,16 @@ def verify(state: State):
     }
 
 
-async def main(input_path: str, output_path: str, max_concurrency: int = 8):
+async def main(input_fn: str, output_dir: str, max_concurrency: int = 8):
     graph_builder = StateGraph(State)
     graph_builder.add_node(verify)
     graph_builder.add_edge(START, "verify")
     graph_builder.add_edge("verify", END)
     graph = graph_builder.compile()
 
-    with open(input_path, 'r') as f:
+    with open(input_fn, 'r') as f:
         data = json.load(f)
-    logger.info(f"Read {len(data)} questions from {input_path}")
+    logger.info(f"Read {len(data)} questions from {input_fn}")
 
     inputs = [
         {
@@ -90,7 +90,8 @@ async def main(input_path: str, output_path: str, max_concurrency: int = 8):
         output_doc['metadatas']['feedback'] = result_dict[document_id]['feedback']
         output_doc['metadatas']['verdict'] = result_dict[document_id]['verdict']
         results.append(output_doc)
-    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    output_path = Path(output_dir) / "qa_pairs.validated.json"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, 'w') as f:
         json.dump(results, f, indent=4, ensure_ascii=False)
     logger.info(f"Wrote {len(results)} questions to {output_path}")
@@ -98,8 +99,8 @@ async def main(input_path: str, output_path: str, max_concurrency: int = 8):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_path", type=str, required=True)
-    parser.add_argument("--output_path", type=str, required=True)
+    parser.add_argument("--input_fn", "-i", type=str, required=True)
+    parser.add_argument("--output_dir", type=str, required=True)
     parser.add_argument("--max-concurrency", type=int, default=8)
     args = parser.parse_args()
-    asyncio.run(main(args.input_path, args.output_path, args.max_concurrency))
+    asyncio.run(main(args.input_fn, args.output_dir, args.max_concurrency))
