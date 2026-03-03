@@ -1,0 +1,100 @@
+Implement the following plan:
+
+# Plan: Refactor ch05/06_embeddings/02_generate_qa_triplets.py
+
+## Context
+The file generates QA triplets (question, positive context, negative document) for embedding fine-tuning. It currently uses `click` for CLI parsing and synchronous sequential processing. The goal is to improve readability and efficiency by:
+- Switching to `argparse` (consistent with other ch05 scripts like `generate_qa_pairs.py`)
+- Renaming variables for clarity (`output_path→output_dir`, `input_fn→index_dir`)
+- Adding `collection_name` as a CLI argument (currently hardcoded as `'olympic_games'`)
+- Adopting async `abatch()` via LangGraph StateGraph (mirroring `ch05/04_evaluation/03_generate_qa_pairs/generate_qa_pairs.py`)
+
+## Critical Files
+- **Target**: `ch05/06_embeddings/02_generate_qa_triplets.py`
+- **Reference pattern**: `ch05/04_evaluation/03_generate_qa_pairs/generate_qa_pairs.py`
+- **Prompts**: `ch05/06_embeddings/synthetic_data_prompt.py` (imported as `from synthetic_data_prompt import SYSTEM_PROMPT, USER_PROMPT`)
+
+## Implementation Plan
+
+### 1. Imports & Model
+- Replace `click` import with `argparse`, `asyncio`
+- Add `loguru.logger` for logging (matches reference style)
+- Keep `langchain_core.runnables.RunnableConfig` for `max_concurrency`
+- Keep `QATriplet` Pydantic model (has `question`, `answer`, `negative_document`)
+- Change `from langchain_core.pydantic_v1 import BaseModel` → `from pydantic import BaseModel` (modernize, consistent with reference)
+
+### 2. LangGraph StateGraph
+Define a `State` TypedDict with fields:
+```python
+class State(TypedDict):
+    length: int
+    clarity: str
+    difficulty: str
+    document_id: str
+    context: str
+    query: str
+    answer: str
+    negative_document: str
+```
+
+Create four nodes (same pattern as reference):
+- `select_length`: returns `{"length": random.choice([8, 16, 32])}`
+- `select_clarity`: returns `{"clarity": random.choice(["简单", "基础", "困难"])}`
+- `select_difficulty`: returns `{"difficulty": random.choice(["小学", "初中", "高中", "大学", "研究生博士"])}`
+- `generate`: invokes `prompt | llm`, returns `{"query": ..., "answer": ..., "negative_document": ...}`
+
+Wire edges: `START → {select_length, select_clarity, select_difficulty}` (parallel), all three → `generate → END`
+
+Move `prompt_template` and `llm` to module level (same as reference).
+
+### 3. Async `main()` function
+```python
+async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: str, max_concurrency: int = 8):
+```
+
+- Build and compile the StateGraph
+- Load vectorstore with `Chroma(persist_directory=index_dir, collection_name=collection_name)`
+- If `num_docs == -1`, use all documents; otherwise `num_docs = min(num_docs, len(ids))`
+- Prepare `inputs` list: `[{"document_id": doc["ids"], "context": doc["documents"]} for doc in selected_docs]`
+- Run `await graph.abatch(inputs, config=RunnableConfig(max_concurrency=max_concurrency))`
+- Build both `qa_pairs` and `qa_triplets` lists from results
+- Write `{output_dir}/qa_pairs.json` and `{output_dir}/qa_triplets.json`
+
+### 4. argparse CLI
+```python
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--index_dir", default=None, required=False, ...)   # optional flag, default=None
+    parser.add_argument("--num_docs", "-n", type=int, default=-1, ...)
+    parser.add_argument("--output_dir", "-o", default="./data_finetuning", ...)
+    parser.add_argument("--collection_name", default="olympic_games", ...)
+    parser.add_argument("--max_concurrency", type=int, default=8, ...)
+    args = parser.parse_args()
+    if args.index_dir is None:
+        parser.error("--index_dir is required. Please provide the path to the Chroma index directory.")
+    asyncio.run(main(...))
+```
+
+### 5. Key Differences from Original
+- `cycle(selected_docs)` is removed — each document processed once (cleaner for batch mode); `num_docs=-1` means all docs
+- Sequential `chain.invoke()` in a for-loop replaced with parallel `graph.abatch()`
+- `tqdm` removed (loguru progress messages sufficient for async batch)
+- Error handling: `abatch` will propagate exceptions; individual errors are less granular but the batch is more efficient
+
+## Verification
+Manual review of the generated file. Runtime testing requires Python 3.10 environment (user will test separately).
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+add usages and docstrings to @ch05/06_embeddings/02_generate_qa_triplets.py.
+
+---
+
+update @ch05/06_embeddings/README.md. Create a new section with the name ``运行步骤`` to incluce the example shell scripts for running the python scripts. Add minimal explaination in Chinese.
+
+---
+
+make a commit

@@ -1,0 +1,30 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "596da45f1905",
+  "session_id": "d761f459-1db9-46ae-be31-0fc580f7c8d0",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-03T13:39:57.1388Z",
+  "branch": "feat-add-async-qa-generation-06-embeddings-0303",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "ch05/06_embeddings/02_generate_qa_triplets.py",
+    "ch05/06_embeddings/README.md"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 27,
+    "cache_creation_tokens": 38887,
+    "cache_read_tokens": 735708,
+    "output_tokens": 8287,
+    "api_call_count": 19
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-03T13:39:57.102413Z",
+    "agent_lines": 241,
+    "human_added": 70866,
+    "human_modified": 3,
+    "human_removed": 0,
+    "total_committed": 71110,
+    "agent_percentage": 0.3389115454928983
+  }
+}
