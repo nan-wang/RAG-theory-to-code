@@ -1,0 +1,32 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "bcb3f1844bc3",
+  "session_id": "26455137-557e-488d-8736-aa043da365ac",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-03T03:46:28.387943Z",
+  "branch": "feat-add-metrics-summary-0303",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/04_evaluation/02_calculate_generation_metrics.py",
+    "ch05/04_evaluation/02_calculate_global_metrics.py",
+    "ch05/04_evaluation/02_calculate_retrieval_metrics.py",
+    "ch05/04_evaluation/utils.py"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 25147,
+    "cache_read_tokens": 184853,
+    "output_tokens": 969,
+    "api_call_count": 6
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-03T03:46:28.36612Z",
+    "agent_lines": 44,
+    "human_added": 10,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 54,
+    "agent_percentage": 81.48148148148148
+  }
+}

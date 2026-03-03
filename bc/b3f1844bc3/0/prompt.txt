@@ -1,0 +1,90 @@
+Implement the following plan:
+
+# Plan: Write global metric scores to shared scores.json
+
+## Context
+`02_calculate_global_metrics.py` computes `precision_score`, `recall_score`, and `f1` but only prints them. The user wants these persisted to `Path(output_path) / "metrics" / "scores.json"`. This file is shared across all three metric scripts (`02_calculate_global_metrics.py`, `02_calculate_retrieval_metrics.py`, `02_calculate_generation_metrics.py`), so the file must be read first (if it exists), updated with new scores, and written back — rather than overwritten.
+
+## Changes
+
+### 1. Add a `dump_scores` utility to `utils.py`
+**File:** `ch05/04_evaluation/utils.py`
+
+Add a reusable function after the existing `dump_metrics` function (line 119):
+
+```python
+def dump_scores(scores: dict, output_fn):
+    """Read existing scores.json (if any), update with new scores, and write back."""
+    path = Path(output_fn)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    existing = {}
+    if path.exists():
+        with open(path, 'r') as f:
+            existing = json.load(f)
+    existing.update(scores)
+    with open(path, 'w') as f:
+        json.dump(existing, f, indent=2)
+    print(f"Dumping the scores to {output_fn}")
+```
+
+### 2. Use `dump_scores` in `02_calculate_global_metrics.py`
+**File:** `ch05/04_evaluation/02_calculate_global_metrics.py`
+
+- Import `dump_scores` from `utils` (line 7)
+- At the end of `_main()` (after line 107), collect computed scores and call `dump_scores`:
+
+```python
+    scores = {}
+    if precision:
+        scores["precision"] = precision_score
+    if recall:
+        scores["recall"] = recall_score
+    if precision and recall:
+        scores["f1"] = f1
+    dump_scores(scores, Path(output_path) / "metrics" / "scores.json")
+```
+
+### 3. Use `dump_scores` in `02_calculate_retrieval_metrics.py`
+**File:** `ch05/04_evaluation/02_calculate_retrieval_metrics.py`
+
+- Import `dump_scores` from `utils` (line 16)
+- At the end of `_main()` (after line 140), collect and dump:
+
+```python
+    scores = {}
+    if precision:
+        scores["context_precision"] = precision_score
+    if recall:
+        scores["context_recall"] = keypoints_recall
+    dump_scores(scores, Path(output_path) / "metrics" / "scores.json")
+```
+
+### 4. Use `dump_scores` in `02_calculate_generation_metrics.py`
+**File:** `ch05/04_evaluation/02_calculate_generation_metrics.py`
+
+- At the end of `_main()` (after line 265), collect and dump:
+
+```python
+    scores = {}
+    if loyalty:
+        scores["response_loyalty"] = response_loyalty
+    if hallucination:
+        scores["hallucination"] = hallucination_score
+    if noise_sensitivity:
+        scores["noise_sensitivity"] = noise_sensitivity_score
+    if context_utility_ratio:
+        scores["context_utility_ratio"] = context_utility_ratio_score
+    dump_scores(scores, Path(output_path) / "metrics" / "scores.json")
+```
+
+Need to add `from utils import dump_scores` at the top (currently `utils` is not imported in this file).
+
+## Verification
+After running any combination of the three scripts with the same `--output_path`, check that `<output_path>/metrics/scores.json` accumulates all scores without overwriting previously written ones.
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+good. make a git add and commit
