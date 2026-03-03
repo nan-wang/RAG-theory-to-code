@@ -1,0 +1,148 @@
+Implement the following plan:
+
+# Plan: Add Async Batch Query and CLI to ch05/06_embeddings
+
+## Context
+The four embedding scripts in `ch05/06_embeddings/` use a synchronous `rag_chain.invoke()` loop and have hardcoded paths for inputs/outputs. The goal is to refactor them to follow the pattern established in `ch05/04_evaluation/01_extract_keypoints/naive_rag.py` and `ch05/07_hybrid_indexing/hybrid_rag.py`, adding:
+- CLI argument parsing (`--index`, `--query`, and path flags)
+- `index()` function for building the vector store
+- `async query()` function using LangGraph's `graph.abatch()`
+- Parameterized paths instead of hardcoded values
+
+## Files to Modify
+
+1. `ch05/06_embeddings/01_use_bge_embeddings.py`
+2. `ch05/06_embeddings/01_use_jina_embeddings.py`
+3. `ch05/06_embeddings/01_use_local_embeddings.py`
+4. `ch05/06_embeddings/02_use_finetuned_embeddings.py`
+
+## Reference Files
+- `ch05/04_evaluation/01_extract_keypoints/naive_rag.py` — primary pattern reference
+- `ch05/06_embeddings/utils.py` — provides `load_documents`, `split_sections`, `split_chunks`
+
+## Common Refactoring Pattern (applied to all 4 files)
+
+### Imports
+Replace old rag-chain imports with LangGraph + async imports:
+```python
+import argparse, asyncio, json
+from argparse import BooleanOptionalAction
+from pathlib import Path
+import dotenv
+from langchain_chroma import Chroma
+from langchain_core.documents import Document
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableConfig
+from langchain_openai import ChatOpenAI
+from langgraph.graph import START, StateGraph
+from loguru import logger
+from typing_extensions import List, TypedDict
+from utils import load_documents, split_sections, split_chunks
+```
+Remove: `RunnablePassthrough`, `RunnableParallel`, `RunnablePick`, `StrOutputParser`, `tqdm`, `format_docs`
+
+### State + Prompt
+```python
+class State(TypedDict):
+    question: str
+    context: List[Document]
+    answer: str
+
+prompt_template = ChatPromptTemplate.from_template(...)  # keep existing prompt text
+llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus")
+```
+
+### `index()` function
+```python
+def index(index_input_dir: str, index_dir: str, collection_name: str):
+    docs = load_documents(f"{index_input_dir}/*.txt")
+    chunks = []
+    for doc in docs:
+        sections = split_sections(doc.page_content, source=Path(doc.metadata.get("source","")).stem)
+        chunks.extend(split_chunks(sections))
+    Chroma.from_documents(documents=chunks, embedding=get_embeddings(),
+                          persist_directory=index_dir, collection_name=collection_name)
+```
+
+### `retrieve()` / `generate()` node functions
+Use global `vector_store`; keep `search_kwargs={"k": 10}` (matching existing files).
+
+### `async query()` function
+```python
+async def query(query_input_path, index_dir, collection_name, output_dir, max_concurrency):
+    global vector_store
+    vector_store = Chroma(persist_directory=index_dir, embedding_function=get_embeddings(),
+                          create_collection_if_not_exists=False, collection_name=collection_name)
+    graph = StateGraph(State).add_sequence([retrieve, generate])
+    graph.add_edge(START, "retrieve")
+    graph = graph.compile()
+    qa_pairs = json.load(open(query_input_path))
+    outputs = await graph.abatch([{"question": d["query"]} for d in qa_pairs],
+                                  config=RunnableConfig(max_concurrency=max_concurrency))
+    results = [dict(doc, response={"content": out["answer"],
+               "contexts": [d.page_content for d in out["context"]]})
+               for doc, out in zip(qa_pairs, outputs)]
+    out_path = f"{output_dir}/response.json"
+    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+    json.dump(results, open(out_path, "w"), indent=4, ensure_ascii=False)
+```
+
+### `main()` with argparse
+```python
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--index', dest='do_index', action=BooleanOptionalAction, default=False)
+    parser.add_argument('--query', dest='do_query', action=BooleanOptionalAction, default=False)
+    parser.add_argument('--index_dir', required=True)
+    parser.add_argument('--collection_name', required=True)
+    parser.add_argument('--index_input_dir', default=None)
+    parser.add_argument('--query_input_path', default=None)
+    parser.add_argument('--output_dir', default=None)
+    parser.add_argument('--max_concurrency', default=8, type=int)
+    # (02_use_finetuned only: --model_path, --cache_folder)
+    ...
+```
+
+## Per-File Specifics
+
+### `01_use_bge_embeddings.py`
+- Keep `SILICONFLOW_API_KEY` / `SILICONFLOW_BASE_URL` env reads
+- `get_embeddings()` → `OpenAIEmbeddings(model="Pro/BAAI/bge-m3", api_key=..., base_url=..., chunk_size=16, check_embedding_ctx_length=False)`
+
+### `01_use_jina_embeddings.py`
+- `get_embeddings()` → `JinaEmbeddings(model_name="jina-embeddings-v3")`
+
+### `01_use_local_embeddings.py`
+- Remove duplicate `from langchain_huggingface import HuggingFaceEmbeddings` (currently on lines 5 and 9)
+- `get_embeddings()` → `HuggingFaceEmbeddings(model_name="sentence-transformers/distiluse-base-multilingual-cased-v1")`
+
+### `02_use_finetuned_embeddings.py`
+- Add two extra CLI args: `--model_path` (required) and `--cache_folder` (default None)
+- Store parsed values in module-level globals `_model_path`, `_cache_folder` before calling index/query
+- `get_embeddings()` → `HuggingFaceEmbeddings(model_name=_model_path, cache_folder=_cache_folder, model_kwargs={'trust_remote_code': True})`
+
+## Docstring Usage Examples (per file)
+Each file gets a module docstring showing:
+```
+python <script>.py --index --index_dir data_chroma --collection_name olympic_games \
+    --index_input_dir ../../data
+
+python <script>.py --query --index_dir data_chroma --collection_name olympic_games \
+    --query_input_path data_eval/v20250501/keypoints.json --output_dir data_eval/v20250501
+
+python <script>.py --index --query ...
+```
+
+## Verification
+Since Python cannot be executed in this environment, verify by:
+- Reviewing that all 4 files follow the `naive_rag.py` structure
+- Checking that `get_embeddings()` in each file uses the correct embedding class/config
+- Confirming no hardcoded paths remain in the module body
+- Confirming `graph.abatch()` is used in the `query()` async function
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+good. make a git commit

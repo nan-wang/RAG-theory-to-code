@@ -1,0 +1,32 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "596da45f1905",
+  "session_id": "e481a13c-ac27-4d9f-82c5-81b21a915045",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-03T13:10:23.824542Z",
+  "branch": "feat-add-async-cli-06-0303",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/06_embeddings/01_use_bge_embeddings.py",
+    "ch05/06_embeddings/01_use_jina_embeddings.py",
+    "ch05/06_embeddings/01_use_local_embeddings.py",
+    "ch05/06_embeddings/02_use_finetuned_embeddings.py"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 18,
+    "cache_creation_tokens": 38786,
+    "cache_read_tokens": 578801,
+    "output_tokens": 13049,
+    "api_call_count": 14
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-03T13:10:23.786607Z",
+    "agent_lines": 700,
+    "human_added": 0,
+    "human_modified": 24,
+    "human_removed": 0,
+    "total_committed": 724,
+    "agent_percentage": 96.68508287292818
+  }
+}

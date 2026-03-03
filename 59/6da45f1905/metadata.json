@@ -2,9 +2,13 @@
   "cli_version": "0.4.2",
   "checkpoint_id": "596da45f1905",
   "strategy": "manual-commit",
-  "branch": "main",
-  "checkpoints_count": 1,
+  "branch": "feat-add-async-cli-06-0303",
+  "checkpoints_count": 2,
   "files_touched": [
+    "ch05/06_embeddings/01_use_bge_embeddings.py",
+    "ch05/06_embeddings/01_use_jina_embeddings.py",
+    "ch05/06_embeddings/01_use_local_embeddings.py",
+    "ch05/06_embeddings/02_use_finetuned_embeddings.py",
     "ch05/07_hybrid_indexing/hybrid_rag.py"
   ],
   "sessions": [
@@ -14,13 +18,20 @@
       "context": "/59/6da45f1905/0/context.md",
       "content_hash": "/59/6da45f1905/0/content_hash.txt",
       "prompt": "/59/6da45f1905/0/prompt.txt"
+    },
+    {
+      "metadata": "/59/6da45f1905/1/metadata.json",
+      "transcript": "/59/6da45f1905/1/full.jsonl",
+      "context": "/59/6da45f1905/1/context.md",
+      "content_hash": "/59/6da45f1905/1/content_hash.txt",
+      "prompt": "/59/6da45f1905/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 12,
-    "cache_creation_tokens": 9452,
-    "cache_read_tokens": 314936,
-    "output_tokens": 4139,
-    "api_call_count": 6
+    "input_tokens": 30,
+    "cache_creation_tokens": 48238,
+    "cache_read_tokens": 893737,
+    "output_tokens": 17188,
+    "api_call_count": 20
   }
 }
