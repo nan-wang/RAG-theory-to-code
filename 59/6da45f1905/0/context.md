@@ -41,3 +41,20 @@ wait. the `split_sections` and the `split_chunks` function should not be touched
 
 good. make a commit.
 
+### Prompt 6
+
+Let's focus at 
+
+@ch05/05_chunking/02_chunking_add_meta_info.py
+
+Modify the file to fulfill the following requirements.
+- Take @ch05/04_evaluation/01_extract_keypoints/naive_rag.py for reference.
+- use `async` function to run the `abatch` function from the langchain to run the queries in a batch instead of using the `invoke`. 
+- use `query_input_path` for loading the QA pairs.
+- use `output_dir` + `response.json` as the output path instead of using `output_path`.
+- load the documents from `index...
+
+### Prompt 7
+
+good. make a commit
+

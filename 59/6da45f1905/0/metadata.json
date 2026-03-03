@@ -3,28 +3,30 @@
   "checkpoint_id": "596da45f1905",
   "session_id": "c4e57f87-2bce-4333-b89e-06354e121e87",
   "strategy": "manual-commit",
-  "created_at": "2026-03-03T11:11:44.685992Z",
+  "created_at": "2026-03-03T11:18:24.805428Z",
   "branch": "feat-add-async-cli-05-chunking-0303",
-  "checkpoints_count": 2,
+  "checkpoints_count": 1,
   "files_touched": [
-    "ch05/05_chunking/01_chunking_zh_section.py"
+    "ch05/05_chunking/02_chunking_add_meta_info.py"
   ],
   "agent": "Claude Code",
-  "transcript_identifier_at_start": "6a3b601a-00bb-462e-9803-3a4860067943",
+  "transcript_identifier_at_start": "7130721e-dd7e-4b5a-8775-7a7ca42067ef",
+  "checkpoint_transcript_start": 51,
+  "transcript_lines_at_start": 51,
   "token_usage": {
-    "input_tokens": 14,
-    "cache_creation_tokens": 28804,
-    "cache_read_tokens": 242925,
-    "output_tokens": 4280,
-    "api_call_count": 8
+    "input_tokens": 9,
+    "cache_creation_tokens": 8122,
+    "cache_read_tokens": 220172,
+    "output_tokens": 3761,
+    "api_call_count": 5
   },
   "initial_attribution": {
-    "calculated_at": "2026-03-03T11:11:44.665534Z",
-    "agent_lines": 168,
-    "human_added": 5197,
-    "human_modified": 9,
+    "calculated_at": "2026-03-03T11:18:24.780734Z",
+    "agent_lines": 177,
+    "human_added": 132,
+    "human_modified": 0,
     "human_removed": 0,
-    "total_committed": 5374,
-    "agent_percentage": 3.1261630070710833
+    "total_committed": 309,
+    "agent_percentage": 57.28155339805825
   }
 }

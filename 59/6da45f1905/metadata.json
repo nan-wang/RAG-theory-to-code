@@ -3,9 +3,9 @@
   "checkpoint_id": "596da45f1905",
   "strategy": "manual-commit",
   "branch": "feat-add-async-cli-05-chunking-0303",
-  "checkpoints_count": 2,
+  "checkpoints_count": 1,
   "files_touched": [
-    "ch05/05_chunking/01_chunking_zh_section.py"
+    "ch05/05_chunking/02_chunking_add_meta_info.py"
   ],
   "sessions": [
     {
@@ -17,10 +17,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 14,
-    "cache_creation_tokens": 28804,
-    "cache_read_tokens": 242925,
-    "output_tokens": 4280,
-    "api_call_count": 8
+    "input_tokens": 9,
+    "cache_creation_tokens": 8122,
+    "cache_read_tokens": 220172,
+    "output_tokens": 3761,
+    "api_call_count": 5
   }
 }
