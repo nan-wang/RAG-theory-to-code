@@ -1,0 +1,66 @@
+Implement the following plan:
+
+# Plan: Use separate prompt modules for precision vs recall in `02_calculate_retrieval_metrics.py`
+
+## Context
+
+Same refactoring as was done for `02_calculate_global_metrics.py` — replace the single legacy `prompts.keypoints_verify_prompt` import with two separate prompt modules so precision and recall use different verification prompts.
+
+## File to modify
+
+`ch05/04_evaluation/02_calculate_retrieval_metrics.py`
+
+## Changes
+
+### 1. Replace import (line 11)
+
+**Remove:**
+```python
+from prompts.keypoints_verify_prompt import SYSTEM_PROMPT, USER_PROMPT
+```
+
+**Add:**
+```python
+from prompts.groundtruth_keypoints_verify_prompt import SYSTEM_PROMPT as GT_SYSTEM_PROMPT, USER_PROMPT as GT_USER_PROMPT
+from prompts.answer_keypoints_verify_prompt import SYSTEM_PROMPT as ANS_SYSTEM_PROMPT, USER_PROMPT as ANS_USER_PROMPT
+```
+
+### 2. Replace single chain with two chains (lines 76–92)
+
+Remove the old `KV_SYS_TMPL` / `KV_USER_TMPL` / `prompt` / `chain` block. Replace with:
+
+```python
+llm = ChatOpenAI(model="gpt-4o-mini")
+match = re.compile(r'\[\[\[([^\]]+)\]\]\]')
+
+# chain for ground-truth verification (used by recall)
+gt_prompt = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template(GT_SYSTEM_PROMPT),
+    HumanMessagePromptTemplate.from_template(GT_USER_PROMPT),
+])
+chain_gt = (gt_prompt | llm | StrOutputParser())
+
+# chain for answer keypoints verification (used by precision)
+ans_prompt = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template(ANS_SYSTEM_PROMPT),
+    HumanMessagePromptTemplate.from_template(ANS_USER_PROMPT),
+])
+chain_ans = (ans_prompt | llm | StrOutputParser())
+
+config = RunnableConfig(max_concurrency=max_concurrency)
+```
+
+### 3. Use correct chain per metric
+
+- **Precision** (line 104): `chain.abatch(...)` → `chain_ans.abatch(...)`
+- **Recall** (line 133): `verify_keypoints(cxt_recall_kp, chain, ...)` → `verify_keypoints(cxt_recall_kp, chain_gt, ...)`
+
+## Verification
+
+Visual review only (Python 3.10 environment not available). Confirm:
+- No references to `prompts.keypoints_verify_prompt` remain
+- `chain_ans` used for precision, `chain_gt` used for recall
+- `config` and `match` variables preserved (used by precision's `abatch` path)
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
