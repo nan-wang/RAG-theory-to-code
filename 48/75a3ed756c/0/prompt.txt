@@ -1,0 +1,128 @@
+Implement the following plan:
+
+# Plan: Convert evaluation scripts to async batch processing
+
+## Context
+
+Four evaluation scripts in `ch05/04_evaluation/` use sequential `chain.invoke()` / `lc_chain.invoke()` loops with `tqdm`. The user wants to convert them all to async `abatch` following the pattern in `03_generate_qa_pairs.py`: `async def main(...)` → `await chain.abatch(inputs, config=RunnableConfig(max_concurrency=...))` → `asyncio.run(main(...))`.
+
+The shared utility `verify_keypoints()` in `utils.py` also uses sequential `invoke` and must be converted.
+
+## Files to modify (5 total)
+
+### 1. `ch05/04_evaluation/utils.py` — `verify_keypoints()`
+
+**Current**: Iterates `keypoints` with `tqdm`, calling `lc_chain.invoke()` per keypoint.
+
+**Change**: Make async, replace loop with `abatch`:
+```python
+async def verify_keypoints(keypoints, lc_chain, max_concurrency=8):
+    match = re.compile(r'\[\[\[([^\]]+)\]\]\]')
+    inputs = [{"question": kp.question, "answer": kp.answer, "keypoint": kp.keypoint} for kp in keypoints]
+    outputs = await lc_chain.abatch(inputs, config=RunnableConfig(max_concurrency=max_concurrency))
+    for kp, result in zip(keypoints, outputs):
+        rsp = match.search(result)
+        if rsp:
+            kp.label = rsp.group(1)
+        else:
+            print(...)
+    return list(keypoints)
+```
+
+- Add imports: `from langchain_core.runnables import RunnableConfig`
+- Remove `tqdm` import
+
+### 2. `ch05/04_evaluation/01_extract_keypoints.py`
+
+**Current**: Loop over docs, `chain.invoke()` per doc for ground_truth and/or response mode.
+
+**Change**:
+- Add `--max_concurrency` click option (default 8)
+- Add `import asyncio`, `from langchain_core.runnables import RunnableConfig`; remove `tqdm`
+- Make `main()` → `async def _main(...)`, click wrapper calls `asyncio.run(_main(...))`
+- Batch ground_truth invocations: collect all `{"question": ..., "answer": ...}` dicts → `await chain.abatch(inputs, config=...)` → assign `result.keypoints` per doc (with try/except to skip failures)
+- Batch response invocations similarly
+- Build `results` list after both batches complete, filtering out docs that failed ground_truth extraction
+
+### 3. `ch05/04_evaluation/02_calculate_generation_metrics.py`
+
+**Current**: 4 metric modes, each with `chain.invoke()` loops (loyalty, hallucination, noise_sensitivity, context_utility_ratio). Hallucination has nested loop over (kp_context, kp_answer) pairs.
+
+**Change**:
+- Add `--max_concurrency` click option (default 8)
+- Add `import asyncio`, `from langchain_core.runnables import RunnableConfig`; remove `tqdm`
+- Make `main()` → `async def _main(...)`, click wrapper calls `asyncio.run(_main(...))`
+- **Loyalty**: Flatten all keypoints → `await chain.abatch(...)` → assign labels from results
+- **Hallucination**: Flatten all keypoints from all groups → single `abatch` → assign labels → reconstruct `(kp_group, is_hallucination)` by checking if any in group is "Relevant"
+- **Noise sensitivity**: Flatten all `(claim_context, claim_ans)` pairs → single `abatch` → assign labels → reconstruct with original logic
+- **Context utility ratio**: Same flatten/batch/reconstruct pattern
+
+### 4. `ch05/04_evaluation/02_calculate_global_metrics.py`
+
+**Current**: Calls `verify_keypoints(rsp_kp, chain)` and `verify_keypoints(ans_kp, chain)`.
+
+**Change**:
+- Add `--max_concurrency` click option (default 8)
+- Add `import asyncio`; remove `tqdm`
+- Make `main()` → `async def _main(...)`, click wrapper calls `asyncio.run(_main(...))`
+- Call `await verify_keypoints(rsp_kp, chain, max_concurrency)` (now async)
+
+### 5. `ch05/04_evaluation/02_calculate_retrieval_metrics.py`
+
+**Current**: Precision uses nested loop with `chain.invoke()`, recall calls `verify_keypoints()`.
+
+**Change**:
+- Add `--max_concurrency` click option (default 8)
+- Add `import asyncio`, `from langchain_core.runnables import RunnableConfig`; remove `tqdm`
+- Make `main()` → `async def _main(...)`, click wrapper calls `asyncio.run(_main(...))`
+- **Precision**: Flatten all keypoints from all groups → single `abatch` → assign labels → reconstruct `(kp_group, label)` by checking if any is "Relevant"
+- **Recall**: Call `await verify_keypoints(...)` (now async)
+
+## Common pattern across all files
+
+```python
+# click wrapper (unchanged signature)
+@click.command()
+@click.option('--max_concurrency', default=8, type=int, help='Max concurrent batch runs.')
+# ... existing options ...
+def main(..., max_concurrency):
+    asyncio.run(_main(..., max_concurrency=max_concurrency))
+
+async def _main(..., max_concurrency):
+    # ... batch processing with abatch ...
+```
+
+## Verification
+
+```bash
+cd ch05/04_evaluation
+python 01_extract_keypoints.py --help
+python 02_calculate_generation_metrics.py --help
+python 02_calculate_global_metrics.py --help
+python 02_calculate_retrieval_metrics.py --help
+# All should show --max_concurrency option
+```
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+[Request interrupted by user for tool use]
+
+---
+
+Don't run the python codes in this project because it requires Python 3.10 which is conflicts with claude.
+
+---
+
+Focus on @ch05/04_evaluation/02_calculate_global_metrics.py. In line 12, we should not import the same ``SYSTEM_PROMPT`` and ``USER_PROMPT`` from one single module ``prompts.keypoint_verify_prompt`` which is a legacy module and is not longer existing. Instead, 
+- import ``SYSTEM_PROMPT`` and ``USER_PROMPT`` from ``prompts.groundtruth_keypoints_verify_prompt`` as ``GT_SYSTEM_PROMPT`` and ``GT_USER_PROMPT``
+- import ``SYSTEM_PROMPT`` and ``USER_PROMPT`` from ``prompts.answer_keypoints_verify_prompt`` as ``ANS_SYSTEM_PROMPT`` and ``ANS_USER_PROMPT``
+- in line 69-84, construct two chains with the name ``chain_gt`` and ``chain_ans`` with two different sets of prompts load above
+- when calculating ``precision_list`` in line 88, use the ``chain_ans``.
+- when calculating ``recall_list`` in line 97, use the ``chain_gt``
+
+---
+
+[Request interrupted by user for tool use]
