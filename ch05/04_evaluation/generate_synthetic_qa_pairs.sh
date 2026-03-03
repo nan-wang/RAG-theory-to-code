@@ -7,18 +7,18 @@
 
 # --- Usage Function ---
 usage() {
-    echo "Usage: $0 --index-dir <path> --collection-name <name> --output-dir <path> --num-generate <int>"
+    echo "Usage: $0 --index-dir <path> --collection-name <name> --output-dir <path> --num-docs <int>"
     echo ""
     echo "Options:"
     echo "  --index-dir <path>      : Directory containing the document index (e.g., ./data_chroma_multi)"
     echo "  --collection-name <name>: Name of the collection within the index (e.g., test_db)"
     echo "  --output-dir <path>     : Base directory where all synthetic data will be stored (e.g., data_eval/v20250501)"
-    echo "  --num-generate <int>    : Number of synthetic QA pairs to generate (e.g., 128)"
+    echo "  --num-docs <int>        : Number of synthetic QA pairs to generate (e.g., 128)"
     echo "  -h, --help              : Show this help message"
     echo ""
     echo "Example:"
-    echo "  $0 --index-dir ./data_chroma_multi --collection-name test_db --output-dir ./eval_eval/v20250506 --num-generate 256"
-    echo "  $0 --index-dir ./my_index --collection-name my_collection --output-dir ./eval_results_20231231 --num-generate 200"
+    echo "  $0 --index-dir ./data_chroma_multi --collection-name test_db --output-dir ./eval_eval/v20250506 --num-docs 256"
+    echo "  $0 --index-dir ./my_index --collection-name my_collection --output-dir ./eval_results_20231231 --num-docs 200"
 }
 
 # --- Parse Arguments ---
@@ -34,7 +34,7 @@ while [[ "$#" -gt 0 ]]; do
         --index-dir) INDEX_DIR="$2"; shift ;;
         --collection-name) COLLECTION_NAME="$2"; shift ;;
         --output-dir) BASE_OUTPUT_DIR="$2"; shift ;;
-        --num-generate) NUM_GENERATE_DOCS="$2"; shift ;;
+        --num-docs) NUM_GENERATE_DOCS="$2"; shift ;;
         -h|--help) usage; exit 0 ;;
         *) echo "Error: Unknown parameter passed: $1"; usage; exit 1 ;;
     esac
