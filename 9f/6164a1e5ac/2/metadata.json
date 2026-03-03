@@ -3,30 +3,30 @@
   "checkpoint_id": "9f6164a1e5ac",
   "session_id": "ce74cce0-8cf8-479c-bcb7-1263980724f5",
   "strategy": "manual-commit",
-  "created_at": "2026-03-03T15:01:35.461684Z",
+  "created_at": "2026-03-03T15:05:24.038271Z",
   "branch": "feat-add-cli-11-agentic-rag-0303",
   "checkpoints_count": 1,
   "files_touched": [
     "ch05/11_agentic_rag/README.md"
   ],
   "agent": "Claude Code",
-  "transcript_identifier_at_start": "4f7db316-fd4d-4583-b457-54993595f954",
-  "checkpoint_transcript_start": 61,
-  "transcript_lines_at_start": 61,
+  "transcript_identifier_at_start": "0a0d46c5-3ca7-4227-9d27-e12639df63c9",
+  "checkpoint_transcript_start": 81,
+  "transcript_lines_at_start": 81,
   "token_usage": {
-    "input_tokens": 7,
-    "cache_creation_tokens": 2095,
-    "cache_read_tokens": 263451,
-    "output_tokens": 843,
-    "api_call_count": 5
+    "input_tokens": 6,
+    "cache_creation_tokens": 2244,
+    "cache_read_tokens": 218036,
+    "output_tokens": 901,
+    "api_call_count": 4
   },
   "initial_attribution": {
-    "calculated_at": "2026-03-03T15:01:35.438242Z",
+    "calculated_at": "2026-03-03T15:05:24.013208Z",
     "agent_lines": 0,
-    "human_added": 372,
-    "human_modified": 3,
+    "human_added": 25,
+    "human_modified": 5,
     "human_removed": 0,
-    "total_committed": 372,
+    "total_committed": 28,
     "agent_percentage": 0
   }
 }

@@ -28,3 +28,7 @@ make a commit
 
 rename @ch05/11_agentic_rag/graph.py to main.py. Update @ch05/11_agentic_rag/README.md accordingly.
 
+### Prompt 5
+
+update @ch05/11_agentic_rag/README.md. Create a new section with the name ``运行步骤`` to incluce the example shell scripts for running `main.py`. Add minimal explaination in Chinese.
+
