@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "47d6bf3c086a",
+  "strategy": "manual-commit",
+  "branch": "feat-unify-script-usage-04-evaluation-0303",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/04_evaluation/02_calculate_generation_metrics.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/47/d6bf3c086a/0/metadata.json",
+      "transcript": "/47/d6bf3c086a/0/full.jsonl",
+      "context": "/47/d6bf3c086a/0/context.md",
+      "content_hash": "/47/d6bf3c086a/0/content_hash.txt",
+      "prompt": "/47/d6bf3c086a/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 7895,
+    "cache_read_tokens": 231076,
+    "output_tokens": 992,
+    "api_call_count": 6
+  }
+}
