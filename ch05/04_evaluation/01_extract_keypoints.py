@@ -18,22 +18,25 @@ dotenv.load_dotenv()
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_fn', nargs='?', default="response.json")
     parser.add_argument('--num_docs', '-n', default=-1, type=int,
                         help='The number of documents to be processed.')
-    parser.add_argument('--output_path', '-o', default="./metrics",
-                        help='The output file path.')
     parser.add_argument('--ground-truth', action=BooleanOptionalAction, default=False,
                         help='Whether to extract keypoints from ground truth or response.')
     parser.add_argument('--response', action=BooleanOptionalAction, default=False,
                         help='Whether to extract keypoints from ground truth or response.')
     parser.add_argument('--max_concurrency', default=8, type=int,
                         help='Max concurrent batch runs.')
+    parser.add_argument('--input_fn', '-i', default=None,
+                        help='The input file path.')
+    parser.add_argument('--output_dir', '-o', default="./metrics",
+                        help='The output file path.')
     args = parser.parse_args()
-    asyncio.run(_main(args.num_docs, args.output_path, args.ground_truth, args.response, args.max_concurrency, args.input_fn))
+    if args.input_fn is None:
+        raise RuntimeError("Please provide the input file path via --input_fn/-i.")
+    asyncio.run(_main(args.num_docs, args.output_dir, args.ground_truth, args.response, args.max_concurrency, args.input_fn))
 
 
-async def _main(num_docs, output_path, ground_truth, response, max_concurrency, input_fn):
+async def _main(num_docs, output_dir, ground_truth, response, max_concurrency, input_fn):
     KE_SYS_TMPL = (
         SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT))
 
@@ -84,7 +87,7 @@ async def _main(num_docs, output_path, ground_truth, response, max_concurrency, 
     for doc in results:
         doc.pop("_gt_failed", None)
 
-    output_fn = Path(output_path) / "keypoints.json"
+    output_fn = Path(output_dir) / "keypoints.json"
     Path(output_fn).parent.mkdir(parents=True, exist_ok=True)
     with open(output_fn, 'w') as f:
         json.dump(results, f, indent=4, ensure_ascii=False)

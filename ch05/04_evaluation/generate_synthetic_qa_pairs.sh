@@ -85,8 +85,8 @@ echo "--- Step 4: Extracting keypoints for groundtruth ---"
 python 01_extract_keypoints.py \
     --num_docs "$NUM_GENERATE_DOCS" \
     --ground-truth \
-    --output_path "${BASE_OUTPUT_DIR}" \
-    "${REWRITTEN_OUTPUT_PATH}" || { echo "Error during Step 4. Aborting."; exit 1; }
+    --output_dir "${BASE_OUTPUT_DIR}" \
+    --input_fn "${REWRITTEN_OUTPUT_PATH}" || { echo "Error during Step 4. Aborting."; exit 1; }
 
 echo "--- All steps completed successfully! ---"
 

@@ -68,9 +68,9 @@ echo "--- Step 1: Extracting keypoints from RAG output ---"
 
 python 01_extract_keypoints.py \
     --response \
-    --output_path "$RAG_OUTPUT_DIR" \
+    --output_dir "$RAG_OUTPUT_DIR" \
     --num_docs "$NUM_METRIC_DOCS" \
-    "$RAG_RESPONSE_INPUT_PATH" || { echo "Error during RAG keypoint extraction step. Aborting."; exit 1; }
+    --input_fn "$RAG_RESPONSE_INPUT_PATH" || { echo "Error during RAG keypoint extraction step. Aborting."; exit 1; }
 
 # Validate that RAG keypoints file was created before proceeding
 if [ ! -f "$RAG_KEYPOINTS_PATH" ]; then
