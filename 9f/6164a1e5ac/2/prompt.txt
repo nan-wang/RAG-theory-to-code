@@ -1,0 +1,102 @@
+Implement the following plan:
+
+# Plan: Modify ch05/11_agentic_rag/graph.py
+
+## Context
+The user wants to update `graph.py` in the agentic RAG module to:
+1. Replace the `JinaEmbeddings` model with `OpenAIEmbeddings` using a hardcoded Qwen model name
+2. Accept `index_dir` and `collection_name` via `argparse` (instead of hardcoded values or env vars)
+3. Add Chinese docstrings throughout for readability
+
+Currently, `graph.py` initializes the vectorstore and retriever at module level using hardcoded paths and runs the graph at module level too. The `search()` node references a module-level `retriever` global.
+
+## File to Modify
+
+**`/Users/nanwang/Codes/nan/RAG-theory-to-code/ch05/11_agentic_rag/graph.py`**
+
+## Detailed Changes
+
+### 1. Imports
+- Remove: `from langchain_community.embeddings import JinaEmbeddings`
+- Add: `import argparse` (new import)
+- Keep: `from langchain_openai import OpenAIEmbeddings` — OpenAIEmbeddings is already in `langchain_openai` alongside ChatOpenAI
+
+### 2. Extract initialization into `setup_retriever(index_dir, collection_name)`
+Move lines 40–73 (vectorstore/retriever setup) into a dedicated function that accepts `index_dir` and `collection_name` as parameters. This function will set the module-level `retriever` global so that node functions can still reference it.
+
+Key change inside: replace `JinaEmbeddings(model_name="jina-embeddings-v3")` with `OpenAIEmbeddings(model="Qwen/Qwen3-Embedding-0.6B")`.
+
+### 3. Extract graph compilation into `build_graph()`
+Move lines 241–255 (builder + compile) into a `build_graph()` function that returns the compiled graph.
+
+### 4. Add `main()` with argparse
+- `--index-dir` (default: `../../data_chroma_jina_embeddings`)
+- `--collection-name` (default: `olympic_games`)
+- Call `setup_retriever(args.index_dir, args.collection_name)`
+- Call `build_graph()`
+- Invoke graph with test query
+
+### 5. Declare global `retriever` at module level (set to None), then assign in `setup_retriever()`
+This allows node functions to reference `retriever` without needing closures.
+
+### 6. Add Chinese docstrings to all functions
+- `get_all_splits()`: 加载并切分所有奥运文档
+- `tokenize_doc()`: 使用pkuseg对中文文档进行分词
+- `setup_retriever()`: 初始化向量检索器和混合检索器
+- `build_graph()`: 构建并编译LangGraph工作流图
+- `generate_query()`: 根据用户主题生成搜索查询
+- `search()`: 执行混合检索（向量+BM25+Jina重排序）
+- `web_search()`: 执行网络搜索（Tavily/DuckDuckGo）
+- `summarize_sources()`: 根据检索结果生成或更新摘要
+- `reflect_on_summary()`: 反思现有摘要并识别知识盲点
+- `finalize_summary()`: 去重来源并生成最终摘要
+- `route_search()`: 路由决策：继续搜索或结束
+
+## Final Structure
+
+```
+imports (with argparse, OpenAIEmbeddings replacing JinaEmbeddings)
+│
+├── get_all_splits()         # 文档加载与切分
+├── tokenize_doc()           # pkuseg 中文分词
+│
+├── retriever = None         # 模块级全局变量，在 setup_retriever() 中赋值
+│
+├── setup_retriever(index_dir, collection_name)  # 初始化检索器
+│
+├── generate_query()         # LangGraph 节点
+├── search()                 # LangGraph 节点
+├── web_search()             # LangGraph 节点
+├── summarize_sources()      # LangGraph 节点
+├── reflect_on_summary()     # LangGraph 节点
+├── finalize_summary()       # LangGraph 节点
+├── route_search()           # 条件路由函数
+│
+├── build_graph()            # 构建并编译图
+│
+└── main()                   # argparse + 执行入口
+    if __name__ == "__main__": main()
+```
+
+## Verification
+
+Run manually (after setting up .env):
+```bash
+cd ch05/11_agentic_rag
+python graph.py --index-dir ../../data_chroma_qwen_embeddings --collection-name olympic_games
+# or use defaults:
+python graph.py
+```
+
+Expected: The graph runs the test query through the agentic loop and prints the final summary.
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+in @ch05/11_agentic_rag/graph.py, when `load_documents`, use `--index_input_dir` to get the input from the cli argument. Load all the .txt files from `index_input_dir`.
+
+---
+
+make a commit

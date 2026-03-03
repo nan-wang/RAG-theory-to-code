@@ -1,0 +1,30 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "9f6164a1e5ac",
+  "session_id": "ce74cce0-8cf8-479c-bcb7-1263980724f5",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-03T15:00:34.164211Z",
+  "branch": "feat-add-cli-11-agentic-rag-0303",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "ch05/11_agentic_rag/.env.example",
+    "ch05/11_agentic_rag/graph.py"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 21,
+    "cache_creation_tokens": 35024,
+    "cache_read_tokens": 573482,
+    "output_tokens": 7981,
+    "api_call_count": 15
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-03T15:00:34.132197Z",
+    "agent_lines": 152,
+    "human_added": 1,
+    "human_modified": 13,
+    "human_removed": 0,
+    "total_committed": 166,
+    "agent_percentage": 91.56626506024097
+  }
+}
