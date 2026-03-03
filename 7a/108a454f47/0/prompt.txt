@@ -1,0 +1,27 @@
+Implement the following plan:
+
+# Plan: Rename `--input-dir` to `--input-fn` in `evaluate.sh`
+
+## Context
+Continuing argument-style unification. `evaluate.sh` currently takes `--input-dir` (a directory) and derives `RAG_RESPONSE_INPUT_PATH="${INPUT_BASE_DIR}/response.json"`. The user wants `--input-fn` to accept the file path directly, eliminating the derivation.
+
+## File: `ch05/04_evaluation/evaluate.sh`
+
+### Changes
+1. **Usage text** (lines 14, 17, 23): `--input-dir <path>` → `--input-fn <path>`, update description to reference a file instead of directory
+2. **Variable** (line 28): `INPUT_BASE_DIR=""` → `INPUT_FN=""`
+3. **Argument parsing** (line 34): `--input-dir) INPUT_BASE_DIR="$2"` → `--input-fn) INPUT_FN="$2"`
+4. **Validation** (line 44): `$INPUT_BASE_DIR` → `$INPUT_FN`
+5. **Directory check → file check** (lines 50-53): change `if [ ! -d "$INPUT_BASE_DIR" ]` to `if [ ! -f "$INPUT_FN" ]` with updated error message
+6. **Remove derivation** (line 55): delete `RAG_RESPONSE_INPUT_PATH="${INPUT_BASE_DIR}/response.json"` — use `$INPUT_FN` directly
+7. **Step 1 invocation** (line 73): `--input_fn "$RAG_RESPONSE_INPUT_PATH"` → `--input_fn "$INPUT_FN"`
+
+## Verification
+- Review diff to confirm no remaining references to `INPUT_BASE_DIR`, `--input-dir`, or `RAG_RESPONSE_INPUT_PATH`.
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+good. make a commit
