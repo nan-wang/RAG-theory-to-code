@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "596da45f1905",
+  "strategy": "manual-commit",
+  "branch": "feat-add-async-cli-05-chunking-0303",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "ch05/05_chunking/01_chunking_zh_section.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/59/6da45f1905/0/metadata.json",
+      "transcript": "/59/6da45f1905/0/full.jsonl",
+      "context": "/59/6da45f1905/0/context.md",
+      "content_hash": "/59/6da45f1905/0/content_hash.txt",
+      "prompt": "/59/6da45f1905/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 14,
+    "cache_creation_tokens": 28804,
+    "cache_read_tokens": 242925,
+    "output_tokens": 4280,
+    "api_call_count": 8
+  }
+}
