@@ -1,0 +1,9 @@
+In @ch05/04_evaluation/01_extract_keypoints.py, rename the argument `output_path` with `output_dir`.
+
+---
+
+update @ch05/04_evaluation/evaluate.sh and @ch05/04_evaluation/generate_synthetic_qa_pairs.sh accordingly.
+
+---
+
+good. Make a commit
