@@ -1,7 +1,7 @@
 import json
+import asyncio
 import click
 
-from tqdm import tqdm
 from pathlib import Path
 import dotenv
 from utils import dump_metrics, verify_keypoints
@@ -37,10 +37,20 @@ dotenv.load_dotenv()
     '--recall/--no-recall',
     default=True
 )
+@click.option(
+    '--max_concurrency',
+    default=8,
+    type=int,
+    help='Max concurrent batch runs.'
+)
 @click.argument(
     'input_fn',
     default="keypoints.json")
-def main(num_docs, output_path, precision, recall, input_fn):
+def main(num_docs, output_path, precision, recall, max_concurrency, input_fn):
+    asyncio.run(_main(num_docs, output_path, precision, recall, max_concurrency, input_fn))
+
+
+async def _main(num_docs, output_path, precision, recall, max_concurrency, input_fn):
     with open(input_fn, "r") as f:
         docs = json.load(f)
         rsp_kp = []
@@ -75,7 +85,7 @@ def main(num_docs, output_path, precision, recall, input_fn):
 
     # calculate the precision
     if precision:
-        precision_list = verify_keypoints(rsp_kp, chain)
+        precision_list = await verify_keypoints(rsp_kp, chain, max_concurrency)
         dump_metrics(
             precision_list,
             Path(output_path) / "metrics" / "global_precision.json")
@@ -84,7 +94,7 @@ def main(num_docs, output_path, precision, recall, input_fn):
         print(f"precision: {precision_score:.3f}")
 
     if recall:
-        recall_list = verify_keypoints(ans_kp, chain)
+        recall_list = await verify_keypoints(ans_kp, chain, max_concurrency)
         dump_metrics(
             recall_list,
             Path(output_path) / "metrics" / "global_recall.json")
@@ -100,5 +110,3 @@ def main(num_docs, output_path, precision, recall, input_fn):
 if __name__ == '__main__':
     # python calculate_global_metrics.py -n 100 -o data_metrics/v20241219/ch0503_naive/ --precision --recall data_metrics/v20241219/ch0503_naive/keypoints.json
     main()
-
-
