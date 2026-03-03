@@ -1,8 +1,9 @@
+import argparse
 import json
 import asyncio
+from argparse import BooleanOptionalAction
 from pathlib import Path
 import dotenv
-import click
 import re
 
 from langchain_openai.chat_models import ChatOpenAI
@@ -18,39 +19,20 @@ from utils import dump_metrics, dump_scores, verify_keypoints
 
 dotenv.load_dotenv()
 
-@click.command()
-@click.option(
-    '--num_docs',
-    '-n',
-    default=-1,
-    help='The number of documents to be processed.')
-@click.option(
-    '--output_path',
-    '-o',
-    default="./metrics",
-    help='The output file path.',
-    type=click.Path(file_okay=False, dir_okay=True, writable=True)
-)
-@click.option(
-    '--precision/--no-precision',
-    default=False
-)
-@click.option(
-    '--recall/--no-recall',
-    default=False
-)
-@click.option(
-    '--max_concurrency',
-    default=8,
-    type=int,
-    help='Max concurrent batch runs.'
-)
-@click.argument(
-    'input_fn',
-    type=click.Path(exists=True, dir_okay=False, readable=True)
-)
-def main(num_docs, output_path, precision, recall, max_concurrency, input_fn):
-    asyncio.run(_main(num_docs, output_path, precision, recall, max_concurrency, input_fn))
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input_fn')
+    parser.add_argument('--num_docs', '-n', default=-1, type=int,
+                        help='The number of documents to be processed.')
+    parser.add_argument('--output_path', '-o', default="./metrics",
+                        help='The output file path.')
+    parser.add_argument('--precision', action=BooleanOptionalAction, default=False)
+    parser.add_argument('--recall', action=BooleanOptionalAction, default=False)
+    parser.add_argument('--max_concurrency', default=8, type=int,
+                        help='Max concurrent batch runs.')
+    args = parser.parse_args()
+    asyncio.run(_main(args.num_docs, args.output_path, args.precision, args.recall, args.max_concurrency, args.input_fn))
 
 
 async def _main(num_docs, output_path, precision, recall, max_concurrency, input_fn):

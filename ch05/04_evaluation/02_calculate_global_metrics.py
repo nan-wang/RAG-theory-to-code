@@ -1,7 +1,8 @@
+import argparse
 import json
 import asyncio
-import click
 
+from argparse import BooleanOptionalAction
 from pathlib import Path
 import dotenv
 from utils import dump_metrics, dump_scores, verify_keypoints
@@ -17,38 +18,19 @@ from langchain_core.output_parsers import StrOutputParser
 dotenv.load_dotenv()
 
 
-@click.command()
-@click.option(
-    '--num_docs',
-    '-n',
-    default=-1,
-    help='The number of documents to be processed.')
-@click.option(
-    '--output_path',
-    '-o',
-    default="./metrics",
-    help='The output file path.',
-    type=click.Path(file_okay=False, dir_okay=True, writable=True)
-)
-@click.option(
-    '--precision/--no-precision',
-    default=True
-)
-@click.option(
-    '--recall/--no-recall',
-    default=True
-)
-@click.option(
-    '--max_concurrency',
-    default=8,
-    type=int,
-    help='Max concurrent batch runs.'
-)
-@click.argument(
-    'input_fn',
-    default="keypoints.json")
-def main(num_docs, output_path, precision, recall, max_concurrency, input_fn):
-    asyncio.run(_main(num_docs, output_path, precision, recall, max_concurrency, input_fn))
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input_fn', nargs='?', default="keypoints.json")
+    parser.add_argument('--num_docs', '-n', default=-1, type=int,
+                        help='The number of documents to be processed.')
+    parser.add_argument('--output_path', '-o', default="./metrics",
+                        help='The output file path.')
+    parser.add_argument('--precision', action=BooleanOptionalAction, default=True)
+    parser.add_argument('--recall', action=BooleanOptionalAction, default=True)
+    parser.add_argument('--max_concurrency', default=8, type=int,
+                        help='Max concurrent batch runs.')
+    args = parser.parse_args()
+    asyncio.run(_main(args.num_docs, args.output_path, args.precision, args.recall, args.max_concurrency, args.input_fn))
 
 
 async def _main(num_docs, output_path, precision, recall, max_concurrency, input_fn):

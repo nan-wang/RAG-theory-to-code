@@ -21,11 +21,12 @@
         --output_dir data_eval/v20250501
 """
 
+import argparse
 import asyncio
 import json
+from argparse import BooleanOptionalAction
 from pathlib import Path
 
-import click
 import dotenv
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
@@ -151,36 +152,46 @@ async def query(
     logger.info(f"Wrote {len(results)} results to {output_path}")
 
 
-@click.command()
-@click.option("--index/--no-index", "do_index", default=False, help="Run indexing step.")
-@click.option("--query/--no-query", "do_query", default=False, help="Run query step.")
-@click.option("--index_dir", required=True, type=str, help="Chroma persist directory.")
-@click.option("--collection_name", required=True, type=str, help="Chroma collection name.")
-@click.option("--index_input_dir", default=None, type=str, help="Directory containing *.txt files for indexing.")
-@click.option("--query_input_path", default=None, type=str, help="Path to input JSON file with queries.")
-@click.option("--output_dir", default=None, type=str, help="Directory for response.json output.")
-@click.option("--max_concurrency", default=8, type=int, help="Batch concurrency for querying.")
-def cli(do_index, do_query, index_dir, collection_name, index_input_dir, query_input_path, output_dir, max_concurrency):
-    if not do_index and not do_query:
-        raise click.UsageError("At least one of --index or --query must be specified.")
+def cli():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--index', dest='do_index', action=BooleanOptionalAction, default=False,
+                        help='Run indexing step.')
+    parser.add_argument('--query', dest='do_query', action=BooleanOptionalAction, default=False,
+                        help='Run query step.')
+    parser.add_argument('--index_dir', required=True, type=str,
+                        help='Chroma persist directory.')
+    parser.add_argument('--collection_name', required=True, type=str,
+                        help='Chroma collection name.')
+    parser.add_argument('--index_input_dir', default=None, type=str,
+                        help='Directory containing *.txt files for indexing.')
+    parser.add_argument('--query_input_path', default=None, type=str,
+                        help='Path to input JSON file with queries.')
+    parser.add_argument('--output_dir', default=None, type=str,
+                        help='Directory for response.json output.')
+    parser.add_argument('--max_concurrency', default=8, type=int,
+                        help='Batch concurrency for querying.')
+    args = parser.parse_args()
 
-    if do_index:
-        if not index_input_dir:
-            raise click.UsageError("--index_input_dir is required when --index is set.")
-        index(index_input_dir=index_input_dir, index_dir=index_dir, collection_name=collection_name)
+    if not args.do_index and not args.do_query:
+        parser.error("At least one of --index or --query must be specified.")
 
-    if do_query:
-        if not query_input_path:
-            raise click.UsageError("--query_input_path is required when --query is set.")
-        if not output_dir:
-            raise click.UsageError("--output_dir is required when --query is set.")
+    if args.do_index:
+        if not args.index_input_dir:
+            parser.error("--index_input_dir is required when --index is set.")
+        index(index_input_dir=args.index_input_dir, index_dir=args.index_dir, collection_name=args.collection_name)
+
+    if args.do_query:
+        if not args.query_input_path:
+            parser.error("--query_input_path is required when --query is set.")
+        if not args.output_dir:
+            parser.error("--output_dir is required when --query is set.")
         asyncio.run(
             query(
-                query_input_path=query_input_path,
-                index_dir=index_dir,
-                collection_name=collection_name,
-                output_dir=output_dir,
-                max_concurrency=max_concurrency,
+                query_input_path=args.query_input_path,
+                index_dir=args.index_dir,
+                collection_name=args.collection_name,
+                output_dir=args.output_dir,
+                max_concurrency=args.max_concurrency,
             )
         )
 

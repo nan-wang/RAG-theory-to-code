@@ -1,7 +1,8 @@
+import argparse
 import json
 import asyncio
 
-import click
+from argparse import BooleanOptionalAction
 from pathlib import Path
 import dotenv
 import re
@@ -20,47 +21,21 @@ from utils import dump_scores
 dotenv.load_dotenv()
 
 
-@click.command()
-@click.option(
-    '--num_docs',
-    '-n',
-    default=-1,
-    help='The number of documents to be processed.')
-@click.option(
-    '--output_path',
-    '-o',
-    default="./metrics",
-    help='The output file path.',
-    type=click.Path(file_okay=False, dir_okay=True, writable=True)
-)
-@click.option(
-    '--loyalty/--no-loyalty',
-    default=False
-)
-@click.option(
-    '--hallucination/--no-hallucination',
-    default=False
-)
-@click.option(
-    '--noise-sensitivity/--no-noise-sensitivity',
-    default=False
-)
-@click.option(
-    '--context-utility-ratio/--no-context-utility-ratio',
-    default=False
-)
-@click.option(
-    '--max_concurrency',
-    default=8,
-    type=int,
-    help='Max concurrent batch runs.'
-)
-@click.argument(
-    'input_fn',
-    type=click.Path(exists=True, dir_okay=False, readable=True)
-)
-def main(num_docs, output_path, loyalty, hallucination, noise_sensitivity, context_utility_ratio, max_concurrency, input_fn):
-    asyncio.run(_main(num_docs, output_path, loyalty, hallucination, noise_sensitivity, context_utility_ratio, max_concurrency, input_fn))
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input_fn')
+    parser.add_argument('--num_docs', '-n', default=-1, type=int,
+                        help='The number of documents to be processed.')
+    parser.add_argument('--output_path', '-o', default="./metrics",
+                        help='The output file path.')
+    parser.add_argument('--loyalty', action=BooleanOptionalAction, default=False)
+    parser.add_argument('--hallucination', action=BooleanOptionalAction, default=False)
+    parser.add_argument('--noise-sensitivity', action=BooleanOptionalAction, default=False)
+    parser.add_argument('--context-utility-ratio', action=BooleanOptionalAction, default=False)
+    parser.add_argument('--max_concurrency', default=8, type=int,
+                        help='Max concurrent batch runs.')
+    args = parser.parse_args()
+    asyncio.run(_main(args.num_docs, args.output_path, args.loyalty, args.hallucination, args.noise_sensitivity, args.context_utility_ratio, args.max_concurrency, args.input_fn))
 
 
 async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity, context_utility_ratio, max_concurrency, input_fn):
