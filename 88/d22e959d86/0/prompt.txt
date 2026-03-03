@@ -1,0 +1,38 @@
+Implement the following plan:
+
+# Plan: Rename `input_path` to `input_fn` in `03_rewrite_qa_pairs.py`
+
+## Context
+Continuing the argument-style unification across `ch05/04_evaluation` scripts. `03_rewrite_qa_pairs.py` currently uses `--input_path` (required). Rename it to `--input_fn/-i` with `default=None` and a `RuntimeError` if missing, matching the pattern in the other scripts.
+
+## Changes
+
+### 1. `ch05/04_evaluation/03_rewrite_qa_pairs.py`
+- Line 62: rename `main` parameter `input_path` → `input_fn`
+- Line 68: rename local usage `input_path` → `input_fn`
+- Line 73: rename log reference `input_path` → `input_fn`
+- Line 109: update comment `--input_path` → `--input_fn`
+- Line 111: change `parser.add_argument("--input_path", type=str, required=True)` → `parser.add_argument("--input_fn", "-i", default=None)`
+- After `args = parser.parse_args()` (line 114), add: `if args.input_fn is None: raise RuntimeError("Missing required argument: --input_fn/-i")`
+- Line 116: `args.input_path` → `args.input_fn`
+
+### 2. `ch05/04_evaluation/generate_synthetic_qa_pairs.sh`
+- Line 80: `--input_path` → `--input_fn`
+
+## Verification
+- Review diffs to confirm all `input_path` references are renamed to `input_fn` in both files.
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+good. make a commit
+
+---
+
+in @ch05/04_evaluation/generate_synthetic_qa_pairs.sh, rename `num-generate` with `num-docs` to be consistent with the python scripts at `03_generate_qa_pairs.py`
+
+---
+
+good. Make a commit.
