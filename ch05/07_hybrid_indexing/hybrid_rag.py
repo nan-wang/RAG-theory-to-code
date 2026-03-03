@@ -12,13 +12,13 @@
     # 仅查询
     python hybrid_rag.py --query --index_dir data_chroma --collection_name olympic_games \
         --index_input_dir ../data \
-        --query_input_path data_eval/keypoints.json \
+        --query_input_path ../05_chunking/data_eval/keypoints.json \
         --output_dir data_eval/
 
     # 同时执行索引和查询
     python hybrid_rag.py --index --query --index_dir data_chroma --collection_name olympic_games \
         --index_input_dir ../data \
-        --query_input_path data_eval/keypoints.json \
+        --query_input_path ../05_chunking/data_eval/keypoints.json \
         --output_dir data_eval
 """
 

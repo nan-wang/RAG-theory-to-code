@@ -6,15 +6,15 @@
 
 使用示例:
     # 仅构建索引
-    python prompt_optimization.py --index --index_dir ../data_chroma_jina_embeddings \
+    python prompt_optimization.py --index --index_dir data_chroma \
         --collection_name olympic_games --index_input_dir ../data
 
     # 仅查询
-    python prompt_optimization.py --query --index_dir ../data_chroma_jina_embeddings \
+    python prompt_optimization.py --query --index_dir data_chroma \
         --collection_name olympic_games \
         --index_input_dir ../data \
-        --query_input_path ../03_eval/data_eval/v20241219/qa_pairs_rewrite.json \
-        --output_dir ../03_eval/data_metrics/v20241219/ch0507_prompt
+        --query_input_path ../05_chunking/data_eval/keypoints.json \
+        --output_dir data_eval 
 
     # 同时执行索引和查询
     python prompt_optimization.py --index --query --index_dir data_chroma \
