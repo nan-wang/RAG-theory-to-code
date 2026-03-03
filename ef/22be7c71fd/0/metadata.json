@@ -1,0 +1,30 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "ef22be7c71fd",
+  "session_id": "1a312adb-1b3f-4666-a901-8122fe622873",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-03T07:36:36.381723Z",
+  "branch": "feat-unify-script-usage-04-evaluation-0303",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/04_evaluation/evaluate.sh",
+    "ch05/04_evaluation/generate_synthetic_qa_pairs.sh"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 5,
+    "cache_creation_tokens": 13610,
+    "cache_read_tokens": 66412,
+    "output_tokens": 684,
+    "api_call_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-03T07:36:36.367669Z",
+    "agent_lines": 4,
+    "human_added": 9,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 13,
+    "agent_percentage": 30.76923076923077
+  }
+}

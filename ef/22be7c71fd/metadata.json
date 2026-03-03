@@ -1,0 +1,27 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "ef22be7c71fd",
+  "strategy": "manual-commit",
+  "branch": "feat-unify-script-usage-04-evaluation-0303",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/04_evaluation/evaluate.sh",
+    "ch05/04_evaluation/generate_synthetic_qa_pairs.sh"
+  ],
+  "sessions": [
+    {
+      "metadata": "/ef/22be7c71fd/0/metadata.json",
+      "transcript": "/ef/22be7c71fd/0/full.jsonl",
+      "context": "/ef/22be7c71fd/0/context.md",
+      "content_hash": "/ef/22be7c71fd/0/content_hash.txt",
+      "prompt": "/ef/22be7c71fd/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 5,
+    "cache_creation_tokens": 13610,
+    "cache_read_tokens": 66412,
+    "output_tokens": 684,
+    "api_call_count": 3
+  }
+}

@@ -1,0 +1,58 @@
+Implement the following plan:
+
+# Plan: Convert `input_fn` from positional to `--input_fn` option in `01_extract_keypoints.py`
+
+## Context
+
+The user wants `input_fn` in `01_extract_keypoints.py` to be an optional `--input_fn`/`-i` argument (same style as `--output_path`/`-o`) instead of a positional argument, with `default=None` and a `RuntimeError` if not provided.
+
+## Changes
+
+### 1. `ch05/04_evaluation/01_extract_keypoints.py` (already done)
+
+Changed:
+```python
+parser.add_argument('input_fn', nargs='?', default="response.json")
+```
+To:
+```python
+parser.add_argument('--input_fn', '-i', default=None,
+                    help='The input file path.')
+```
+Added validation before calling `_main`:
+```python
+if args.input_fn is None:
+    raise RuntimeError("Please provide the input file path via --input_fn/-i.")
+```
+
+### 2. `ch05/04_evaluation/evaluate.sh` (line 73)
+
+Change the positional argument to `--input_fn`:
+```diff
+ python 01_extract_keypoints.py \
+     --response \
+     --output_path "$RAG_OUTPUT_DIR" \
+     --num_docs "$NUM_METRIC_DOCS" \
+-    "$RAG_RESPONSE_INPUT_PATH"
++    --input_fn "$RAG_RESPONSE_INPUT_PATH"
+```
+
+### 3. `ch05/04_evaluation/generate_synthetic_qa_pairs.sh` (line 89)
+
+Change the positional argument to `--input_fn`:
+```diff
+ python 01_extract_keypoints.py \
+     --num_docs "$NUM_GENERATE_DOCS" \
+     --ground-truth \
+     --output_path "${BASE_OUTPUT_DIR}" \
+-    "${REWRITTEN_OUTPUT_PATH}"
++    --input_fn "${REWRITTEN_OUTPUT_PATH}"
+```
+
+## Verification
+
+- Confirm the two shell scripts pass the input path via `--input_fn` instead of as a positional arg
+- The `--help` output should show `--input_fn/-i` as an optional argument
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
