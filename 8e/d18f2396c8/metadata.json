@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "8ed18f2396c8",
+  "strategy": "manual-commit",
+  "branch": "refactor-rename-python-scripts-04-eval-0303",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/04_evaluation/README.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/8e/d18f2396c8/0/metadata.json",
+      "transcript": "/8e/d18f2396c8/0/full.jsonl",
+      "context": "/8e/d18f2396c8/0/context.md",
+      "content_hash": "/8e/d18f2396c8/0/content_hash.txt",
+      "prompt": "/8e/d18f2396c8/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 22,
+    "cache_creation_tokens": 23553,
+    "cache_read_tokens": 515467,
+    "output_tokens": 3950,
+    "api_call_count": 18
+  }
+}

@@ -1,0 +1,52 @@
+Implement the following plan:
+
+# Plan: Remove Numeric Prefixes from Python Scripts in `ch05/04_evaluation/`
+
+## Context
+The Python scripts in each subfolder of `ch05/04_evaluation/` have redundant numeric prefixes (e.g., `01_extract_keypoints.py` inside the `01_extract_keypoints/` folder). The folder names already convey the ordering, so the script prefixes should be removed for cleaner naming.
+
+## Files to Rename
+
+### `01_extract_keypoints/`
+| Old Name | New Name |
+|---|---|
+| `01_extract_keypoints.py` | `extract_keypoints.py` |
+
+### `02_calculate_metrics/`
+| Old Name | New Name |
+|---|---|
+| `02_calculate_global_metrics.py` | `calculate_global_metrics.py` |
+| `02_calculate_retrieval_metrics.py` | `calculate_retrieval_metrics.py` |
+| `02_calculate_generation_metrics.py` | `calculate_generation_metrics.py` |
+
+### `03_generate_qa_pairs/`
+| Old Name | New Name |
+|---|---|
+| `03_generate_qa_pairs.py` | `generate_qa_pairs.py` |
+| `03_validate_qa_pairs.py` | `validate_qa_pairs.py` |
+| `03_rewrite_qa_pairs.py` | `rewrite_qa_pairs.py` |
+
+## Cross-Reference Impact
+- **No Python imports** reference these scripts by their prefixed names
+- **No shell scripts** exist in the directory
+- **CLAUDE.md** does not reference these filenames
+- Scripts communicate via CLI args and JSON files, not by importing each other
+
+## Steps
+
+1. **Rename 7 Python scripts** using `git mv` to preserve git history
+2. **Update `ch05/04_evaluation/README.md`** — update all references to the old filenames in:
+   - Directory tree (lines 18-36)
+   - Command examples (lines 59-121)
+   - Content table (lines 126-143)
+
+## Verification
+- Run `git status` to confirm all renames are tracked
+- Grep the entire `04_evaluation/` directory for any remaining old prefixed filenames
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+good. make a commit
