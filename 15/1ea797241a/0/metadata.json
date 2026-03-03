@@ -1,0 +1,37 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "151ea797241a",
+  "session_id": "548d9bba-cfd2-4a25-8af9-906650cbaad5",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-03T10:04:25.47313Z",
+  "branch": "feat-add-subfolders-04-eval-0303",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "ch05/04_evaluation/01_extract_keypoints/datamodels.py",
+    "ch05/04_evaluation/01_extract_keypoints/test_env_setup.py",
+    "ch05/04_evaluation/01_extract_keypoints/utils.py",
+    "ch05/04_evaluation/02_calculate_metrics/datamodels.py",
+    "ch05/04_evaluation/02_calculate_metrics/test_env_setup.py",
+    "ch05/04_evaluation/02_calculate_metrics/utils.py",
+    "ch05/04_evaluation/03_generate_qa_pairs/03_validate_qa_pairs.py",
+    "ch05/04_evaluation/03_generate_qa_pairs/test_env_setup.py",
+    "ch05/04_evaluation/README.md"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 58,
+    "cache_creation_tokens": 75997,
+    "cache_read_tokens": 3244843,
+    "output_tokens": 13702,
+    "api_call_count": 52
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-03T10:04:25.415273Z",
+    "agent_lines": 564,
+    "human_added": 1436,
+    "human_modified": 25,
+    "human_removed": 0,
+    "total_committed": 2025,
+    "agent_percentage": 27.85185185185185
+  }
+}

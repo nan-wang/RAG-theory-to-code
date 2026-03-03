@@ -1,0 +1,165 @@
+Implement the following plan:
+
+# Plan: Reorganize `04_evaluation/` into Three Subfolders
+
+## Context
+
+The `ch05/04_evaluation/` directory currently has all scripts, shared modules, and prompts flat in one directory. We need to organize them into three independent subfolders (`01_extract_keypoints/`, `02_calculate_metrics/`, `03_generate_qa_pairs/`) so each folder can be executed independently (except for data dependencies via CLI args).
+
+## Target Structure
+
+```
+ch05/04_evaluation/
+├── .env / .env.example          # shared env (dotenv searches parent dirs)
+├── test_env_setup.py            # shared env validation
+├── README.md                    # updated
+├── evaluate.sh                  # kept as-is (rewrite later)
+├── generate_synthetic_qa_pairs.sh  # kept as-is (rewrite later)
+├── data_chroma/                 # existing data
+├── data_eval/                   # existing data
+│
+├── 01_extract_keypoints/
+│   ├── .env / .env.example
+│   ├── test_env_setup.py
+│   ├── naive_rag.py
+│   ├── 01_extract_keypoints.py
+│   ├── utils.py                 # subset: doc loading/chunking functions
+│   ├── datamodels.py            # KeyPoints class
+│   └── prompts/
+│       └── keypoints_extract_prompt.py
+│
+├── 02_calculate_metrics/
+│   ├── .env / .env.example
+│   ├── test_env_setup.py
+│   ├── 02_calculate_global_metrics.py
+│   ├── 02_calculate_retrieval_metrics.py
+│   ├── 02_calculate_generation_metrics.py
+│   ├── utils.py                 # subset: metrics dump/verify functions
+│   ├── datamodels.py            # KeyPoint class
+│   └── prompts/
+│       ├── groundtruth_keypoints_verify_prompt.py
+│       └── answer_keypoints_verify_prompt.py
+│
+└── 03_generate_qa_pairs/
+    ├── .env / .env.example
+    ├── test_env_setup.py
+    ├── 03_generate_qa_pairs.py
+    ├── 03_validate_qa_pairs.py
+    ├── 03_rewrite_qa_pairs.py
+    └── prompts/
+        ├── synthetic_data_prompt.py
+        ├── validate_question_answer_prompt.py
+        └── rewrite_question_prompt.py
+```
+
+## Steps
+
+### Step 1: Create subfolders and prompts directories
+
+Create the three subfolders and their `prompts/` subdirectories:
+- `01_extract_keypoints/prompts/`
+- `02_calculate_metrics/prompts/`
+- `03_generate_qa_pairs/prompts/`
+
+### Step 2: Distribute prompt files
+
+Move prompt files to the subfolder that uses them:
+
+| Prompt file | Destination |
+|---|---|
+| `keypoints_extract_prompt.py` | `01_extract_keypoints/prompts/` |
+| `groundtruth_keypoints_verify_prompt.py` | `02_calculate_metrics/prompts/` |
+| `answer_keypoints_verify_prompt.py` | `02_calculate_metrics/prompts/` |
+| `synthetic_data_prompt.py` | `03_generate_qa_pairs/prompts/` |
+| `validate_question_answer_prompt.py` | `03_generate_qa_pairs/prompts/` |
+| `rewrite_question_prompt.py` | `03_generate_qa_pairs/prompts/` |
+
+Then delete the parent `prompts/` directory.
+
+### Step 3: Split and distribute `utils.py`
+
+**`01_extract_keypoints/utils.py`** — document loading and chunking:
+- Functions: `split_sections`, `create_section_documents`, `get_chunks`, `load_documents`, `format_docs`
+- Imports: `re`, `copy`, `pathlib.Path`, `glob`, `TextLoader`, `RecursiveCharacterTextSplitter`, `Document`
+
+**`02_calculate_metrics/utils.py`** — metrics persistence and verification:
+- Functions: `dump_metrics`, `dump_scores`, `verify_keypoints`, `split_contexts`
+- Imports: `re`, `pathlib.Path`, `json`, `RunnableConfig`
+
+Then delete the parent `utils.py`.
+
+### Step 4: Distribute `datamodels.py`
+
+**`01_extract_keypoints/datamodels.py`** — contains only `KeyPoints` class (used by `01_extract_keypoints.py`).
+
+**`02_calculate_metrics/datamodels.py`** — contains only `KeyPoint` class (used by all three metric scripts).
+
+Then delete the parent `datamodels.py`.
+
+### Step 5: Duplicate `.env`, `.env.example`, and `test_env_setup.py` to each subfolder
+
+Copy these three files into each of the three subfolders so each can be run independently:
+- `01_extract_keypoints/.env`, `.env.example`, `test_env_setup.py`
+- `02_calculate_metrics/.env`, `.env.example`, `test_env_setup.py`
+- `03_generate_qa_pairs/.env`, `.env.example`, `test_env_setup.py`
+
+Update the section name in each `test_env_setup.py` copy (e.g., "01_extract_keypoints", "02_calculate_metrics", "03_generate_qa_pairs").
+
+### Step 6: Move scripts to subfolders
+
+| Script | Destination |
+|---|---|
+| `naive_rag.py` | `01_extract_keypoints/` |
+| `01_extract_keypoints.py` | `01_extract_keypoints/` |
+| `02_calculate_global_metrics.py` | `02_calculate_metrics/` |
+| `02_calculate_retrieval_metrics.py` | `02_calculate_metrics/` |
+| `02_calculate_generation_metrics.py` | `02_calculate_metrics/` |
+| `03_generate_qa_pairs.py` | `03_generate_qa_pairs/` |
+| `03_validate_qa_pairs.py` | `03_generate_qa_pairs/` |
+| `03_rewrite_qa_pairs.py` | `03_generate_qa_pairs/` |
+
+No import changes needed — each script's local imports (`from prompts.xxx`, `from utils`, `from datamodels`) resolve within its own subfolder.
+
+### Step 7: Argument changes
+
+**`03_validate_qa_pairs.py`**: Change `--output_path` to `--output_dir`
+- CLI: `--output_path` → `--output_dir` (takes a directory path)
+- Internal: construct file path as `Path(output_dir) / "qa_pairs.validated.json"`
+- Update `main()` signature and function body accordingly
+
+### Step 8: Clean up parent directory
+
+Delete from parent `04_evaluation/`:
+- All 8 moved Python scripts
+- `utils.py`, `datamodels.py`
+- `prompts/` directory (all 6 prompt files)
+- `test_env_setup.py`
+- `__pycache__/`
+
+Keep in parent:
+- `.env`, `.env.example` (still useful for shell scripts)
+- `README.md` (update references)
+- `evaluate.sh`, `generate_synthetic_qa_pairs.sh` (untouched)
+- `data_chroma/`, `data_eval/`
+
+### Step 9: Update `README.md`
+
+Update to reflect the new subfolder structure and usage commands.
+
+## Verification
+
+Since we cannot run Python in this environment, verify by:
+1. Confirm all imports in each subfolder resolve to files within that subfolder
+2. Confirm CLI argument names match the user's specified commands
+3. Confirm no cross-subfolder code dependencies exist
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+in @ch05/04_evaluation/03_generate_qa_pairs/03_validate_qa_pairs.py, rename `input_path` to `input_fn`.
+
+---
+
+make a git add and commit
