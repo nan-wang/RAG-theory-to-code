@@ -1,11 +1,12 @@
+import asyncio
 import click
 import dotenv
-import tqdm
 import json
 from loguru import logger
 
 from prompts.keypoints_extract_prompt import SYSTEM_PROMPT, USER_PROMPT
 from langchain_core.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate, ChatPromptTemplate
+from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
 from pathlib import Path
 from datamodels import KeyPoints
@@ -37,11 +38,21 @@ dotenv.load_dotenv()
     default=False,
     help='Whether to extract keypoints from ground truth or response.'
 )
+@click.option(
+    '--max_concurrency',
+    default=8,
+    type=int,
+    help='Max concurrent batch runs.'
+)
 @click.argument(
     'input_fn',
     default="response.json"
 )
-def main(num_docs, output_path, ground_truth, response, input_fn):
+def main(num_docs, output_path, ground_truth, response, max_concurrency, input_fn):
+    asyncio.run(_main(num_docs, output_path, ground_truth, response, max_concurrency, input_fn))
+
+
+async def _main(num_docs, output_path, ground_truth, response, max_concurrency, input_fn):
     KE_SYS_TMPL = (
         SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT))
 
@@ -63,32 +74,34 @@ def main(num_docs, output_path, ground_truth, response, input_fn):
         data = json.load(f)
     logger.info(f"Loaded from {input_fn}")
 
-    results = []
+    docs = data[:num_docs]
     logger.info(f"Selected {num_docs if num_docs!=-1 else len(data)} from {len(data)} documents")
-    for doc in tqdm.tqdm(data[:num_docs]):
-        question = doc['query']
-        if ground_truth:
-            answer = doc['ground_truth']['content']
-            result = chain.invoke({
-                "question": question,
-                "answer": answer
-            })
+
+    if ground_truth:
+        gt_inputs = [{"question": doc['query'], "answer": doc['ground_truth']['content']} for doc in docs]
+        gt_outputs = await chain.abatch(gt_inputs, config=RunnableConfig(max_concurrency=max_concurrency))
+        for doc, result in zip(docs, gt_outputs):
             try:
                 doc["ground_truth"]["keypoints"] = result.keypoints
             except Exception as e:
                 logger.info(f"Error: {e}")
                 logger.info(f"Failed to extract keypoints from ground truth for result: {result}")
-                continue
-            doc["ground_truth"]["keypoints"] = result.keypoints
+                doc["_gt_failed"] = True
 
-        if response:
-            response = doc['response']['content']
-            result = chain.invoke({
-                "question": question,
-                "answer": response
-            })
-            doc["response"]["keypoints"] = result.keypoints
-        results.append(doc)
+    if response:
+        rsp_inputs = [{"question": doc['query'], "answer": doc['response']['content']} for doc in docs]
+        rsp_outputs = await chain.abatch(rsp_inputs, config=RunnableConfig(max_concurrency=max_concurrency))
+        for doc, result in zip(docs, rsp_outputs):
+            try:
+                doc["response"]["keypoints"] = result.keypoints
+            except Exception as e:
+                logger.info(f"Error: {e}")
+                logger.info(f"Failed to extract keypoints from response for result: {result}")
+
+    results = [doc for doc in docs if not doc.get("_gt_failed")]
+    # Clean up temporary marker
+    for doc in results:
+        doc.pop("_gt_failed", None)
 
     output_fn = Path(output_path) / "keypoints.json"
     Path(output_fn).parent.mkdir(parents=True, exist_ok=True)
