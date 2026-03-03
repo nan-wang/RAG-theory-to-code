@@ -1,0 +1,34 @@
+Implement the following plan:
+
+# Plan: Unify argument style for global and retrieval metrics scripts
+
+## Context
+Continuing the pattern established in `01_extract_keypoints.py` and `02_calculate_generation_metrics.py`: converting `input_fn` from a positional argument to an optional `--input_fn/-i` with validation, and renaming `output_path` to `output_dir`.
+
+## Changes
+
+### 1. `ch05/04_evaluation/02_calculate_global_metrics.py`
+- Remove positional `input_fn` (line 23: `parser.add_argument('input_fn', nargs='?', default="keypoints.json")`)
+- Add optional `--input_fn/-i` with `default=None`
+- Add `RuntimeError` if `args.input_fn is None`
+- Rename all `output_path` occurrences to `output_dir` (argument definition, `args.output_path`, `_main` parameter, and 3 usages in `Path(output_path)`)
+
+### 2. `ch05/04_evaluation/02_calculate_retrieval_metrics.py`
+- Remove positional `input_fn` (line 25: `parser.add_argument('input_fn')`)
+- Add optional `--input_fn/-i` with `default=None`
+- Add `RuntimeError` if `args.input_fn is None`
+- Rename all `output_path` occurrences to `output_dir` (argument definition, `args.output_path`, `_main` parameter, and 3 usages in `Path(output_path)`)
+
+### 3. `ch05/04_evaluation/evaluate.sh`
+- Step 2 (lines 86-90): `--output_path` → `--output_dir`, positional `"$RAG_KEYPOINTS_PATH"` → `--input_fn "$RAG_KEYPOINTS_PATH"`
+- Step 3 (lines 95-99): `--output_path` → `--output_dir`, positional `"$RAG_KEYPOINTS_PATH"` → `--input_fn "$RAG_KEYPOINTS_PATH"`
+
+## Verification
+- Review diffs to confirm all `output_path` references are renamed and `input_fn` is converted consistently across both files and the shell script.
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+make a commit
