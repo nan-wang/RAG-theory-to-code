@@ -152,7 +152,7 @@ async def query(
     logger.info(f"Wrote {len(results)} results to {output_path}")
 
 
-def cli():
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--index', dest='do_index', action=BooleanOptionalAction, default=False,
                         help='Run indexing step.')
@@ -197,4 +197,4 @@ def cli():
 
 
 if __name__ == "__main__":
-    cli()
+    main()
