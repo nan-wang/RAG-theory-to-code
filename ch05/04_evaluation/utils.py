@@ -1,5 +1,4 @@
 import re
-from tqdm import tqdm
 import copy
 from pathlib import Path
 import glob
@@ -9,6 +8,7 @@ import json
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
+from langchain_core.runnables import RunnableConfig
 
 def split_sections(content, skip_empty_sections=True):
     sections = []
@@ -119,19 +119,14 @@ def dump_metrics(results, output_fn):
     print(f"Dumping the results to {output_fn}")
 
 
-def verify_keypoints(keypoints, lc_chain):
+async def verify_keypoints(keypoints, lc_chain, max_concurrency=8):
     match = re.compile(r'\[\[\[([^\]]+)\]\]\]')
-    results = []
-    for kp in tqdm(keypoints):
-        result = lc_chain.invoke({
-            "question": kp.question,
-            "answer": kp.answer,
-            "keypoint": kp.keypoint
-        })
+    inputs = [{"question": kp.question, "answer": kp.answer, "keypoint": kp.keypoint} for kp in keypoints]
+    outputs = await lc_chain.abatch(inputs, config=RunnableConfig(max_concurrency=max_concurrency))
+    for kp, result in zip(keypoints, outputs):
         rsp = match.search(result)
         if rsp:
             kp.label = rsp.group(1)
         else:
             print(f"Failed to extract the label for the keypoint: {result}")
-        results.append(kp)
-    return results
+    return list(keypoints)

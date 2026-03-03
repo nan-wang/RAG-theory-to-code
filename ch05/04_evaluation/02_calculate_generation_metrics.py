@@ -9,9 +9,9 @@ import re
 from langchain_openai.chat_models import ChatOpenAI
 from langchain_core.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate, ChatPromptTemplate
 from langchain_core.runnables import RunnableConfig
-from prompts.keypoints_verify_prompt import SYSTEM_PROMPT, USER_PROMPT
+from prompts.groundtruth_keypoints_verify_prompt import SYSTEM_PROMPT as GT_SYSTEM_PROMPT, USER_PROMPT as GT_USER_PROMPT
+from prompts.answer_keypoints_verify_prompt import SYSTEM_PROMPT as ANS_SYSTEM_PROMPT, USER_PROMPT as ANS_USER_PROMPT
 from langchain_core.output_parsers import StrOutputParser
-from langchain import QAWithSourcesChain
 
 from datamodels import KeyPoint
 
@@ -103,28 +103,28 @@ async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity
                     )
                 )
 
-    KV_SYS_TMPL = (
-        SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT))
-
-    KV_USER_TMPL = (
-        HumanMessagePromptTemplate.from_template(USER_PROMPT))
-
-    prompt = ChatPromptTemplate.from_messages(
-        messages=[
-            KV_SYS_TMPL,
-            KV_USER_TMPL
-        ]
-    )
-
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus", temperature=0)
     match = re.compile(r'\[\[\[([^\]]+)\]\]\]')
 
-    chain = (prompt | llm | StrOutputParser())
+    # chain for ground-truth keypoints verification
+    gt_prompt = ChatPromptTemplate.from_messages([
+        SystemMessagePromptTemplate.from_template(GT_SYSTEM_PROMPT),
+        HumanMessagePromptTemplate.from_template(GT_USER_PROMPT),
+    ])
+    chain_gt = (gt_prompt | llm | StrOutputParser())
+
+    # chain for answer keypoints verification
+    ans_prompt = ChatPromptTemplate.from_messages([
+        SystemMessagePromptTemplate.from_template(ANS_SYSTEM_PROMPT),
+        HumanMessagePromptTemplate.from_template(ANS_USER_PROMPT),
+    ])
+    chain_ans = (ans_prompt | llm | StrOutputParser())
+
     config = RunnableConfig(max_concurrency=max_concurrency)
 
     if loyalty:
         inputs = [{"question": kp.question, "answer": kp.answer, "keypoint": kp.keypoint} for kp in response_loyalty_kp]
-        outputs = await chain.abatch(inputs, config=config)
+        outputs = await chain_ans.abatch(inputs, config=config)
         for kp, result in zip(response_loyalty_kp, outputs):
             rsp = match.search(result)
             if rsp:
@@ -151,7 +151,7 @@ async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity
                 flat_indices.append((group_idx, pos))
 
         inputs = [{"question": kp.question, "answer": kp.answer, "keypoint": kp.keypoint} for kp in flat_kps]
-        outputs = await chain.abatch(inputs, config=config)
+        outputs = await chain_ans.abatch(inputs, config=config)
 
         for kp, result in zip(flat_kps, outputs):
             rsp = match.search(result)
@@ -188,7 +188,7 @@ async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity
             flat_indices.append((pair_idx, 1))
 
         inputs = [{"question": kp.question, "answer": kp.answer, "keypoint": kp.keypoint} for kp in flat_kps]
-        outputs = await chain.abatch(inputs, config=config)
+        outputs = await chain_ans.abatch(inputs, config=config)
 
         for kp, result in zip(flat_kps, outputs):
             rsp = match.search(result)
@@ -228,7 +228,7 @@ async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity
             flat_kps.append(claim_ans)
 
         inputs = [{"question": kp.question, "answer": kp.answer, "keypoint": kp.keypoint} for kp in flat_kps]
-        outputs = await chain.abatch(inputs, config=config)
+        outputs = await chain_gt.abatch(inputs, config=config)
 
         for kp, result in zip(flat_kps, outputs):
             rsp = match.search(result)
