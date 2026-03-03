@@ -17,7 +17,7 @@ class Configuration(BaseModel):
         description="Number of search iterations to perform"
     )
     reasoning_llm: str = Field(
-        default="deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+        default="deepseek-ai/DeepSeek-V3.1-Terminus",
         title="LLM Model Name",
         description="Name of the LLM model to use"
     )
