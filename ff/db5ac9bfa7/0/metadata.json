@@ -1,0 +1,29 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "ffdb5ac9bfa7",
+  "session_id": "d6ab0bb1-1926-461b-90f4-ad479c2e5a80",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-03T08:43:06.591723Z",
+  "branch": "feat-unify-script-usage-04-evaluation-0303",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/04_evaluation/naive_rag.py"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 11,
+    "cache_creation_tokens": 12232,
+    "cache_read_tokens": 169072,
+    "output_tokens": 77,
+    "api_call_count": 7
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-03T08:43:06.575692Z",
+    "agent_lines": 2,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 2,
+    "agent_percentage": 100
+  }
+}

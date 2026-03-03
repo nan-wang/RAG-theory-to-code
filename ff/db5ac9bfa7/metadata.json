@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "ffdb5ac9bfa7",
+  "strategy": "manual-commit",
+  "branch": "feat-unify-script-usage-04-evaluation-0303",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/04_evaluation/naive_rag.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/ff/db5ac9bfa7/0/metadata.json",
+      "transcript": "/ff/db5ac9bfa7/0/full.jsonl",
+      "context": "/ff/db5ac9bfa7/0/context.md",
+      "content_hash": "/ff/db5ac9bfa7/0/content_hash.txt",
+      "prompt": "/ff/db5ac9bfa7/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 11,
+    "cache_creation_tokens": 12232,
+    "cache_read_tokens": 169072,
+    "output_tokens": 77,
+    "api_call_count": 7
+  }
+}

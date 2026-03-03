@@ -1,0 +1,35 @@
+Implement the following plan:
+
+# Plan: Rename entry-point functions to `main()` in `naive_rag.py`
+
+## Context
+Unifying the main function naming across all Python scripts in `ch05/04_evaluation/`. All scripts already use `main()` except `naive_rag.py`, which uses `cli()`.
+
+### Current state
+| Script | Entry function | Status |
+|---|---|---|
+| `01_extract_keypoints.py` | `main()` | OK |
+| `02_calculate_generation_metrics.py` | `main()` | OK |
+| `02_calculate_global_metrics.py` | `main()` | OK |
+| `02_calculate_retrieval_metrics.py` | `main()` | OK |
+| `03_generate_qa_pairs.py` | `main()` | OK |
+| `03_rewrite_qa_pairs.py` | `main()` | OK |
+| `03_validate_qa_pairs.py` | `main()` | OK |
+| **`naive_rag.py`** | **`cli()`** | **Rename needed** |
+
+## File: `ch05/04_evaluation/naive_rag.py`
+
+### Changes
+1. **Line 155**: `def cli():` → `def main():`
+2. **Line 200**: `cli()` → `main()`
+
+## Verification
+- Grep for `cli(` in `naive_rag.py` to confirm no remaining references.
+- Grep for `naive_rag.*cli` across shell scripts to confirm no external callers use `cli()`.
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+good. make a commit
