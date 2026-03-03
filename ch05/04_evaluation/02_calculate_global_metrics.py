@@ -9,7 +9,8 @@ from datamodels import KeyPoint
 
 from langchain_openai.chat_models import ChatOpenAI
 from langchain_core.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate, ChatPromptTemplate
-from prompts.keypoints_verify_prompt import SYSTEM_PROMPT, USER_PROMPT
+from prompts.groundtruth_keypoints_verify_prompt import SYSTEM_PROMPT as GT_SYSTEM_PROMPT, USER_PROMPT as GT_USER_PROMPT
+from prompts.answer_keypoints_verify_prompt import SYSTEM_PROMPT as ANS_SYSTEM_PROMPT, USER_PROMPT as ANS_USER_PROMPT
 from langchain_core.output_parsers import StrOutputParser
 
 
@@ -66,26 +67,25 @@ async def _main(num_docs, output_path, precision, recall, max_concurrency, input
                 ans_kp.append(
                     KeyPoint(question=question, answer=response, keypoint=k))
 
-    KV_SYS_TMPL = (
-        SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT))
+    llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus")
 
-    KV_USER_TMPL = (
-        HumanMessagePromptTemplate.from_template(USER_PROMPT))
+    # chain for ground-truth verification (used by recall)
+    gt_prompt = ChatPromptTemplate.from_messages([
+        SystemMessagePromptTemplate.from_template(GT_SYSTEM_PROMPT),
+        HumanMessagePromptTemplate.from_template(GT_USER_PROMPT),
+    ])
+    chain_gt = (gt_prompt | llm | StrOutputParser())
 
-    prompt = ChatPromptTemplate.from_messages(
-        messages=[
-            KV_SYS_TMPL,
-            KV_USER_TMPL
-        ]
-    )
-
-    llm = ChatOpenAI(model="gpt-4o-mini")
-
-    chain = (prompt | llm | StrOutputParser())
+    # chain for answer keypoints verification (used by precision)
+    ans_prompt = ChatPromptTemplate.from_messages([
+        SystemMessagePromptTemplate.from_template(ANS_SYSTEM_PROMPT),
+        HumanMessagePromptTemplate.from_template(ANS_USER_PROMPT),
+    ])
+    chain_ans = (ans_prompt | llm | StrOutputParser())
 
     # calculate the precision
     if precision:
-        precision_list = await verify_keypoints(rsp_kp, chain, max_concurrency)
+        precision_list = await verify_keypoints(rsp_kp, chain_ans, max_concurrency)
         dump_metrics(
             precision_list,
             Path(output_path) / "metrics" / "global_precision.json")
@@ -94,7 +94,7 @@ async def _main(num_docs, output_path, precision, recall, max_concurrency, input
         print(f"precision: {precision_score:.3f}")
 
     if recall:
-        recall_list = await verify_keypoints(ans_kp, chain, max_concurrency)
+        recall_list = await verify_keypoints(ans_kp, chain_gt, max_concurrency)
         dump_metrics(
             recall_list,
             Path(output_path) / "metrics" / "global_recall.json")
