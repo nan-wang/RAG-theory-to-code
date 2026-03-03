@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "4697e2df8ffd",
+  "strategy": "manual-commit",
+  "branch": "feat-add-async-04-evaluation-0303",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/04_evaluation/02_calculate_generation_metrics.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/46/97e2df8ffd/0/metadata.json",
+      "transcript": "/46/97e2df8ffd/0/full.jsonl",
+      "context": "/46/97e2df8ffd/0/context.md",
+      "content_hash": "/46/97e2df8ffd/0/content_hash.txt",
+      "prompt": "/46/97e2df8ffd/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 12,
+    "cache_creation_tokens": 19605,
+    "cache_read_tokens": 270360,
+    "output_tokens": 1836,
+    "api_call_count": 10
+  }
+}

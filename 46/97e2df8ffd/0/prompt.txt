@@ -1,0 +1,85 @@
+Implement the following plan:
+
+# Plan: Use separate prompt modules for each metric in `02_calculate_generation_metrics.py`
+
+## Context
+
+Same refactoring pattern already applied to `02_calculate_retrieval_metrics.py` and `02_calculate_global_metrics.py` — replace the single legacy `prompts.keypoints_verify_prompt` import with two separate prompt modules so each metric uses the appropriate verification prompt.
+
+## File to modify
+
+`ch05/04_evaluation/02_calculate_generation_metrics.py`
+
+## Changes
+
+### 1. Replace import (line 12)
+
+**Remove:**
+```python
+from prompts.keypoints_verify_prompt import SYSTEM_PROMPT, USER_PROMPT
+```
+
+**Add:**
+```python
+from prompts.groundtruth_keypoints_verify_prompt import SYSTEM_PROMPT as GT_SYSTEM_PROMPT, USER_PROMPT as GT_USER_PROMPT
+from prompts.answer_keypoints_verify_prompt import SYSTEM_PROMPT as ANS_SYSTEM_PROMPT, USER_PROMPT as ANS_USER_PROMPT
+```
+
+### 2. Remove unused import (line 14)
+
+**Remove:**
+```python
+from langchain import QAWithSourcesChain
+```
+
+This import is unused anywhere in the file.
+
+### 3. Replace single chain with two chains (lines 106–123)
+
+Remove the old `KV_SYS_TMPL` / `KV_USER_TMPL` / `prompt` / `chain` block. Replace with:
+
+```python
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+match = re.compile(r'\[\[\[([^\]]+)\]\]\]')
+
+# chain for ground-truth keypoints verification
+gt_prompt = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template(GT_SYSTEM_PROMPT),
+    HumanMessagePromptTemplate.from_template(GT_USER_PROMPT),
+])
+chain_gt = (gt_prompt | llm | StrOutputParser())
+
+# chain for answer keypoints verification
+ans_prompt = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template(ANS_SYSTEM_PROMPT),
+    HumanMessagePromptTemplate.from_template(ANS_USER_PROMPT),
+])
+chain_ans = (ans_prompt | llm | StrOutputParser())
+
+config = RunnableConfig(max_concurrency=max_concurrency)
+```
+
+Note: preserves existing `temperature=0` from the original code.
+
+### 4. Use correct chain per metric
+
+| Metric | Line | Chain | Rationale |
+|---|---|---|---|
+| **loyalty** | 127 | `chain_ans` | Verifies response keypoints against context |
+| **hallucination** | 154 | `chain_ans` | Verifies response keypoints against context & answer |
+| **noise_sensitivity** | 191 | `chain_ans` | Verifies response keypoints against context & answer |
+| **context_utility_ratio** | 231 | `chain_gt` | Verifies ground-truth keypoints against context & answer |
+
+Each `chain.abatch(...)` call becomes `chain_ans.abatch(...)` or `chain_gt.abatch(...)` accordingly.
+
+## Verification
+
+Visual review only (Python 3.10 environment not available). Confirm:
+- No references to `prompts.keypoints_verify_prompt` remain
+- No references to `QAWithSourcesChain` remain
+- `chain_ans` used for loyalty, hallucination, noise_sensitivity
+- `chain_gt` used for context_utility_ratio
+- `config` and `match` variables preserved
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
