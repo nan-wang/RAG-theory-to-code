@@ -15,22 +15,24 @@ python test_env_setup.py
 
 ### 生成评估数据
 
+构建索引，用于抽取文本块。
+
 ```bash
-bash generate_synthetic_qa_pairs.sh --index-dir ../03_langchain_core_and_langgraph/09_naive_rag/data_chroma --collection-name olympic_games --output-dir data_eval/demo_v2 --num-generate 8
+python naive_rag.py --index --no-query --index_dir data_chroma  --collection_name olympic_games --index_input_dir ../data
+```
+
+从索引中随机抽取文本块，用于生成评估数据。
+
+```bash
+bash generate_synthetic_qa_pairs.sh --index-dir data_chroma --collection-name olympic_games --output-dir data_eval/demo --num-generate 8
 ```
 
 在这个过程中，`generate_synthetic_qa_pairs.sh`脚本会依次执行以下Python脚本，
 
-- `python 03_generate_qa_pairs.py --index_dir ../03_langchain_core_and_langgraph/09_naive_rag/data_chroma  --collection_name olympic_games --output_dir data_eval/demo --num_docs 8`。使用上一章节产生的索引作为输出，随机选择8条文本块用于生成问题和答案对。结果保存在`data_eval/demo/qa_pairs.raw.json`
+- `python 03_generate_qa_pairs.py --index_dir ../03_langchain_core_and_langgraph/09_naive_rag/data_chroma  --collection_name olympic_games --output_dir data_eval/demo --num_docs 8`。随机选择8条文本块用于生成问题和答案对。结果保存在`data_eval/demo/qa_pairs.raw.json`
 - `python 03_validate_qa_pairs.py --input_path data_eval/demo/qa_pairs.raw.json --output_path data_eval/demo/qa_pairs.validated.json`。读取`data_eval/demo/qa_pairs.raw.json`中的QA对，使用大模型进行验证，将验证结果保存在`data_eval/demo/qa_pairs.validated.json`
 - `python 03_rewrite_qa_pairs.py --input_path data_eval/demo/qa_pairs.validated.json --output_dir data_eval/demo`。读取`data_eval/demo/qa_pairs.validated.json`中的QA对，使用大模型进行重写，将重写的结果保存在`data_eval/demo/qa_pairs.rewritten.json`
-
-### 抽取标准答案的信息点
-使用``qa_pairs.rewritten.json``，对标准答案抽取细颗粒度关键信息，保存在``data_eval/demo/keypoints.json``中。
-
-```bash
-python 01_extract_keypoints.py --ground-truth --output_path data_eval/demo/ data_eval/demo/qa_pairs.rewritten.json
-```
+- `python 01_extract_keypoints.py --ground-truth --output_path data_eval/demo/ data_eval/demo/qa_pairs.rewritten.json`。使用``qa_pairs.rewritten.json``，对标准答案抽取细颗粒度关键信息，保存在``data_eval/demo/keypoints.json``中。
 
 ### 测试评估数据
 使用目标RAG系统对评估数据进行回答，结果保存在``data_eval/naive_rag/response.json``。为了保持标准答案的细颗粒度关键信息，使用上一步得到的输出文件``data_eval/demo/keypoints.json``作为输入。参考`naive_rag.py`。
@@ -77,3 +79,4 @@ bash evaluate.sh --input-dir data_eval/naive_rag --num-docs 6 --output-dir data_
 | 验证问答提示词 | 用于验证问答对质量的提示词 | [validate_question_answer_prompt.py](prompts/validate_question_answer_prompt.py) |
 | 生成合成数据脚本 | 编排合成数据生成流程的 Shell 脚本 | [generate_synthetic_qa_pairs.sh](generate_synthetic_qa_pairs.sh) |
 | 评估脚本 | 编排评估流程的 Shell 脚本 | [evaluate.sh](evaluate.sh) |
+| Naive RAG | 统一的索引构建与检索问答脚本 | [naive_rag.py](naive_rag.py) |
