@@ -33,15 +33,15 @@ def main():
                         help='Max concurrent batch runs.')
     parser.add_argument('--input_fn', '-i', default=None,
                         help='The input file path.')
-    parser.add_argument('--output_path', '-o', default="./metrics",
+    parser.add_argument('--output_dir', '-o', default="./metrics",
                         help='The output file path.')
     args = parser.parse_args()
     if args.input_fn is None:
         raise RuntimeError("Please provide the input file path via --input_fn/-i.")
-    asyncio.run(_main(args.num_docs, args.output_path, args.loyalty, args.hallucination, args.noise_sensitivity, args.context_utility_ratio, args.max_concurrency, args.input_fn))
+    asyncio.run(_main(args.num_docs, args.output_dir, args.loyalty, args.hallucination, args.noise_sensitivity, args.context_utility_ratio, args.max_concurrency, args.input_fn))
 
 
-async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity, context_utility_ratio, max_concurrency, input_fn):
+async def _main(num_docs, output_dir, loyalty, hallucination, noise_sensitivity, context_utility_ratio, max_concurrency, input_fn):
     with open(input_fn) as f:
         docs = json.load(f)
         response_loyalty_kp = []
@@ -112,7 +112,7 @@ async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity
                 print(f"Failed to extract the label for the keypoint: {result}")
 
         response_loyalty_list = response_loyalty_kp
-        output_fn = Path(output_path) / "metrics" / "generation_loyalty.json"
+        output_fn = Path(output_dir) / "metrics" / "generation_loyalty.json"
         Path(output_fn).parent.mkdir(parents=True, exist_ok=True)
         with open(output_fn, 'w') as f:
             json.dump([kp.dict() for kp in response_loyalty_list], f, indent=4, ensure_ascii=False)
@@ -148,7 +148,7 @@ async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity
                     label = False
             result_list.append((kp_group, label))
 
-        output_fn = Path(output_path) / "metrics" / "generation_hallucination.json"
+        output_fn = Path(output_dir) / "metrics" / "generation_hallucination.json"
         Path(output_fn).parent.mkdir(parents=True, exist_ok=True)
         with open(output_fn, 'w') as f:
             json.dump([{"details": [kp.dict() for kp in kp_g], "is_hallucination": l} for kp_g, l in result_list], f, indent=4, ensure_ascii=False)
@@ -186,7 +186,7 @@ async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity
                 label = False
             result_list.append(((claim_context, claim_ans), label))
 
-        output_fn = Path(output_path) / "metrics" / "generation_noise_sensitivity.json"
+        output_fn = Path(output_dir) / "metrics" / "generation_noise_sensitivity.json"
         Path(output_fn).parent.mkdir(parents=True, exist_ok=True)
         with open(output_fn, 'w') as f:
             json.dump([
@@ -229,7 +229,7 @@ async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity
                 supported_by_cxt_and_ans = False
             result_list.append(((claim_context, claim_ans), supported_by_cxt, supported_by_cxt_and_ans))
 
-        output_fn = Path(output_path) / "metrics" / "generation_context_utility_ratio.json"
+        output_fn = Path(output_dir) / "metrics" / "generation_context_utility_ratio.json"
         Path(output_fn).parent.mkdir(parents=True, exist_ok=True)
         with open(output_fn, 'w') as f:
             json.dump([{
@@ -252,7 +252,7 @@ async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity
         scores["noise_sensitivity"] = noise_sensitivity_score
     if context_utility_ratio:
         scores["context_utility_ratio"] = context_utility_ratio_score
-    dump_scores(scores, Path(output_path) / "metrics" / "scores.json")
+    dump_scores(scores, Path(output_dir) / "metrics" / "scores.json")
 
 
 if __name__ == '__main__':

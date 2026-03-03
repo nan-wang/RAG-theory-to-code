@@ -22,20 +22,23 @@ dotenv.load_dotenv()
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_fn')
+    parser.add_argument('--input_fn', '-i', default=None,
+                        help='The input keypoints JSON file.')
     parser.add_argument('--num_docs', '-n', default=-1, type=int,
                         help='The number of documents to be processed.')
-    parser.add_argument('--output_path', '-o', default="./metrics",
-                        help='The output file path.')
+    parser.add_argument('--output_dir', '-o', default="./metrics",
+                        help='The output directory.')
     parser.add_argument('--precision', action=BooleanOptionalAction, default=False)
     parser.add_argument('--recall', action=BooleanOptionalAction, default=False)
     parser.add_argument('--max_concurrency', default=8, type=int,
                         help='Max concurrent batch runs.')
     args = parser.parse_args()
-    asyncio.run(_main(args.num_docs, args.output_path, args.precision, args.recall, args.max_concurrency, args.input_fn))
+    if args.input_fn is None:
+        raise RuntimeError("Missing required argument: --input_fn/-i")
+    asyncio.run(_main(args.num_docs, args.output_dir, args.precision, args.recall, args.max_concurrency, args.input_fn))
 
 
-async def _main(num_docs, output_path, precision, recall, max_concurrency, input_fn):
+async def _main(num_docs, output_dir, precision, recall, max_concurrency, input_fn):
     with open(input_fn) as f:
         docs = json.load(f)
         cxt_precision_kp = []
@@ -104,7 +107,7 @@ async def _main(num_docs, output_path, precision, recall, max_concurrency, input
             context_precision_list.append((kp_group, label))
             offset += size
 
-        output_fn = Path(output_path) / "metrics" / "retrieval_context_precision.json"
+        output_fn = Path(output_dir) / "metrics" / "retrieval_context_precision.json"
         Path(output_fn).parent.mkdir(parents=True, exist_ok=True)
         with open(output_fn, 'w') as f:
             json.dump([([kp.dict() for kp in kp_g], l) for kp_g, l in context_precision_list], f, indent=4, ensure_ascii=False)
@@ -115,7 +118,7 @@ async def _main(num_docs, output_path, precision, recall, max_concurrency, input
     if recall:
         context_recall_list = await verify_keypoints(cxt_recall_kp, chain_gt, max_concurrency)
 
-        output_fn = Path(output_path) / "metrics" / "retrieval_keypoints_recall.json"
+        output_fn = Path(output_dir) / "metrics" / "retrieval_keypoints_recall.json"
         dump_metrics(context_recall_list, output_fn)
         supported_kp = sum([1 for kp in context_recall_list if kp.label == "Relevant"])
         keypoints_recall = supported_kp/len(context_recall_list)
@@ -126,7 +129,7 @@ async def _main(num_docs, output_path, precision, recall, max_concurrency, input
         scores["context_precision"] = precision_score
     if recall:
         scores["context_recall"] = keypoints_recall
-    dump_scores(scores, Path(output_path) / "metrics" / "scores.json")
+    dump_scores(scores, Path(output_dir) / "metrics" / "scores.json")
 
 
 if __name__ == '__main__':

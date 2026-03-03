@@ -86,8 +86,8 @@ echo "Starting Step 2: Calculating global metrics..."
 python 02_calculate_global_metrics.py \
     --num_docs "$NUM_METRIC_DOCS" \
     --precision --recall \
-    --output_path "$RAG_OUTPUT_DIR" \
-    "$RAG_KEYPOINTS_PATH" &
+    --output_dir "$RAG_OUTPUT_DIR" \
+    --input_fn "$RAG_KEYPOINTS_PATH" &
 PID_GLOBAL=$! # Capture the Process ID of the background job
 
 # Step 3: calculate the retrieval metrics
@@ -95,8 +95,8 @@ echo "Starting Step 3: Calculating retrieval metrics..."
 python 02_calculate_retrieval_metrics.py \
     --num_docs "$NUM_METRIC_DOCS" \
     --precision --recall \
-    --output_path "$RAG_OUTPUT_DIR" \
-    "$RAG_KEYPOINTS_PATH" &
+    --output_dir "$RAG_OUTPUT_DIR" \
+    --input_fn "$RAG_KEYPOINTS_PATH" &
 PID_RETRIEVAL=$! # Capture the Process ID
 
 # Step 4: calculate the generation metrics
@@ -104,8 +104,8 @@ echo "Starting Step 4: Calculating generation metrics..."
 python 02_calculate_generation_metrics.py \
     --num_docs "$NUM_METRIC_DOCS" \
     --loyalty --hallucination --noise-sensitivity --context-utility-ratio \
-    --output_path "$RAG_OUTPUT_DIR" \
-    "$RAG_KEYPOINTS_PATH" &
+    --output_dir "$RAG_OUTPUT_DIR" \
+    --input_fn "$RAG_KEYPOINTS_PATH" &
 PID_GENERATION=$! # Capture the Process ID
 
 # --- Wait for Parallel Jobs to Finish and Check Status ---
