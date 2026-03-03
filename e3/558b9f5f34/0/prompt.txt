@@ -1,0 +1,78 @@
+Implement the following plan:
+
+# Plan: Replace `click` with `argparse` in `ch05/04_evaluation/`
+
+## Context
+
+5 Python files in `ch05/04_evaluation/` use `click` for CLI argument parsing, while 3 other files (`03_*.py`) already use `argparse`. This change unifies all scripts to use `argparse` (stdlib), eliminating the `click` dependency for this directory.
+
+The shell scripts (`evaluate.sh`, `generate_synthetic_qa_pairs.sh`) invoke these scripts and must continue working with identical CLI interfaces.
+
+## Files to modify
+
+1. **`ch05/04_evaluation/01_extract_keypoints.py`**
+2. **`ch05/04_evaluation/02_calculate_retrieval_metrics.py`**
+3. **`ch05/04_evaluation/02_calculate_generation_metrics.py`**
+4. **`ch05/04_evaluation/02_calculate_global_metrics.py`**
+5. **`ch05/04_evaluation/naive_rag.py`**
+
+No shell script changes needed — the CLI interfaces stay identical.
+
+## Conversion pattern
+
+Each file follows the same transformation:
+
+1. Replace `import click` with `import argparse`
+2. Remove all `@click.command()`, `@click.option()`, `@click.argument()` decorators
+3. Add `argparse.ArgumentParser()` setup inside the `main()` / `cli()` function
+4. Use `argparse.BooleanOptionalAction` (available in Python 3.9+, project requires 3.10) for `--flag/--no-flag` boolean pairs
+5. Use positional `add_argument('input_fn', ...)` for click `@click.argument()` equivalents
+6. Replace `click.UsageError(...)` with `parser.error(...)` (in `naive_rag.py`)
+7. Drop `click.Path(...)` type — just use `str` (argparse doesn't have built-in path validation; existing code already handles paths via `pathlib.Path`)
+8. Call `args = parser.parse_args()` then pass `args.*` to the async `_main()` function
+
+### Mapping reference
+
+| click feature | argparse equivalent |
+|---|---|
+| `@click.option('--flag/--no-flag', default=False)` | `add_argument('--flag', action=BooleanOptionalAction, default=False)` |
+| `@click.option('--name', '-n', default=-1, type=int)` | `add_argument('--name', '-n', default=-1, type=int)` |
+| `@click.option('--index/--no-index', "do_index")` | `add_argument('--index', dest='do_index', action=BooleanOptionalAction)` |
+| `@click.option('--x', required=True)` | `add_argument('--x', required=True)` |
+| `@click.argument('input_fn', default="x.json")` | `add_argument('input_fn', nargs='?', default="x.json")` |
+| `@click.argument('input_fn', type=click.Path(exists=True))` | `add_argument('input_fn')` (just a string) |
+| `click.UsageError("msg")` | `parser.error("msg")` |
+
+## Per-file details
+
+### 1. `01_extract_keypoints.py`
+- Options: `--num_docs/-n` (int, default=-1), `--output_path/-o` (str, default="./metrics"), `--ground-truth/--no-ground-truth` (bool, default=False), `--response/--no-response` (bool, default=False), `--max_concurrency` (int, default=8)
+- Argument: `input_fn` (str, default="response.json") → positional with `nargs='?'`
+
+### 2. `02_calculate_retrieval_metrics.py`
+- Options: `--num_docs/-n` (int, default=-1), `--output_path/-o` (str, default="./metrics"), `--precision/--no-precision` (bool, default=False), `--recall/--no-recall` (bool, default=False), `--max_concurrency` (int, default=8)
+- Argument: `input_fn` (str, required) → positional without default
+
+### 3. `02_calculate_generation_metrics.py`
+- Options: `--num_docs/-n` (int, default=-1), `--output_path/-o` (str, default="./metrics"), `--loyalty/--no-loyalty` (bool, default=False), `--hallucination/--no-hallucination` (bool, default=False), `--noise-sensitivity/--no-noise-sensitivity` (bool, default=False), `--context-utility-ratio/--no-context-utility-ratio` (bool, default=False), `--max_concurrency` (int, default=8)
+- Argument: `input_fn` (str, required) → positional without default
+
+### 4. `02_calculate_global_metrics.py`
+- Options: `--num_docs/-n` (int, default=-1), `--output_path/-o` (str, default="./metrics"), `--precision/--no-precision` (bool, default=**True**), `--recall/--no-recall` (bool, default=**True**), `--max_concurrency` (int, default=8)
+- Argument: `input_fn` (str, default="keypoints.json") → positional with `nargs='?'`
+
+### 5. `naive_rag.py`
+- Options: `--index/--no-index` (dest=do_index, bool, default=False), `--query/--no-query` (dest=do_query, bool, default=False), `--index_dir` (str, required), `--collection_name` (str, required), `--index_input_dir` (str, default=None), `--query_input_path` (str, default=None), `--output_dir` (str, default=None), `--max_concurrency` (int, default=8)
+- Custom validation: replace `click.UsageError(...)` → `parser.error(...)`
+
+## Verification
+
+- Check each script's `--help` output to confirm flags match the original interface
+- Confirm shell scripts `evaluate.sh` and `generate_synthetic_qa_pairs.sh` parse correctly (dry-read the invocations against the new argparse definitions)
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+good. make a git add and commit

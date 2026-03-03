@@ -1,0 +1,33 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "e3558b9f5f34",
+  "session_id": "e78b0adf-b5a7-49df-8542-ebc7ee2764dd",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-03T07:23:11.266406Z",
+  "branch": "feat-unify-script-usage-04-evaluation-0303",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/04_evaluation/01_extract_keypoints.py",
+    "ch05/04_evaluation/02_calculate_generation_metrics.py",
+    "ch05/04_evaluation/02_calculate_global_metrics.py",
+    "ch05/04_evaluation/02_calculate_retrieval_metrics.py",
+    "ch05/04_evaluation/naive_rag.py"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 13,
+    "cache_creation_tokens": 42762,
+    "cache_read_tokens": 371151,
+    "output_tokens": 677,
+    "api_call_count": 9
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-03T07:23:11.235184Z",
+    "agent_lines": 103,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 103,
+    "agent_percentage": 100
+  }
+}
