@@ -21,8 +21,34 @@ python test_env_setup.py
 | 工作流图 | 基于 LangGraph StateGraph 实现的完整智能体 RAG 工作流（含混合检索） | [main.py](main.py) |
 | 工具函数 | 搜索结果格式化、去重、thinking token 处理等工具函数 | [src/utils.py](src/utils.py) |
 
-## 运行
+## 运行步骤
+
+首先配置环境变量：
+
+```bash
+cp .env.example .env
+# 编辑 .env，填入 OPENAI_API_KEY、JINA_API_KEY 等必要的密钥
+```
+
+使用默认参数运行（向量库目录 `data_chroma`，文档目录 `../data`）：
 
 ```bash
 python main.py
 ```
+
+指定自定义路径：
+
+```bash
+python main.py \
+  --index_dir ./data_chroma \
+  --collection_name olympic_games \
+  --index_input_dir ../data
+```
+
+**参数说明：**
+
+| 参数 | 默认值 | 说明 |
+| --- | --- | --- |
+| `--index_dir` | `data_chroma` | Chroma 向量数据库目录路径 |
+| `--collection_name` | `olympic_games` | Chroma 集合名称 |
+| `--index_input_dir` | `../data` | 原始 `.txt` 文档目录（用于构建 BM25 索引） |
