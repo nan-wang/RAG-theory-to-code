@@ -16,9 +16,9 @@
 
     # 同时执行索引和查询
     python hybrid_rag_with_reranking.py --index --query --index_dir data_chroma --collection_name olympic_games \
-        --index_input_dir ../../data \
-        --query_input_path data_eval/v20250501/keypoints.json \
-        --output_dir data_eval/v20250501
+        --index_input_dir ../data \
+        --query_input_path ../05_chunking/data_eval/keypoints.json \
+        --output_dir data_eval/
 """
 
 import argparse
@@ -68,7 +68,7 @@ Answer:
 """
 )
 
-llm = ChatOpenAI(model="Qwen/Qwen2.5-7B-Instruct")
+llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus")
 
 
 def get_embeddings():
@@ -220,7 +220,7 @@ def main():
                         help='Path to input JSON file with queries.')
     parser.add_argument('--output_dir', default=None, type=str,
                         help='Directory for response.json output.')
-    parser.add_argument('--max_concurrency', default=8, type=int,
+    parser.add_argument('--max_concurrency', default=2, type=int,
                         help='Batch concurrency for querying.')
     args = parser.parse_args()
 

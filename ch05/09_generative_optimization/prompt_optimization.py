@@ -17,10 +17,10 @@
         --output_dir ../03_eval/data_metrics/v20241219/ch0507_prompt
 
     # 同时执行索引和查询
-    python prompt_optimization.py --index --query --index_dir ../data_chroma_jina_embeddings \
+    python prompt_optimization.py --index --query --index_dir data_chroma \
         --collection_name olympic_games --index_input_dir ../data \
-        --query_input_path ../03_eval/data_eval/v20241219/qa_pairs_rewrite.json \
-        --output_dir ../03_eval/data_metrics/v20241219/ch0507_prompt
+        --query_input_path ../05_chunking/data_eval/keypoints.json \
+        --output_dir data_eval 
 """
 
 import argparse
@@ -38,7 +38,7 @@ from langchain_community.document_compressors.jina_rerank import JinaRerank
 from langchain_community.embeddings import JinaEmbeddings
 from langchain_community.retrievers import BM25Retriever
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel, RunnablePick, RunnableConfig
 from langchain_openai import ChatOpenAI
 from loguru import logger
@@ -149,7 +149,7 @@ async def query(
         base_compressor=compressor, base_retriever=ensemble_retriever
     )
 
-    llm = ChatOpenAI(model="gpt-4o-mini").with_structured_output(Response)
+    llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(Response)
 
     rag_chain = (
         RunnableParallel(
@@ -202,7 +202,7 @@ def main():
                         help='Path to input JSON file with queries.')
     parser.add_argument('--output_dir', default=None, type=str,
                         help='Directory for response.json output.')
-    parser.add_argument('--max_concurrency', default=8, type=int,
+    parser.add_argument('--max_concurrency', default=2, type=int,
                         help='Batch concurrency for querying.')
     args = parser.parse_args()
 
