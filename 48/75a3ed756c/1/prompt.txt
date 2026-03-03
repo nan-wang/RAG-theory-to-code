@@ -1,0 +1,64 @@
+Implement the following plan:
+
+# Plan: Use separate prompt modules for precision vs recall in `02_calculate_global_metrics.py`
+
+## Context
+
+`02_calculate_global_metrics.py` currently imports `SYSTEM_PROMPT` and `USER_PROMPT` from the legacy module `prompts.keypoints_verify_prompt`, using one shared chain for both precision and recall. The two metrics have different verification directions and should use different prompts:
+
+- **Precision** (`rsp_kp`): response keypoints verified against the ground-truth answer → uses `answer_keypoints_verify_prompt` (checks if the answer supports response keypoints)
+- **Recall** (`ans_kp`): ground-truth keypoints verified against the response → uses `groundtruth_keypoints_verify_prompt` (checks if the response matches ground-truth keypoints)
+
+## File to modify
+
+`ch05/04_evaluation/02_calculate_global_metrics.py`
+
+## Changes
+
+### 1. Replace import (line 12)
+
+**Remove:**
+```python
+from prompts.keypoints_verify_prompt import SYSTEM_PROMPT, USER_PROMPT
+```
+
+**Add:**
+```python
+from prompts.groundtruth_keypoints_verify_prompt import SYSTEM_PROMPT as GT_SYSTEM_PROMPT, USER_PROMPT as GT_USER_PROMPT
+from prompts.answer_keypoints_verify_prompt import SYSTEM_PROMPT as ANS_SYSTEM_PROMPT, USER_PROMPT as ANS_USER_PROMPT
+```
+
+### 2. Replace single chain with two chains (lines 69–84)
+
+Replace the single `prompt` / `chain` construction with two:
+
+```python
+# chain for ground-truth verification (used by recall)
+gt_prompt = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template(GT_SYSTEM_PROMPT),
+    HumanMessagePromptTemplate.from_template(GT_USER_PROMPT),
+])
+chain_gt = (gt_prompt | llm | StrOutputParser())
+
+# chain for answer keypoints verification (used by precision)
+ans_prompt = ChatPromptTemplate.from_messages([
+    SystemMessagePromptTemplate.from_template(ANS_SYSTEM_PROMPT),
+    HumanMessagePromptTemplate.from_template(ANS_USER_PROMPT),
+])
+chain_ans = (ans_prompt | llm | StrOutputParser())
+```
+
+### 3. Use correct chain per metric
+
+- **Precision** (line 88): `await verify_keypoints(rsp_kp, chain_ans, max_concurrency)`
+- **Recall** (line 97): `await verify_keypoints(ans_kp, chain_gt, max_concurrency)`
+
+## Verification
+
+Visual review only (Python 3.10 environment not available). Confirm:
+- No references to `prompts.keypoints_verify_prompt` remain
+- `chain_gt` used for recall, `chain_ans` used for precision
+- Both prompts use the same `{question}`, `{answer}`, `{keypoint}` template variables (confirmed from exploration)
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl

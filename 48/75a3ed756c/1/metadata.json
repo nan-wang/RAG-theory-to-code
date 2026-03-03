@@ -1,0 +1,29 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "4875a3ed756c",
+  "session_id": "f8f3a2af-3787-4467-af6d-59805236a51e",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-03T02:27:41.4536Z",
+  "branch": "feat-add-async-04-evaluation-0303",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "ch05/04_evaluation/02_calculate_global_metrics.py"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 9,
+    "cache_creation_tokens": 12279,
+    "cache_read_tokens": 164990,
+    "output_tokens": 369,
+    "api_call_count": 7
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-03T02:27:41.448158Z",
+    "agent_lines": 16,
+    "human_added": 0,
+    "human_modified": 1,
+    "human_removed": 0,
+    "total_committed": 17,
+    "agent_percentage": 94.11764705882352
+  }
+}
