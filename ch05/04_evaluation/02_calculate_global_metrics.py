@@ -102,5 +102,4 @@ async def _main(num_docs, output_dir, precision, recall, max_concurrency, input_
 
 
 if __name__ == '__main__':
-    # python calculate_global_metrics.py -n 100 -o data_metrics/v20241219/ch0503_naive/ --precision --recall data_metrics/v20241219/ch0503_naive/keypoints.json
     main()

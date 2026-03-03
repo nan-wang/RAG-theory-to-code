@@ -141,7 +141,6 @@ async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: 
 
 
 if __name__ == "__main__":
-    # python 03_generate_qa_pairs.py --index_dir ../03_langchain_core_and_langgraph/09_naive_rag/data_chroma  --collection_name olympic_games --output_dir data_eval/demo --num_docs 8
     parser = argparse.ArgumentParser()
     parser.add_argument("--num_docs", type=int, help="Number of documents to generate.")
     parser.add_argument("--index_dir", type=str, help="Directory where the index is stored.")

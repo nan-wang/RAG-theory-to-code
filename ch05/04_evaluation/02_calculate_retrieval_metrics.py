@@ -133,6 +133,4 @@ async def _main(num_docs, output_dir, precision, recall, max_concurrency, input_
 
 
 if __name__ == '__main__':
-    # python calculate_retrieval_metrics.py -n 100 -o data_metrics/v20241219/ch0503_naive/metrics --precision data_metrics/v20241219/ch0503_naive/keypoints.json
-    # python calculate_retrieval_metrics.py -n 100 -o data_metrics/v20241219/ch0503_naive/metrics --precision --recall data_metrics/v20241219/ch0503_naive/keypoints.json
     main()

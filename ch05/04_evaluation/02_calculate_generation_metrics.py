@@ -256,5 +256,4 @@ async def _main(num_docs, output_dir, loyalty, hallucination, noise_sensitivity,
 
 
 if __name__ == '__main__':
-    # python calculate_generation_metrics.py -n 100 -o data_metrics/v20241219/ch0503_naive --loyalty --hallucination --noise-sensitivity --context-utility-ratio data_metrics/v20241219/ch0503_naive/keypoints.json
     main()

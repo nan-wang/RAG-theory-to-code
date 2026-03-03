@@ -106,7 +106,6 @@ async def main(input_fn: str, output_dir: str, max_concurrency: int = 8):
 
 
 if __name__ == '__main__':
-    # python 03_rewrite_qa_pairs.py --input_fn data_eval/demo/qa_pairs.validated.json --output_dir data_eval/demo
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_fn", "-i", default=None)
     parser.add_argument("--output_dir", type=str, required=True)
