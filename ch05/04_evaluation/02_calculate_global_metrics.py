@@ -4,7 +4,7 @@ import click
 
 from pathlib import Path
 import dotenv
-from utils import dump_metrics, verify_keypoints
+from utils import dump_metrics, dump_scores, verify_keypoints
 from datamodels import KeyPoint
 
 from langchain_openai.chat_models import ChatOpenAI
@@ -105,6 +105,15 @@ async def _main(num_docs, output_path, precision, recall, max_concurrency, input
     if precision and recall:
         f1 = 2 * precision_score * recall_score / (precision_score + recall_score)
         print(f"f1: {f1:.3f}")
+
+    scores = {}
+    if precision:
+        scores["precision"] = precision_score
+    if recall:
+        scores["recall"] = recall_score
+    if precision and recall:
+        scores["f1"] = f1
+    dump_scores(scores, Path(output_path) / "metrics" / "scores.json")
 
 
 if __name__ == '__main__':

@@ -69,7 +69,7 @@ echo "--- Step 1: Extracting keypoints from RAG output ---"
 python 01_extract_keypoints.py \
     --response \
     --output_path "$RAG_OUTPUT_DIR" \
-    --num-docs "$NUM_METRIC_DOCS" \
+    --num_docs "$NUM_METRIC_DOCS" \
     "$RAG_RESPONSE_INPUT_PATH" || { echo "Error during RAG keypoint extraction step. Aborting."; exit 1; }
 
 # Validate that RAG keypoints file was created before proceeding
@@ -81,8 +81,8 @@ fi
 # Variable to track overall success of parallel jobs
 overall_status=0
 
-# Step 6: calculate the global metrics
-echo "Starting Step 6: Calculating global metrics..."
+# Step 2: calculate the global metrics
+echo "Starting Step 2: Calculating global metrics..."
 python 02_calculate_global_metrics.py \
     --num_docs "$NUM_METRIC_DOCS" \
     --precision --recall \
@@ -90,8 +90,8 @@ python 02_calculate_global_metrics.py \
     "$RAG_KEYPOINTS_PATH" &
 PID_GLOBAL=$! # Capture the Process ID of the background job
 
-# Step 7: calculate the retrieval metrics
-echo "Starting Step 7: Calculating retrieval metrics..."
+# Step 3: calculate the retrieval metrics
+echo "Starting Step 3: Calculating retrieval metrics..."
 python 02_calculate_retrieval_metrics.py \
     --num_docs "$NUM_METRIC_DOCS" \
     --precision --recall \
@@ -99,8 +99,8 @@ python 02_calculate_retrieval_metrics.py \
     "$RAG_KEYPOINTS_PATH" &
 PID_RETRIEVAL=$! # Capture the Process ID
 
-# Step 8: calculate the generation metrics
-echo "Starting Step 8: Calculating generation metrics..."
+# Step 4: calculate the generation metrics
+echo "Starting Step 4: Calculating generation metrics..."
 python 02_calculate_generation_metrics.py \
     --num_docs "$NUM_METRIC_DOCS" \
     --loyalty --hallucination --noise-sensitivity --context-utility-ratio \
@@ -115,7 +115,7 @@ echo "Waiting for global metrics calculation (PID: $PID_GLOBAL)..."
 wait $PID_GLOBAL
 STATUS_GLOBAL=$?
 if [ $STATUS_GLOBAL -ne 0 ]; then
-    echo "Error: Global metrics calculation (Step 6, PID $PID_GLOBAL) failed with status $STATUS_GLOBAL."
+    echo "Error: Global metrics calculation (Step 2, PID $PID_GLOBAL) failed with status $STATUS_GLOBAL."
     overall_status=1
 fi
 
@@ -123,7 +123,7 @@ echo "Waiting for retrieval metrics calculation (PID: $PID_RETRIEVAL)..."
 wait $PID_RETRIEVAL
 STATUS_RETRIEVAL=$?
 if [ $STATUS_RETRIEVAL -ne 0 ]; then
-    echo "Error: Retrieval metrics calculation (Step 7, PID $PID_RETRIEVAL) failed with status $STATUS_RETRIEVAL."
+    echo "Error: Retrieval metrics calculation (Step 3, PID $PID_RETRIEVAL) failed with status $STATUS_RETRIEVAL."
     overall_status=1
 fi
 
@@ -131,7 +131,7 @@ echo "Waiting for generation metrics calculation (PID: $PID_GENERATION)..."
 wait $PID_GENERATION
 STATUS_GENERATION=$?
 if [ $STATUS_GENERATION -ne 0 ]; then
-    echo "Error: Generation metrics calculation (Step 8, PID $PID_GENERATION) failed with status $STATUS_GENERATION."
+    echo "Error: Generation metrics calculation (Step 4, PID $PID_GENERATION) failed with status $STATUS_GENERATION."
     overall_status=1
 fi
 

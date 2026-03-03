@@ -13,7 +13,7 @@ from prompts.answer_keypoints_verify_prompt import SYSTEM_PROMPT as ANS_SYSTEM_P
 from langchain_core.output_parsers import StrOutputParser
 
 from datamodels import KeyPoint
-from utils import dump_metrics, verify_keypoints
+from utils import dump_metrics, dump_scores, verify_keypoints
 
 
 dotenv.load_dotenv()
@@ -138,6 +138,13 @@ async def _main(num_docs, output_path, precision, recall, max_concurrency, input
         supported_kp = sum([1 for kp in context_recall_list if kp.label == "Relevant"])
         keypoints_recall = supported_kp/len(context_recall_list)
         print(f"context_recall: {keypoints_recall:.3f}")
+
+    scores = {}
+    if precision:
+        scores["context_precision"] = precision_score
+    if recall:
+        scores["context_recall"] = keypoints_recall
+    dump_scores(scores, Path(output_path) / "metrics" / "scores.json")
 
 
 if __name__ == '__main__':

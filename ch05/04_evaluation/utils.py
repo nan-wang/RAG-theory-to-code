@@ -119,6 +119,20 @@ def dump_metrics(results, output_fn):
     print(f"Dumping the results to {output_fn}")
 
 
+def dump_scores(scores: dict, output_fn):
+    """Read existing scores.json (if any), update with new scores, and write back."""
+    path = Path(output_fn)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    existing = {}
+    if path.exists():
+        with open(path, 'r') as f:
+            existing = json.load(f)
+    existing.update(scores)
+    with open(path, 'w') as f:
+        json.dump(existing, f, indent=2)
+    print(f"Dumping the scores to {output_fn}")
+
+
 async def verify_keypoints(keypoints, lc_chain, max_concurrency=8):
     match = re.compile(r'\[\[\[([^\]]+)\]\]\]')
     inputs = [{"question": kp.question, "answer": kp.answer, "keypoint": kp.keypoint} for kp in keypoints]

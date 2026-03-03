@@ -14,6 +14,7 @@ from prompts.answer_keypoints_verify_prompt import SYSTEM_PROMPT as ANS_SYSTEM_P
 from langchain_core.output_parsers import StrOutputParser
 
 from datamodels import KeyPoint
+from utils import dump_scores
 
 
 dotenv.load_dotenv()
@@ -263,6 +264,17 @@ async def _main(num_docs, output_path, loyalty, hallucination, noise_sensitivity
         context_utility_ratio_num = sum([l_ans for (_, _), _, l_ans in result_list])
         context_utility_ratio_score = context_utility_ratio_num / context_utility_ratio_den if context_utility_ratio_den else 0
         print(f"context utility ratio score ↑: {context_utility_ratio_score:.3f} ({context_utility_ratio_num}/{context_utility_ratio_den})")
+
+    scores = {}
+    if loyalty:
+        scores["response_loyalty"] = response_loyalty
+    if hallucination:
+        scores["hallucination"] = hallucination_score
+    if noise_sensitivity:
+        scores["noise_sensitivity"] = noise_sensitivity_score
+    if context_utility_ratio:
+        scores["context_utility_ratio"] = context_utility_ratio_score
+    dump_scores(scores, Path(output_path) / "metrics" / "scores.json")
 
 
 if __name__ == '__main__':
