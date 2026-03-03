@@ -2,10 +2,10 @@
   "cli_version": "0.4.2",
   "checkpoint_id": "596da45f1905",
   "strategy": "manual-commit",
-  "branch": "feat-add-async-cli-05-chunking-0303",
+  "branch": "main",
   "checkpoints_count": 1,
   "files_touched": [
-    "ch05/05_chunking/02_chunking_add_meta_info.py"
+    "ch05/07_hybrid_indexing/hybrid_rag.py"
   ],
   "sessions": [
     {
@@ -17,10 +17,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 9,
-    "cache_creation_tokens": 8122,
-    "cache_read_tokens": 220172,
-    "output_tokens": 3761,
-    "api_call_count": 5
+    "input_tokens": 12,
+    "cache_creation_tokens": 9452,
+    "cache_read_tokens": 314936,
+    "output_tokens": 4139,
+    "api_call_count": 6
   }
 }
