@@ -23,18 +23,21 @@ dotenv.load_dotenv()
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_fn')
     parser.add_argument('--num_docs', '-n', default=-1, type=int,
                         help='The number of documents to be processed.')
-    parser.add_argument('--output_path', '-o', default="./metrics",
-                        help='The output file path.')
     parser.add_argument('--loyalty', action=BooleanOptionalAction, default=False)
     parser.add_argument('--hallucination', action=BooleanOptionalAction, default=False)
     parser.add_argument('--noise-sensitivity', action=BooleanOptionalAction, default=False)
     parser.add_argument('--context-utility-ratio', action=BooleanOptionalAction, default=False)
     parser.add_argument('--max_concurrency', default=8, type=int,
                         help='Max concurrent batch runs.')
+    parser.add_argument('--input_fn', '-i', default=None,
+                        help='The input file path.')
+    parser.add_argument('--output_path', '-o', default="./metrics",
+                        help='The output file path.')
     args = parser.parse_args()
+    if args.input_fn is None:
+        raise RuntimeError("Please provide the input file path via --input_fn/-i.")
     asyncio.run(_main(args.num_docs, args.output_path, args.loyalty, args.hallucination, args.noise_sensitivity, args.context_utility_ratio, args.max_concurrency, args.input_fn))
 
 
