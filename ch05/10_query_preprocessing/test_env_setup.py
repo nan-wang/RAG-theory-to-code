@@ -48,11 +48,7 @@ print("\n检查环境变量（10_query_preprocessing）\n")
 
 REQUIRED = [
     ("OPENAI_API_KEY", "LLM API 密钥"),
-    ("OPENAI_API_BASE", "LLM API 地址"),
-    ("JINA_API_KEY", "Jina AI（向量检索）"),
-    ("VECTOR_DB_DIR", "向量数据库目录"),
-    ("COLLECTION_NAME", "向量数据库集合名称"),
-    ("EMBEDDING_MODEL", "嵌入模型名称"),
+    ("OPENAI_API_BASE", "LLM API 地址")
 ]
 
 for var, desc in REQUIRED:
@@ -69,7 +65,7 @@ base_url = os.getenv("OPENAI_API_BASE")
 if api_key and base_url:
     try:
         from langchain_openai import ChatOpenAI
-        llm = ChatOpenAI(model="Qwen/Qwen2.5-7B-Instruct", max_tokens=16)
+        llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus", max_tokens=16)
         response = llm.invoke("你好")
         if response.content:
             ok(f"LLM API 调用成功")
