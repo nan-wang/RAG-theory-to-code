@@ -2,8 +2,8 @@
   "cli_version": "0.4.2",
   "checkpoint_id": "9f6164a1e5ac",
   "strategy": "manual-commit",
-  "branch": "feat-add-cli-11-agentic-rag-0303",
-  "checkpoints_count": 2,
+  "branch": "feat-fix-12-deployment-0303",
+  "checkpoints_count": 4,
   "files_touched": [
     "CLAUDE.md",
     "ch05/03_langchain_core_and_langgraph/.env.example",
@@ -39,6 +39,7 @@
     "ch05/11_agentic_rag/README.md",
     "ch05/11_agentic_rag/src/.env.example",
     "ch05/12_deployment/.env.example",
+    "ch05/12_deployment/api/src/rag/rag_index.py",
     "setup/README.md"
   ],
   "sessions": [
@@ -62,13 +63,20 @@
       "context": "/9f/6164a1e5ac/2/context.md",
       "content_hash": "/9f/6164a1e5ac/2/content_hash.txt",
       "prompt": "/9f/6164a1e5ac/2/prompt.txt"
+    },
+    {
+      "metadata": "/9f/6164a1e5ac/3/metadata.json",
+      "transcript": "/9f/6164a1e5ac/3/full.jsonl",
+      "context": "/9f/6164a1e5ac/3/context.md",
+      "content_hash": "/9f/6164a1e5ac/3/content_hash.txt",
+      "prompt": "/9f/6164a1e5ac/3/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 32,
-    "cache_creation_tokens": 72869,
-    "cache_read_tokens": 1099122,
-    "output_tokens": 18092,
-    "api_call_count": 22
+    "input_tokens": 49,
+    "cache_creation_tokens": 91268,
+    "cache_read_tokens": 1443351,
+    "output_tokens": 22204,
+    "api_call_count": 33
   }
 }

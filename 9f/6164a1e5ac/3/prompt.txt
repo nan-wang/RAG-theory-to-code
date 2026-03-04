@@ -1,0 +1,87 @@
+Implement the following plan:
+
+# Plan: Modify rag_index.py
+
+## Context
+`ch05/12_deployment/api/src/rag/rag_index.py` is a production indexing script that loads Olympic Games documents, generates hybrid embeddings, and upserts them into TencentVectorDB. Currently it hardcodes the data glob path inside `get_all_splits()`. The goals are:
+1. Accept `--index_input_dir` as a CLI argument and pass it to `load_documents`
+2. Add Chinese docstrings and inline comments for readability
+3. After indexing, log how many documents were stored by querying the DB
+
+## Target File
+`ch05/12_deployment/api/src/rag/rag_index.py`
+
+## Changes
+
+### 1. Add argparse CLI with `--index_input_dir`
+- Import `argparse`
+- Wrap all module-level imperative code in a `main()` function
+- Parse `--index_input_dir` (default: `"../../../../data/*.txt"` to preserve existing behavior)
+- Pass the parsed path into `get_all_splits(input_dir)`
+
+```python
+def main():
+    parser = argparse.ArgumentParser(description="构建混合索引并写入 TencentVectorDB")
+    parser.add_argument("--index_input_dir", default="../../../../data/*.txt",
+                        help="文档输入路径（支持 glob 模式），默认为 ../../../../data/*.txt")
+    args = parser.parse_args()
+    ...
+```
+
+### 2. Update `get_all_splits` signature
+Change signature from `get_all_splits()` to `get_all_splits(input_dir)` and pass `input_dir` to `load_documents(input_dir)`.
+
+### 3. Add Chinese docstrings
+- `get_all_splits(input_dir)`: 加载并切分文档，返回所有文本块
+- `encode_texts(...)`: 调用 Jina API 批量生成稠密向量
+- `main()`: 主流程：解析参数 → 建库 → 编码 → 写入 → 验证
+
+Add brief inline comments in Chinese at key sections (DB init, index creation, batch upsert loop).
+
+### 4. Query document count after indexing
+After all upserts complete, use `coll.count()` to query the actual stored document count from the DB and log it:
+
+```python
+count_result = coll.count()
+print(f"[INFO] 索引完成：TencentVectorDB 中共存储 {count_result.count} 条文档")
+```
+
+If `coll.count()` is unavailable on the RPC client, fall back to:
+```python
+print(f"[INFO] 索引完成：本次写入 {total_count} 条文档块")
+```
+
+### 5. Wrap imperative module-level code
+Move all DB setup and upsert logic from module level into `main()`, keeping `get_all_splits` and `encode_texts` as top-level functions. Add `if __name__ == "__main__": main()` guard.
+
+## Execution Order (inside `main`)
+1. Parse CLI args
+2. Connect to TencentVectorDB (`RPCVectorDBClient`)
+3. Create/get database and collection
+4. `chunks = get_all_splits(args.index_input_dir)`
+5. BM25 encode → Jina dense encode
+6. Batch upsert loop with progress print
+7. Query count from `coll` and print info message
+8. `client.close()`
+
+## Verification
+Run manually:
+```bash
+cd ch05/12_deployment/api/src
+python -m rag.rag_index --index_input_dir "../../../../data/*.txt"
+```
+Expected output includes:
+- `Loaded N documents`
+- Progress messages per batch
+- `[INFO] 索引完成：TencentVectorDB 中共存储 X 条文档`
+
+
+If you need specific details from before exiting plan mode (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/nanwang/.REDACTED.jsonl
+
+---
+
+`--index_input_dir` accepts a folder and we index all the .txt files in this folder. Modify rag_index.py accordingly.
+
+---
+
+make a commit

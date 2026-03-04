@@ -1,0 +1,29 @@
+{
+  "cli_version": "0.4.2",
+  "checkpoint_id": "9f6164a1e5ac",
+  "session_id": "d242c7ee-4209-419d-8049-d64693f648cb",
+  "strategy": "manual-commit",
+  "created_at": "2026-03-04T05:53:37.66778Z",
+  "branch": "feat-fix-12-deployment-0303",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "ch05/12_deployment/api/src/rag/rag_index.py"
+  ],
+  "agent": "Claude Code",
+  "token_usage": {
+    "input_tokens": 17,
+    "cache_creation_tokens": 18399,
+    "cache_read_tokens": 344229,
+    "output_tokens": 4112,
+    "api_call_count": 11
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-03-04T05:53:37.641734Z",
+    "agent_lines": 130,
+    "human_added": 3,
+    "human_modified": 4,
+    "human_removed": 0,
+    "total_committed": 136,
+    "agent_percentage": 95.58823529411765
+  }
+}
