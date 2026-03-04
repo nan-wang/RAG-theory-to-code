@@ -9,7 +9,7 @@ from tcvdb_text.encoder import BM25Encoder
 from tcvectordb.model.enum import ReadConsistency, FieldType, IndexType, MetricType
 from tcvectordb.model.index import Index, FilterIndex, VectorIndex, SparseIndex, HNSWParams
 
-from utils import load_documents, split_sections, split_chunks
+from rag.utils import load_documents, split_sections, split_chunks
 
 dotenv.load_dotenv()
 

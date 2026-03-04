@@ -52,11 +52,11 @@ REQUIRED = [
     ("JINA_API_KEY", "Jina AI（向量检索和重排序）"),
     ("DB_URL", "腾讯云向量数据库地址"),
     ("DB_KEY", "腾讯云向量数据库密钥"),
+    ("DB_USERNAME", "腾讯云向量数据库用户名"),
+    ("CHATBOT_URL", "前端调用后端 API 的地址"),
 ]
 
 OPTIONAL = [
-    ("DB_USERNAME", "腾讯云向量数据库用户名"),
-    ("CHATBOT_URL", "前端调用后端 API 的地址"),
 ]
 
 for var, desc in REQUIRED:

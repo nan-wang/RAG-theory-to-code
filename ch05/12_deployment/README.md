@@ -4,12 +4,96 @@
 
 本章演示如何将 RAG 系统部署到生产环境。采用前后端分离架构：后端使用 FastAPI 提供 RESTful API，前端使用 Streamlit 构建交互式聊天界面。RAG 流水线基于腾讯云向量数据库实现混合检索（向量 + BM25）和 Jina Reranker 重排序。支持 Docker 容器化一键部署。
 
-## 环境配置检查
+## 使用步骤
+
+### 创建腾讯云向量数据库实例
+在使用腾讯云向量数据库之前，需要在腾讯云中创建一个向量数据库实例。向量数据库实例创建完成之后，在实例列表中，找到目标实例。选择目标实例 ID，单击“管理”按钮，进入实例详情页面。选择“密钥管理”选项，将密钥、用户名、外网URL保存在`api/src/.env`中。
 
 ```bash
-cd ch05/12_deployment
-python test_env_setup.py
+$ cd ch05/12_deployment/api/src
+$ cp .env.example .env
+# 在.env中添加需要的LLM秘钥和Jina AI秘钥
+$ python test_env_setup.py
 ```
+
+```bash
+# Jina AI
+# 用于 JinaEmbeddings 向量检索
+JINA_API_KEY=jina_xxx
+
+# 腾讯云向量数据库
+DB_URL=http://xxx.vectordb.tencent.com:8100
+DB_USERNAME=root
+DB_KEY=xxx
+```
+
+### 创建向量索引
+
+```bash
+$ cd ch05/12_deployment/api/src
+$ python -m rag.index --index_input_dir ../../../data
+```
+
+TODO: 添加运行成功的输出
+
+### 本地测试后台服务运行
+
+```bash
+$ cd ch05/12_deployment/api/src
+$ uvicorn main:app --host 0.0.0.0 --port 8000
+
+# INFO:     Started server process [32723]
+# INFO:     Waiting for application startup.
+# INFO:     Application startup complete.
+# INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+```
+
+在命令行中测试后台运行是否正常
+
+```bash
+$ curl -X 'POST' \
+  'http://0.0.0.0:8000/ask' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "text": "北京奥运会是哪一年"
+}'
+
+# {"selected_content":"[doc_1]article_title: 2008年夏季奥林匹克运动会 section_title: summary content: 第二十九届夏季奥林匹克运动会（英语：the Games of the XXIX Olympiad；法语：les Jeux de la 29e Olympiade），即2008年夏季奥运会，又称北京夏奥，是于2008年8月8日至24日在中华人民共和国首都北京市举行的综合运动会。","answer":"北京奥运会是在2008年举办的，具体时间为2008年8月8日至8月24日。"}
+```
+
+### 本地测试前端服务运行
+确保后台服务已经在运行后，在命令行中测试前端服务。
+
+> streamlit的命令行安装参考[官方文档](https://streamlit.io/#install)
+
+```bash
+$ cd ch05/12_deployment/frontend/src
+$ streamlit run main.py
+
+#  You can now view your Streamlit app in your browser.
+
+#  Local URL: http://localhost:8501
+#  Network URL: http://192.168.31.83:8501
+```
+
+打开浏览器，访问[http://localhost:8501](http://localhost:8501)。
+
+
+### 本地测试Docker服务运行
+
+> Docker安装请参考[官方文档](https://docs.docker.com/desktop/setup/install/mac-install/)
+
+创建`ch05/12_deployment/.env`。
+
+```bash
+$ cd ch05/12_deployment
+$ cp .env.example .env
+# 在.env中添加需要的LLM秘钥和Jina AI秘钥
+$ python test_env_setup.py
+$ docker compose-up
+```
+
 
 ## 内容提纲
 
