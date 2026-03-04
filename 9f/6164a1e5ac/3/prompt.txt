@@ -85,3 +85,409 @@ If you need specific details from before exiting plan mode (like exact code snip
 ---
 
 make a commit
+
+---
+
+reformat all the python codes in this repo using black
+
+---
+
+[Request interrupted by user]
+
+---
+
+reformat all the python codes in this repo using black. exclude .venv and .venv_test
+
+---
+
+Add docstrings and minimal explainations to the code base in Chinese when necessary.
+
+---
+
+<task-notification>
+<task-id>adb977892ee822f11</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<status>completed</status>
+<summary>Agent "Add Chinese docstrings to ch05/03" completed</summary>
+<result>All functions and classes in the 20 target files already have Chinese docstrings. The only functions without docstrings (`ok`, `fail`, `warn`) are in `test_env_setup.py`, which is explicitly excluded per the rules.
+
+All 20 files are already fully annotated. Here is a summary of what each file contains:
+
+---
+
+All 20 Python files under `/Users/nanwang/Codes/nan/RAG-theory-to-code/ch05/03_langchain_core_and_langgraph/` were inspected. Every file already contains complete Chinese documentation:
+
+**Every file has:**
+- A module-level Chinese docstring at the top describing the file's purpose
+- Chinese docstrings on every function and class
+- Chinese inline comments where the logic is non-obvious
+
+**Files reviewed (all already fully documented):**
+
+| File | Module docstring | Functions/Classes covered |
+|---|---|---|
+| `02_runnable_invoke.py` | "Runnable 接口 - invoke（同步调用）" | `gen_regards` |
+| `02_runnable_invoke_async.py` | "Runnable 接口 - ainvoke（异步调用）" | `agen_regards`, `main` |
+| `02_runnable_batch.py` | "Runnable 接口 - batch（同步批量调用）" | `gen_regards` |
+| `02_runnable_batch_async.py` | "Runnable 接口 - abatch（异步批量调用）" | `agen_regards`, `main` |
+| `02_runnable_stream.py` | "Runnable 接口 - stream（同步流式输出）" | `gen_regards` |
+| `02_runnable_stream_async.py` | "Runnable 接口 - astream（异步流式输出）" | `agen_regards`, `main` |
+| `03_chatmodel.py` | "ChatModel 基础 - 使用 ChatOpenAI 调用大语言模型" | (script-level, no functions) |
+| `03_chatmodel_siliconflow.py` | "ChatModel 进阶 - 查看模型响应的完整结构" | (script-level, no functions) |
+| `03_chatmodel_with_ratelimiter.py` | "ChatModel 速率限制 - 使用 InMemoryRateLimiter 控制请求频率" | (script-level, no functions) |
+| `04_messages_placeholder.py` | "MessagesPlaceholder - 在提示模板中插入消息列表" | (script-level, no functions) |
+| `05_prompt_template.py` | "PromptTemplate - 字符串提示模板与变量替换" | (script-level, no functions) |
+| `06_document_embedding_vectorstore.py` | "Document、Embedding 与 VectorStore - RAG 三大核心组件" | (script-level, no functions) |
+| `07_add_conditional_edges.py` | "LangGraph 条件边 - 根据状态动态选择下一个节点" | `State`, `node_1`, `node_2`, `routing_function` |
+| `07_graph_state_node.py` | "LangGraph 基础 - State（状态）、Node（节点）与 Edge（边）" | `State`, `node_1`, `node_2` |
+| `07_send_for_adding_nodes_dynamically.py` | "LangGraph Send 机制 - 动态并行创建节点实例" | `OverallState`, `continue_to_jokes` |
+| `07_state_add.py` | "LangGraph 状态归约器 - 使用 Annotated 实现列表追加" | `State`, `node_1`, `node_2` |
+| `07_state_add_messages.py` | "LangGraph 消息管理 - 使用 add_messages 归约器" | `State`, `node_1`, `node_2` |
+| `08_checkpoint_memory_saver.py` | "LangGraph 检查点机制 - 使用 MemorySaver 保存状态历史" | `State`, `node_a`, `node_b` |
+| `09_naive_rag/01_index.py` | "Naive RAG - 索引构建流程" | `load_documents`, `get_chunks` |
+| `09_naive_rag/01_query.py` | "Naive RAG - 检索问答流程" | `State`, `retrieve`, `generate` |
+
+No edits were necessary — all 20 files were already fully annotated with Chinese docstrings and inline comments as required.</result>
+<usage><total_tokens>35051</total_tokens><tool_uses>21</tool_uses><duration_ms>44516</duration_ms></usage>
+</task-notification>
+Full transcript available at: REDACTED.output
+
+---
+
+make a commit
+
+---
+
+<task-notification>
+<task-id>af4c5b680b573e2cb</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<status>completed</status>
+<summary>Agent "Add Chinese docstrings to ch05/07–09" completed</summary>
+<result>All five files are correctly updated. Here is a complete summary of every change made:
+
+---
+
+## Summary of Changes
+
+### 1. `/Users/nanwang/Codes/nan/RAG-theory-to-code/ch05/07_hybrid_indexing/hybrid_rag.py`
+
+File already had a module docstring. Added docstrings and one inline comment to previously undocumented items:
+
+- `State` (TypedDict class): docstring added — "RAG 图的状态，包含问题、检索到的上下文文档和生成的回答。"
+- `get_embeddings()`: "返回 Jina Embeddings v3 实例，用于向量化文档和查询。"
+- `get_all_splits()`: "加载指定目录下的所有 txt 文件，按章节切分后返回所有文本块列表。"
+- `tokenize_doc()`: "使用 pkuseg 对文档字符串逐行分词，返回词元列表（BM25 预处理函数）。" + inline comment "跳过空行，对每行进行中文分词"
+- `retrieve()`: "从混合检索器中获取与问题相关的文档列表。"
+- `generate()`: "根据检索到的上下文文档，调用 LLM 生成回答。"
+- `main()`: "解析命令行参数，根据标志依次执行索引构建和/或检索问答流程。"
+
+---
+
+### 2. `REDACTED.py`
+
+File had no module docstring and no function docstrings. Added:
+
+- Module docstring: "文档加载与分块工具函数，供混合索引 RAG 流程使用。"
+- `get_year()`: "从文件名前四个字符解析并返回奥运年份（整数）。"
+- `get_season()`: "从文件名第 6-7 个字符解析并返回赛季标识（如 'su' 或 'wi'）。"
+- `load_documents()`: "按 glob 模式加载所有 txt 文件，可选附加年份和赛季元数据，返回文档列表。"
+- `format_docs()`: "将文档列表格式化为带编号标签的字符串，供提示词使用。"
+- `split_sections()`: "将 Wikipedia 格式文本按 == 标题标记切分为带层级元数据的章节文档列表。"
+- `split_chunks()`: "将章节文档进一步切分为固定大小的文本块，并在内容前缀添加文章及章节标题。"
+
+---
+
+### 3. `/Users/nanwang/Codes/nan/RAG-theory-to-code/ch05/08_reranking/hybrid_rag_with_reranking.py`
+
+File already had a module docstring and docstrings on `index()` and `query()`. Added:
+
+- `State` (TypedDict class): "RAG 图的状态，包含问题、检索到的上下文文档和生成的回答。"
+- `get_embeddings()`: "返回 Jina Embeddings v3 实例，用于向量化文档和查询。"
+- `load_documents()`: "加载指定目录下所有 txt 文件，返回文档列表。"
+- `get_chunks()`: "将文档列表按固定大小切分为文本块，返回切分后的文档列表。"
+- `tokenize_doc()`: "使用 pkuseg 对文档字符串逐行分词，返回词元列表（BM25 预处理函数）。" + inline comment "跳过空行，对每行进行中文分词"
+- Nested `retrieve()` inside `query()`: "从混合检索器中获取与问题相关的文档列表。"
+- Nested `generate()` inside `query()`: "根据检索到的上下文文档，调用 LLM 生成回答。"
+- `main()`: "解析命令行参数，根据标志依次执行索引构建和/或检索问答流程。"
+- Inline comment on the BM25 document reconstruction block: "从向量数据库中取回所有文档，重新构建 Document 对象以供 BM25 使用"
+- Inline comment on `seg = pkuseg.pkuseg()`: "延迟初始化分词器，避免在主进程中过早占用资源"
+
+---
+
+### 4. `/Users/nanwang/Codes/nan/RAG-theory-to-code/ch05/09_generative_optimization/prompt_optimization.py`
+
+File already had a module docstring and docstrings on `index()` and `query()`. Added:
+
+- `Response` (Pydantic model): "LLM 结构化输出模型，包含从上下文中筛选的相关内容和最终回答。"
+- `tokenize_doc()`: "使用 pkuseg 对文档字符串逐行分词，返回词元列表（BM25 预处理函数）。" + inline comment "跳过空行，对每行进行中文分词"
+- `get_all_splits()`: "加载指定目录下的所有 txt 文件，按章节切分后返回所有文本块列表。"
+- `main()`: "解析命令行参数，根据标志依次执行索引构建和/或检索问答流程。"
+- Inline comment before `rag_chain`: "第一步并行执行检索和透传问题；第二步并行保留上下文/问题并调用 LLM 生成结构化回答"
+
+---
+
+### 5. `REDACTED.py`
+
+File had no module docstring and no function docstrings. Added:
+
+- Module docstring: "文档加载与分块工具函数，供提示词优化 RAG 流程使用。"
+- `get_year()`: "从文件名前四个字符解析并返回奥运年份（整数）。"
+- `get_season()`: "从文件名第 6-7 个字符解析并返回赛季标识（如 'su' 或 'wi'）。"
+- `load_documents()`: "按 glob 模式加载所有 txt 文件，可选附加年份和赛季元数据，返回文档列表。"
+- `format_docs()`: "将文档列表格式化为带编号标签的字符串，供提示词使用。"
+- `split_sections()`: "将 Wikipedia 格式文本按 == 标题标记切分为带层级元数据的章节文档列表。"
+- `split_chunks()`: "将章节文档进一步切分为固定大小的文本块，并在内容前缀添加文章及章节标题。"
+
+No existing code was reformatted, no type annotations were added, and `test_env_setup.py` files were not touched.</result>
+<usage><total_tokens>48663</total_tokens><tool_uses>39</tool_uses><duration_ms>202503</duration_ms></usage>
+</task-notification>
+Full transcript available at: REDACTED.output
+
+---
+
+<task-notification>
+<task-id>a1d5baacd9a485a29</task-id>
+<tool-use-id>toolu_01DmUvRNjp81bZVtZjxe4FtY</tool-use-id>
+<status>completed</status>
+<summary>Agent "Add Chinese docstrings to ch05/10–12 and setup" completed</summary>
+<result>All files look correct. Here is a complete summary of every change made:
+
+---
+
+## Summary of Changes
+
+All edits added Chinese docstrings and minimal inline comments without reformatting code, adding type annotations, or touching `test_env_setup.py` files.
+
+### Files that already had complete docstrings (no changes needed)
+- `REDACTED.py`
+- `REDACTED.py`
+- `REDACTED.py`
+- `/Users/nanwang/Codes/nan/RAG-theory-to-code/setup/test_setup.py` (excluded per rules)
+
+### Files edited
+
+**`ch05/11_agentic_rag/configuration.py`**
+- Added module docstring: `"""Agentic RAG 工作流的运行时配置定义。"""`
+- Added class docstring to `Configuration`
+- Replaced English `from_runnable_config` docstring with Chinese equivalent
+
+**`ch05/11_agentic_rag/main.py`**
+- Added module docstring describing the hybrid-retrieval LangGraph workflow
+
+**`ch05/11_agentic_rag/prompts.py`**
+- Added module docstring
+- Added Chinese docstring to `get_current_date()`
+
+**`ch05/11_agentic_rag/state.py`**
+- Added module docstring
+- Added class docstrings to `SummaryState`, `SummaryStateInput`, and `SummaryStateOutput`
+
+**`ch05/11_agentic_rag/utils.py`**
+- Added module docstring
+- Added Chinese docstrings to: `get_config_value`, `strip_thinking_tokens`, `tavily_search`, `deduplicate_and_format_sources`, `format_sources`, `extract_json_from_markdown`, `get_year`, `get_season`, `load_documents`, `format_docs`, `split_sections`, `split_chunks`
+
+**`ch05/12_deployment/api/src/main.py`**
+- Added module docstring
+- Added Chinese docstrings to `get_status()` and `query_qa()`
+
+**`ch05/12_deployment/api/src/models/query.py`**
+- Added module docstring
+- Added class docstrings to `QueryInput` and `QueryOutput`
+
+**`ch05/12_deployment/api/src/rag/prompts.py`**
+- Added module docstring
+
+**`ch05/12_deployment/api/src/rag/rag_query.py`**
+- Added module docstring
+- Added class docstrings to `Response` and `State`
+- Added Chinese docstrings to `retrieve()` and `generate()`
+
+**`ch05/12_deployment/api/src/rag/tcvectordb_hybrid_search.py`**
+- Added module docstring
+- Added class docstring to `TencentVectorDBRetriever`
+- Added Chinese docstring to `_get_relevant_documents()`
+
+**`ch05/12_deployment/api/src/rag/utils.py`**
+- Added module docstring
+- Added Chinese docstrings to: `get_year`, `get_season`, `load_documents`, `format_docs`, `split_sections`, `split_chunks`
+
+**`ch05/12_deployment/api/src/utils/async_utils.py`**
+- Added module docstring
+- Added Chinese docstrings to `async_retry()`, `decorator()`, and `wrapper()`
+
+**`ch05/12_deployment/frontend/src/main.py`**
+- Added module docstring (the `get_explanation()` function already had an English docstring which was left untouched per the "do not reformat" rule)</result>
+<usage><total_tokens>56992</total_tokens><tool_uses>44</tool_uses><duration_ms>234913</duration_ms></usage>
+</task-notification>
+Full transcript available at: REDACTED.output
+
+---
+
+<task-notification>
+<task-id>aeea579ab883e2a22</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<status>completed</status>
+<summary>Agent "Add Chinese docstrings to ch05/04" completed</summary>
+<result>All 18 files have been edited. Here is a summary of every change made:
+
+---
+
+**Files modified and what was added:**
+
+**`01_extract_keypoints/datamodels.py`**
+- Module docstring: describes the file as defining Pydantic data models for keypoint extraction
+- `KeyPoints` class docstring
+
+**`01_extract_keypoints/extract_keypoints.py`**
+- Module docstring: describes batch keypoint extraction from RAG evaluation datasets
+- `main()` docstring
+- `_main()` docstring
+- Inline comment on `num_docs=-1` slice behaviour
+- Inline comment on filtering failed ground-truth docs
+
+**`01_extract_keypoints/naive_rag.py`**  (already had a module docstring)
+- `get_embeddings()`, `retrieve()`, `generate()`, `main()` docstrings
+
+**`01_extract_keypoints/prompts/keypoints_extract_prompt.py`**
+- Module docstring: describes the file as holding system/user prompt templates for keypoint extraction
+
+**`01_extract_keypoints/utils.py`**
+- Module docstring
+- `split_sections()`, `create_section_documents()`, `get_chunks()`, `load_documents()`, `format_docs()` docstrings
+- Inline comment explaining the synthetic `== summary ==` prefix trick
+
+**`02_calculate_metrics/calculate_generation_metrics.py`**
+- Module docstring
+- `main()` and `_main()` docstrings
+- Inline comments on the `[[[label]]]` regex, hallucination logic, and noise-sensitivity logic
+
+**`02_calculate_metrics/calculate_global_metrics.py`**
+- Module docstring
+- `main()` and `_main()` docstrings
+
+**`02_calculate_metrics/calculate_retrieval_metrics.py`**
+- Module docstring
+- `main()` and `_main()` docstrings
+- Inline comment on group reconstruction logic
+
+**`02_calculate_metrics/datamodels.py`**
+- Module docstring
+- `KeyPoint` class docstring
+
+**`02_calculate_metrics/prompts/answer_keypoints_verify_prompt.py`**
+- Module docstring (precision-direction verification)
+
+**`02_calculate_metrics/prompts/groundtruth_keypoints_verify_prompt.py`**
+- Module docstring (recall-direction verification)
+
+**`02_calculate_metrics/utils.py`**
+- Module docstring
+- `split_contexts()`, `dump_metrics()`, `verify_keypoints()` docstrings
+- Inline comment on the regex in `verify_keypoints`
+
+**`03_generate_qa_pairs/generate_qa_pairs.py`**
+- Module docstring
+- `QAPair`, `State` class docstrings
+- `select_length()`, `select_clarity()`, `select_difficulty()`, `generate()`, `main()` docstrings
+- Inline comment on column-to-row dict conversion
+
+**`03_generate_qa_pairs/prompts/rewrite_question_prompt.py`**
+- Module docstring
+
+**`03_generate_qa_pairs/prompts/synthetic_data_prompt.py`**
+- Module docstring (noting both standard and triplet prompt variants)
+
+**`03_generate_qa_pairs/prompts/validate_question_answer_prompt.py`**
+- Module docstring
+
+**`03_generate_qa_pairs/rewrite_qa_pairs.py`**
+- Module docstring
+- `QAPair`, `State` class docstrings
+- `generate()` and `main()` docstrings
+- Inline comment on skipping `verdict=0` docs
+
+**`03_generate_qa_pairs/validate_qa_pairs.py`**
+- Module docstring
+- `QAFeedback`, `State` class docstrings
+- `verify()` and `main()` docstrings
+- Inline comment on the `result_dict` keying strategy</result>
+<usage><total_tokens>70537</total_tokens><tool_uses>78</tool_uses><duration_ms>409026</duration_ms></usage>
+</task-notification>
+Full transcript available at: REDACTED.output
+
+---
+
+<task-notification>
+<task-id>a15396b02d7a0cfac</task-id>
+<tool-use-id>toolu_01Lyy1jXhM2Z8aDFaywpVkHH</tool-use-id>
+<status>completed</status>
+<summary>Agent "Add Chinese docstrings to ch05/05 and ch05/06" completed</summary>
+<result>Everything looks correct. Here is a complete summary of every change made:
+
+---
+
+## Summary of Changes
+
+### `ch05/05_chunking/01_chunking_zh_section.py`
+Already had a module-level docstring and docstrings on `index` and `query`. Added Chinese docstrings to:
+- `State` class
+- `get_embeddings`
+- `split_sections`
+- `split_chunks`
+- `retrieve`
+- `generate`
+- `main`
+
+### `ch05/05_chunking/02_chunking_add_meta_info.py`
+Already had a module-level docstring and docstrings on `index` and `query`. Added Chinese docstrings to:
+- `State` class
+- `get_embeddings`
+- `split_sections`
+- `split_chunks`
+- `retrieve`
+- `generate`
+- `main`
+
+### `ch05/05_chunking/utils.py`
+Had no docstrings at all. Added:
+- Module-level docstring: `"""文档切分工具模块，提供按章节切分、层级构建、文档加载等辅助函数。"""`
+- `build_hierarchy`, `split_sections`, `create_section_documents`, `get_chunks_at_multi_levels`, `get_chunks`, `get_year`, `get_season`, `load_documents`, `format_docs`, `split_contexts`, `flatten_sections`, `flatten_helper` (inner), `convert_chunks_to_documents`
+
+### `ch05/06_embeddings/01_use_bge_embeddings.py`
+Already had module docstring plus docstrings on `index` and `query`. Added:
+- `State` class, `get_embeddings`, `retrieve`, `generate`, `main`
+
+### `ch05/06_embeddings/01_use_jina_embeddings.py`
+Same pattern as BGE. Added:
+- `State` class, `get_embeddings`, `retrieve`, `generate`, `main`
+
+### `ch05/06_embeddings/01_use_local_embeddings.py`
+Same pattern. Added:
+- `State` class, `get_embeddings`, `retrieve`, `generate`, `main`
+
+### `ch05/06_embeddings/02_finetune_embeddings.py`
+Had no module docstring; `create_dataset_from_list` already had an English docstring. Added:
+- Module-level docstring: `"""使用三元组数据对 Jina Embeddings v3 模型进行微调的训练脚本。"""`
+- `main`
+
+### `ch05/06_embeddings/02_generate_qa_triplets.py`
+All functions already had docstrings (`QATriplet`, `State`, `select_length`, `select_clarity`, `select_difficulty`, `generate`, `main`). Added:
+- Module-level docstring: `"""利用 LLM 从向量索引中随机采样文档并生成问答三元组的数据合成脚本。"""`
+
+### `ch05/06_embeddings/02_use_finetuned_embeddings.py`
+Already had module docstring plus docstrings on `index` and `query`. Added:
+- `State` class, `get_embeddings`, `retrieve`, `generate`, `main`
+
+### `ch05/06_embeddings/synthetic_data_prompt.py`
+Contains only string constants. Added:
+- Module-level docstring: `"""定义用于生成问答三元组的系统提示词和用户提示词模板。"""`
+
+### `ch05/06_embeddings/utils.py`
+Had no docstrings. Added:
+- Module-level docstring: `"""嵌入实验工具模块，提供文档加载、章节切分和文本块构建等辅助函数。"""`
+- `get_year`, `get_season`, `load_documents`, `format_docs`, `split_sections`, `split_chunks`
+
+No code was reformatted, no type annotations were added, and `test_env_setup.py` files were left untouched.</result>
+<usage><total_tokens>66258</total_tokens><tool_uses>63</tool_uses><duration_ms>435616</duration_ms></usage>
+</task-notification>
+Full transcript available at: REDACTED.output

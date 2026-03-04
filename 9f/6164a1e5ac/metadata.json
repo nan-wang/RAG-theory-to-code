@@ -2,8 +2,8 @@
   "cli_version": "0.4.2",
   "checkpoint_id": "9f6164a1e5ac",
   "strategy": "manual-commit",
-  "branch": "feat-fix-12-deployment-0303",
-  "checkpoints_count": 4,
+  "branch": "feat-add-docstrings-0304",
+  "checkpoints_count": 2,
   "files_touched": [
     "CLAUDE.md",
     "ch05/03_langchain_core_and_langgraph/.env.example",
@@ -73,10 +73,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 49,
-    "cache_creation_tokens": 91268,
-    "cache_read_tokens": 1443351,
-    "output_tokens": 22204,
-    "api_call_count": 33
+    "input_tokens": 134,
+    "cache_creation_tokens": 100949,
+    "cache_read_tokens": 2508477,
+    "output_tokens": 23068,
+    "api_call_count": 49
   }
 }

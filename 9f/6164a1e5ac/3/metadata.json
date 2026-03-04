@@ -3,27 +3,29 @@
   "checkpoint_id": "9f6164a1e5ac",
   "session_id": "d242c7ee-4209-419d-8049-d64693f648cb",
   "strategy": "manual-commit",
-  "created_at": "2026-03-04T05:53:37.66778Z",
-  "branch": "feat-fix-12-deployment-0303",
-  "checkpoints_count": 2,
+  "created_at": "2026-03-04T06:45:35.569035Z",
+  "branch": "feat-add-docstrings-0304",
+  "checkpoints_count": 0,
   "files_touched": [
     "ch05/12_deployment/api/src/rag/rag_index.py"
   ],
   "agent": "Claude Code",
+  "checkpoint_transcript_start": 44,
+  "transcript_lines_at_start": 44,
   "token_usage": {
-    "input_tokens": 17,
-    "cache_creation_tokens": 18399,
-    "cache_read_tokens": 344229,
-    "output_tokens": 4112,
-    "api_call_count": 11
+    "input_tokens": 102,
+    "cache_creation_tokens": 28080,
+    "cache_read_tokens": 1409355,
+    "output_tokens": 4976,
+    "api_call_count": 27
   },
   "initial_attribution": {
-    "calculated_at": "2026-03-04T05:53:37.641734Z",
-    "agent_lines": 130,
-    "human_added": 3,
-    "human_modified": 4,
+    "calculated_at": "2026-03-04T06:45:35.518158Z",
+    "agent_lines": 21,
+    "human_added": 1998,
+    "human_modified": 0,
     "human_removed": 0,
-    "total_committed": 136,
-    "agent_percentage": 95.58823529411765
+    "total_committed": 2019,
+    "agent_percentage": 1.040118870728083
   }
 }
