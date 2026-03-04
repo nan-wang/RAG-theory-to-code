@@ -32,9 +32,14 @@ DB_KEY=xxx
 ```bash
 $ cd ch05/12_deployment/api/src
 $ python -m rag.index --index_input_dir ../../../data
+
+# Loaded 24 documents
+# [INFO] 已写入 32/338 条文档块
+# ...
+# [INFO] 已写入 338/338 条文档块
+# [INFO] 索引完成：TencentVectorDB 中共存储 1014 条文档
 ```
 
-TODO: 添加运行成功的输出
 
 ### 本地测试后台服务运行
 
