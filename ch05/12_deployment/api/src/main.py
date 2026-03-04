@@ -29,7 +29,7 @@ async def invoke_qa_with_retry(query: str):
     This can help when there are intermittent connection issues
     to external APIs.
     """
-    return await rag_graph.ainvoke(query)
+    return await rag_graph.ainvoke({"question": query})
 
 
 @app.get("/")

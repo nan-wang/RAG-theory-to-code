@@ -15,7 +15,7 @@ dotenv.load_dotenv()
 
 
 def get_all_splits():
-    docs = load_documents("../../data/*.txt")
+    docs = load_documents("../../../../data/*.txt")
     print(f"Loaded {len(docs)} documents")
     chunks = []
     for doc in docs:

@@ -15,9 +15,9 @@ from pydantic import BaseModel, Field
 from tcvdb_text.encoder import BM25Encoder
 from tcvectordb.model.enum import ReadConsistency
 
-from prompts import GENERATION_PROMPT
-from tcvectordb_hybrid_search import TencentVectorDBRetriever
-from utils import format_docs
+from rag.prompts import GENERATION_PROMPT
+from rag.tcvectordb_hybrid_search import TencentVectorDBRetriever
+from rag.utils import format_docs
 
 dotenv.load_dotenv()
 
@@ -37,6 +37,7 @@ class Response(BaseModel):
 class State(TypedDict):
     question: str
     answer: str
+    selected_content: str
     context: List[Document]
 
 
@@ -64,7 +65,7 @@ retriever = ContextualCompressionRetriever(
     base_retriever=ensemble_retriever
 )
 
-llm = ChatOpenAI(model="Qwen/Qwen2.5-14B-Instruct").with_structured_output(Response)
+llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(Response)
 prompt_template = ChatPromptTemplate.from_template(GENERATION_PROMPT)
 
 
@@ -81,11 +82,9 @@ def generate(state: State):
         }
     )
     response_message = llm.invoke(prompt)
-    return {"answer": response_message.content}
+    return {"answer": response_message.answer, "selected_content": response_message.selected_content}
 
 
 graph_builder = StateGraph(State).add_sequence([retrieve, generate])
 graph_builder.add_edge(START, "retrieve")
 rag_graph = graph_builder.compile()
-
-client.close()
