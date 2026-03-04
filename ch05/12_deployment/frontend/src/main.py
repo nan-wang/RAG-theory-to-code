@@ -1,3 +1,5 @@
+"""Streamlit 前端入口：奥运会问答机器人聊天界面，调用后端 RAG API 获取答案。"""
+
 import os
 import requests
 import streamlit as st

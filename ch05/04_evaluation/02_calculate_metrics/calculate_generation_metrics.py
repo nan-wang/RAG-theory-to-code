@@ -1,3 +1,5 @@
+"""计算 RAG 系统生成质量的四项指标：忠实度、幻觉率、噪声敏感度和上下文利用率。"""
+
 import argparse
 import json
 import asyncio
@@ -31,6 +33,7 @@ dotenv.load_dotenv()
 
 
 def main():
+    """解析命令行参数并启动异步生成指标计算流程。"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--num_docs",
@@ -81,6 +84,7 @@ async def _main(
     max_concurrency,
     input_fn,
 ):
+    """异步计算各项生成质量指标并将详细结果和汇总分数写入文件。"""
     with open(input_fn) as f:
         docs = json.load(f)
         response_loyalty_kp = []
@@ -117,6 +121,7 @@ async def _main(
                 )
 
     llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus", temperature=0)
+    # 正则表达式用于从 LLM 输出中提取 [[[标签]]] 格式的结论
     match = re.compile(r"\[\[\[([^\]]+)\]\]\]")
 
     # chain for ground-truth keypoints verification
@@ -190,7 +195,7 @@ async def _main(
             else:
                 print(f"Failed to extract the label for the keypoint: {result}")
 
-        # Reconstruct: a group is hallucination=True unless any kp is "Relevant"
+        # 若某要点在上下文或标准答案中均无支持，则该要点被判定为幻觉
         result_list = []
         for group_idx, kp_group in enumerate(response_hallucination_kp):
             label = True
@@ -240,7 +245,7 @@ async def _main(
             else:
                 print(f"Failed to extract the label for the keypoint: {result}")
 
-        # Reconstruct with original logic
+        # 要点被上下文支持但不被标准答案支持，则视为噪声敏感
         result_list = []
         for claim_context, claim_ans in response_noise_sensitivity_kp:
             label = False

@@ -1,3 +1,5 @@
+"""嵌入实验工具模块，提供文档加载、章节切分和文本块构建等辅助函数。"""
+
 import glob
 import re
 from pathlib import Path
@@ -9,14 +11,17 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 def get_year(fn):
+    """从文件名前四个字符中提取年份（整数）。"""
     return int(Path(fn).stem[:4])
 
 
 def get_season(fn):
+    """从文件名第6-7个字符中提取赛季标识（如 'su' 或 'wi'）。"""
     return Path(fn).stem[5:7]
 
 
 def load_documents(pathname: str, with_metadata=False):
+    """加载匹配 glob 路径的所有文本文件，可选附加年份和赛季元数据。"""
     docs = []
     for file in glob.glob(pathname):
         loader = TextLoader(file)
@@ -34,6 +39,7 @@ def load_documents(pathname: str, with_metadata=False):
 
 
 def format_docs(docs):
+    """将文档列表格式化为带编号前缀的字符串，每篇文档占一行。"""
     output_list = []
     for idx, doc in enumerate(docs):
         doc_str = doc.page_content.replace("\n", " ")
@@ -42,6 +48,7 @@ def format_docs(docs):
 
 
 def split_sections(text, source=None, skip_empty_sections=False):
+    """按章节标题切分文本，为每个章节附加层级路径和索引等元数据，返回 Document 列表。"""
     sections = []
     pattern = r"(==+)(.*?)==+\s*([^=]*)"
 
@@ -112,6 +119,7 @@ def split_sections(text, source=None, skip_empty_sections=False):
 
 
 def split_chunks(docs: Iterable[Document]):
+    """将章节文档切分为文本块，并在内容前拼接文章标题和章节标题作为上下文前缀。"""
     results = []
     # split the sections into chunks
     text_splitter = RecursiveCharacterTextSplitter(

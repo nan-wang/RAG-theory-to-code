@@ -1,3 +1,5 @@
+"""计算 RAG 系统的全局精确率、召回率和 F1 指标。"""
+
 import argparse
 import json
 import asyncio
@@ -28,6 +30,7 @@ dotenv.load_dotenv()
 
 
 def main():
+    """解析命令行参数并启动异步全局指标计算流程。"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--input_fn", "-i", default=None, help="The input keypoints JSON file."
@@ -63,6 +66,7 @@ def main():
 
 
 async def _main(num_docs, output_dir, precision, recall, max_concurrency, input_fn):
+    """异步计算全局精确率和召回率，并将结果写入文件。"""
     with open(input_fn, "r") as f:
         docs = json.load(f)
         rsp_kp = []

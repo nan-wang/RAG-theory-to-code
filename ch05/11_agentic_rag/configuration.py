@@ -1,3 +1,5 @@
+"""Agentic RAG 工作流的运行时配置定义。"""
+
 import os
 from typing import Any, Optional, Literal
 
@@ -6,6 +8,8 @@ from pydantic import BaseModel, Field
 
 
 class Configuration(BaseModel):
+    """Agentic RAG 图的可配置参数，支持通过环境变量或 RunnableConfig 覆盖默认值。"""
+
     max_web_search_results: int = Field(
         default=1,
         title="Max Web Search Results",
@@ -39,7 +43,7 @@ class Configuration(BaseModel):
     def from_runnable_config(
         cls, config: Optional[RunnableConfig] = None
     ) -> "Configuration":
-        """Create a Configuration instance from a RunnableConfig."""
+        """从 RunnableConfig 或环境变量中读取配置并构造 Configuration 实例。"""
         configurable = (
             config.configurable if hasattr(config, "configurable") and config else {}
         )

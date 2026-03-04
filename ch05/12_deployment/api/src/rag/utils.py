@@ -1,3 +1,5 @@
+"""部署模块文档工具函数：加载、切分和格式化奥运文档。"""
+
 import glob
 import re
 from pathlib import Path
@@ -9,14 +11,17 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 def get_year(fn):
+    """从文件名中解析奥运年份（取文件名前4位）。"""
     return int(Path(fn).stem[:4])
 
 
 def get_season(fn):
+    """从文件名中解析奥运赛季标识（取文件名第6-7位，如 'su' 或 'wi'）。"""
     return Path(fn).stem[5:7]
 
 
 def load_documents(pathname: str, with_metadata=False):
+    """按 glob 路径加载所有文本文档，可选地附加年份和赛季元数据。"""
     docs = []
     for file in glob.glob(pathname):
         loader = TextLoader(file)
@@ -34,6 +39,7 @@ def load_documents(pathname: str, with_metadata=False):
 
 
 def format_docs(docs):
+    """将文档列表格式化为带编号标签的上下文字符串，供 LLM 提示使用。"""
     output_list = []
     for idx, doc in enumerate(docs):
         doc_str = doc.page_content.replace("\n", " ")
@@ -42,6 +48,7 @@ def format_docs(docs):
 
 
 def split_sections(text, source=None, skip_empty_sections=False):
+    """按 Wikipedia 风格的 == 标题 == 语法将文档切分为带层级元数据的章节列表。"""
     sections = []
     pattern = r"(==+)(.*?)==+\s*([^=]*)"
 
@@ -112,6 +119,7 @@ def split_sections(text, source=None, skip_empty_sections=False):
 
 
 def split_chunks(docs: Iterable[Document]):
+    """将章节文档列表进一步切分为固定大小的文本块，并为每块注入文章标题和章节标题前缀。"""
     results = []
     # split the sections into chunks
     text_splitter = RecursiveCharacterTextSplitter(

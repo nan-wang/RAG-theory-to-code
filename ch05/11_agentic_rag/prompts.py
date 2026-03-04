@@ -1,7 +1,10 @@
+"""Agentic RAG 使用的提示词模板及辅助函数。"""
+
 from datetime import datetime
 
 
 def get_current_date():
+    """返回当前日期的格式化字符串（例如：'March 04, 2026'）。"""
     return datetime.now().strftime("%B %d, %Y")
 
 

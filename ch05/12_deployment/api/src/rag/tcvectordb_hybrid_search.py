@@ -1,3 +1,5 @@
+"""基于腾讯云向量数据库的混合检索器（稠密向量 + 稀疏 BM25）。"""
+
 from typing import Any, List
 
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
@@ -9,6 +11,8 @@ from tcvectordb.model.document import AnnSearch, KeywordSearch, WeightedRerank
 
 
 class TencentVectorDBRetriever(BaseRetriever):
+    """封装腾讯云向量数据库的混合检索器，支持向量相似度与 BM25 关键词的加权融合。"""
+
     client: Any
     embeddings: Embeddings
     sparse_encoder: BM25Encoder
@@ -28,6 +32,7 @@ class TencentVectorDBRetriever(BaseRetriever):
         run_manager: CallbackManagerForRetrieverRun,
         hybrid_search_kwargs: dict[str, Any] = {}
     ) -> list[Document]:
+        """对查询进行稠密编码和稀疏编码，执行混合检索并返回 Document 列表。"""
         dense_embeddings: List[float] = self.embeddings.embed_query(query)
         sparse_embeddings = self.sparse_encoder.encode_queries(query)
         weight = hybrid_search_kwargs.get("weight", self.weight)

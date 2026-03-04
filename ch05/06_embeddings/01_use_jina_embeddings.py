@@ -42,6 +42,8 @@ dotenv.load_dotenv()
 
 
 class State(TypedDict):
+    """RAG 工作流的共享状态，包含问题、检索上下文和生成答案。"""
+
     question: str
     context: List[Document]
     answer: str
@@ -62,6 +64,7 @@ llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus")
 
 
 def get_embeddings():
+    """返回 Jina Embeddings v3 多语言嵌入模型实例。"""
     return JinaEmbeddings(model_name="jina-embeddings-v3")
 
 
@@ -88,6 +91,7 @@ def index(index_input_dir: str, index_dir: str, collection_name: str):
 
 
 def retrieve(state: State):
+    """从向量数据库中检索与问题最相关的文档。"""
     retrieved_docs = vector_store.as_retriever(
         search_type="similarity", search_kwargs={"k": 10}
     ).invoke(state["question"])
@@ -95,6 +99,7 @@ def retrieve(state: State):
 
 
 def generate(state: State):
+    """根据检索到的上下文文档调用 LLM 生成答案。"""
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     prompt = prompt_template.invoke(
         {"question": state["question"], "context": docs_content}
@@ -153,6 +158,7 @@ async def query(
 
 
 def main():
+    """解析命令行参数并按需执行索引或查询流程。"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--index",

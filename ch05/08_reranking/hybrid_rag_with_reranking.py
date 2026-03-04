@@ -51,6 +51,8 @@ seg = None  # initialized in query()
 
 
 class State(TypedDict):
+    """RAG 图的状态，包含问题、检索到的上下文文档和生成的回答。"""
+
     question: str
     context: List[Document]
     answer: str
@@ -71,10 +73,12 @@ llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus")
 
 
 def get_embeddings():
+    """返回 Jina Embeddings v3 实例，用于向量化文档和查询。"""
     return JinaEmbeddings(model_name="jina-embeddings-v3")
 
 
 def load_documents(index_input_dir: str):
+    """加载指定目录下所有 txt 文件，返回文档列表。"""
     docs = []
     for file in glob.glob(f"{index_input_dir}/*.txt"):
         loader = TextLoader(file)
@@ -83,6 +87,7 @@ def load_documents(index_input_dir: str):
 
 
 def get_chunks(docs: list[Document]):
+    """将文档列表按固定大小切分为文本块，返回切分后的文档列表。"""
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=512,
         chunk_overlap=128,
@@ -92,11 +97,13 @@ def get_chunks(docs: list[Document]):
 
 
 def tokenize_doc(doc_str: str):
+    """使用 pkuseg 对文档字符串逐行分词，返回词元列表（BM25 预处理函数）。"""
     result = []
     for l in doc_str.splitlines():
         ll = l.strip()
         if not ll:
             continue
+        # 跳过空行，对每行进行中文分词
         split_tokens = [t.strip() for t in seg.cut(ll) if t.strip() != ""]
         result += split_tokens
     return result
@@ -142,6 +149,7 @@ async def query(
 
     ids = vector_store.get()["ids"]
     logger.info(f"Retrieved {len(ids)} documents from the vector store at {index_dir}")
+    # 从向量数据库中取回所有文档，重新构建 Document 对象以供 BM25 使用
     raw = {
         k: v
         for k, v in vector_store.get(ids=ids).items()
@@ -154,7 +162,7 @@ async def query(
             Document(page_content=d["documents"], id=d["ids"], metadata=d["metadatas"])
         )
 
-    seg = pkuseg.pkuseg()
+    seg = pkuseg.pkuseg()  # 延迟初始化分词器，避免在主进程中过早占用资源
     bm25_retriever = BM25Retriever.from_documents(
         documents, preprocess_func=tokenize_doc
     )
@@ -170,10 +178,12 @@ async def query(
     )
 
     def retrieve(state: State):
+        """从混合检索器中获取与问题相关的文档列表。"""
         retrieved_docs = retriever.invoke(state["question"])
         return {"context": retrieved_docs}
 
     def generate(state: State):
+        """根据检索到的上下文文档，调用 LLM 生成回答。"""
         docs_content = "\n\n".join(doc.page_content for doc in state["context"])
         prompt = prompt_template.invoke(
             {"question": state["question"], "context": docs_content}
@@ -214,6 +224,7 @@ async def query(
 
 
 def main():
+    """解析命令行参数，根据标志依次执行索引构建和/或检索问答流程。"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--index",

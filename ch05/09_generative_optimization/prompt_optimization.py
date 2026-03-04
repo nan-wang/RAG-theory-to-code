@@ -56,6 +56,8 @@ seg = pkuseg.pkuseg()
 
 
 class Response(BaseModel):
+    """LLM 结构化输出模型，包含从上下文中筛选的相关内容和最终回答。"""
+
     selected_content: str = Field(
         ...,
         description="selected content from the context that is useful to answer the question.",
@@ -64,17 +66,20 @@ class Response(BaseModel):
 
 
 def tokenize_doc(doc_str: str):
+    """使用 pkuseg 对文档字符串逐行分词，返回词元列表（BM25 预处理函数）。"""
     result = []
     for l in doc_str.splitlines():
         ll = l.strip()
         if not ll:
             continue
+        # 跳过空行，对每行进行中文分词
         split_tokens = [t.strip() for t in seg.cut(ll) if t.strip() != ""]
         result += split_tokens
     return result
 
 
 def get_all_splits(index_input_dir: str):
+    """加载指定目录下的所有 txt 文件，按章节切分后返回所有文本块列表。"""
     docs = load_documents(f"{index_input_dir}/*.txt")
     logger.info(f"Loaded {len(docs)} documents from {index_input_dir}")
     chunks = []
@@ -165,6 +170,7 @@ async def query(
         Response
     )
 
+    # 第一步并行执行检索和透传问题；第二步并行保留上下文/问题并调用 LLM 生成结构化回答
     rag_chain = RunnableParallel(
         context=retriever | format_docs, question=RunnablePassthrough()
     ) | RunnableParallel(
@@ -203,6 +209,7 @@ async def query(
 
 
 def main():
+    """解析命令行参数，根据标志依次执行索引构建和/或检索问答流程。"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--index",

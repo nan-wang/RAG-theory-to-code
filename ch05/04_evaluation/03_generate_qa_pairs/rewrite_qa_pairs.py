@@ -1,3 +1,5 @@
+"""对通过验证的合成问答对进行改写，以提升问题的清晰度和可回答性。"""
+
 import argparse
 import asyncio
 import json
@@ -29,11 +31,15 @@ prompt_template = ChatPromptTemplate.from_messages(
 
 
 class QAPair(BaseModel):
+    """改写后的问答对数据模型。"""
+
     query: str = Field(..., description="The question generated from the context.")
     answer: str = Field(..., description="The answer to the question.")
 
 
 class State(TypedDict):
+    """问答改写工作流的状态字典。"""
+
     document_id: str
     original_query: str
     original_answer: str
@@ -48,6 +54,7 @@ llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_out
 
 
 def generate(state: State):
+    """调用 LLM 对原始问答对进行改写，返回改写后的问题和答案。"""
     prompt = prompt_template.invoke(
         {
             "context_str": state["context"],
@@ -63,6 +70,7 @@ def generate(state: State):
 
 
 async def main(input_fn: str, output_dir: str, max_concurrency: int = 8):
+    """异步主函数：筛选已验证的问答对并批量改写，结果写入 qa_pairs.rewritten.json。"""
     graph_builder = StateGraph(State)
     graph_builder.add_node(generate)
     graph_builder.add_edge(START, "generate")
@@ -75,6 +83,7 @@ async def main(input_fn: str, output_dir: str, max_concurrency: int = 8):
     qa_pair_dict = {}
     logger.info(f"{len(data)} documents loaded from {input_fn}")
     for doc in data:
+        # 跳过未通过验证（verdict=0）的问答对
         if not doc["metadatas"]["verdict"]:
             continue
         original_query = doc["query"]

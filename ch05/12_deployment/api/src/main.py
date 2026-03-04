@@ -1,3 +1,5 @@
+"""FastAPI 应用入口：提供奥运会问答 REST API，包含重试机制和 CORS 支持。"""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -33,10 +35,12 @@ async def invoke_qa_with_retry(query: str):
 
 @app.get("/")
 async def get_status():
+    """健康检查接口，返回服务运行状态。"""
     return {"status": "running"}
 
 
 @app.post("/ask")
 async def query_qa(query: QueryInput) -> QueryOutput:
+    """接收用户问题，调用 RAG 图生成答案并返回结果。"""
     query_response = await invoke_qa_with_retry(query.text)
     return query_response

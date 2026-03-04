@@ -1,3 +1,5 @@
+"""从 RAG 评估数据集中批量提取标准答案和模型回答的关键信息要点。"""
+
 import argparse
 import asyncio
 import dotenv
@@ -20,6 +22,7 @@ dotenv.load_dotenv()
 
 
 def main():
+    """解析命令行参数并启动异步主流程。"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--num_docs",
@@ -65,6 +68,7 @@ def main():
 async def _main(
     num_docs, output_dir, ground_truth, response, max_concurrency, input_fn
 ):
+    """异步批量提取关键要点，并将结果写入 keypoints.json。"""
     KE_SYS_TMPL = SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT)
 
     KE_USER_TMPL = HumanMessagePromptTemplate.from_template(USER_PROMPT)
@@ -81,6 +85,7 @@ async def _main(
         data = json.load(f)
     logger.info(f"Loaded from {input_fn}")
 
+    # num_docs=-1 时取全部文档
     docs = data[:num_docs]
     logger.info(
         f"Selected {num_docs if num_docs!=-1 else len(data)} from {len(data)} documents"
@@ -121,6 +126,7 @@ async def _main(
                     f"Failed to extract keypoints from response for result: {result}"
                 )
 
+    # 过滤掉标准答案提取失败的文档
     results = [doc for doc in docs if not doc.get("_gt_failed")]
     # Clean up temporary marker
     for doc in results:

@@ -1,3 +1,5 @@
+"""RAG 查询图：基于腾讯云向量数据库混合检索和 Jina Rerank 的问答 LangGraph 工作流。"""
+
 import os
 from typing import List
 from typing import TypedDict
@@ -29,6 +31,8 @@ COLLECTION_NAME = "olympic-games-hybrid"
 
 
 class Response(BaseModel):
+    """LLM 结构化输出模型，包含选中上下文和最终答案。"""
+
     selected_content: str = Field(
         ...,
         description="selected content from the context that is useful to answer the question.",
@@ -37,6 +41,8 @@ class Response(BaseModel):
 
 
 class State(TypedDict):
+    """RAG 图的运行状态，包含问题、检索上下文、答案和选中片段。"""
+
     question: str
     answer: str
     selected_content: str
@@ -75,11 +81,13 @@ prompt_template = ChatPromptTemplate.from_template(GENERATION_PROMPT)
 
 
 def retrieve(state: State):
+    """执行混合检索并返回相关文档列表。"""
     retrieved_docs = retriever.invoke(state["question"])
     return {"context": retrieved_docs}
 
 
 def generate(state: State):
+    """根据检索上下文调用 LLM 生成结构化答案。"""
     prompt = prompt_template.invoke(
         {"question": state["question"], "context": format_docs(state["context"])}
     )

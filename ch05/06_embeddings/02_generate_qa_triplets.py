@@ -1,3 +1,5 @@
+"""利用 LLM 从向量索引中随机采样文档并生成问答三元组的数据合成脚本。"""
+
 import asyncio
 import argparse
 import json

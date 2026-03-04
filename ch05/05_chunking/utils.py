@@ -1,3 +1,5 @@
+"""文档切分工具模块，提供按章节切分、层级构建、文档加载等辅助函数。"""
+
 import re
 import copy
 from pathlib import Path
@@ -11,6 +13,7 @@ from collections import defaultdict
 
 
 def build_hierarchy(data):
+    """将扁平的章节列表重建为树形层级结构，返回顶层节点列表。"""
     hierarchy = {}
     sections_by_title = {}
 
@@ -56,6 +59,7 @@ def build_hierarchy(data):
 
 
 def split_sections(content, skip_empty_sections=True, root_title=""):
+    """按维基百科式章节标题切分文本，构建并返回带层级结构的章节树。"""
     sections = defaultdict(list)
     pattern = r"(==+)(.*?)==+\s*([^=]*)"
 
@@ -124,6 +128,7 @@ def split_sections(content, skip_empty_sections=True, root_title=""):
 def create_section_documents(
     section_list, metadatas, add_section_title=True, add_article_title=True
 ):
+    """将章节列表转换为 LangChain Document 对象列表，可选择在内容前拼接章节和文章标题。"""
     _metadatas = metadatas
     documents = []
     for i, sec in enumerate(section_list):
@@ -147,6 +152,7 @@ def create_section_documents(
 
 
 def get_chunks_at_multi_levels(docs):
+    """将文档列表按章节切分为多层级节点（当前仅构建章节文档，未返回）。"""
     section_docs = []
     for doc in docs:
         section_list = split_sections(doc.page_content)
@@ -156,6 +162,7 @@ def get_chunks_at_multi_levels(docs):
 
 
 def get_chunks(docs: list[Document]):
+    """将文档列表切分为带标题前缀的文本块，用于向量索引构建。"""
     # split each document into sections
     section_docs = []
     for doc in docs:
@@ -190,14 +197,17 @@ def get_chunks(docs: list[Document]):
 
 
 def get_year(fn):
+    """从文件名前四个字符中提取年份（整数）。"""
     return int(Path(fn).stem[:4])
 
 
 def get_season(fn):
+    """从文件名第6-7个字符中提取赛季标识（如 'su' 或 'wi'）。"""
     return Path(fn).stem[5:7]
 
 
 def load_documents(pathname: str, with_metadata=False):
+    """加载匹配 glob 路径的所有文本文件，可选附加年份和赛季元数据。"""
     docs = []
     for file in glob.glob(pathname):
         loader = TextLoader(file)
@@ -215,19 +225,23 @@ def load_documents(pathname: str, with_metadata=False):
 
 
 def format_docs(docs):
+    """将文档列表的内容拼接为换行分隔的字符串。"""
     return "\n\n".join(doc.page_content for doc in docs)
 
 
 def split_contexts(contexts):
+    """按 'article_title:' 标记将合并的上下文字符串切分回独立段落。"""
     pattern = r"(?=article_title:)"
     # Split the text using the regex pattern
     return [part.strip() for part in re.split(pattern, contexts) if part.strip()]
 
 
 def flatten_sections(hierarchy):
+    """将层级章节树展平为列表，每个节点包含其父路径和 Markdown 格式内容。"""
     flattened_list = []
 
     def flatten_helper(section, parents, content_list):
+        """递归遍历章节树，收集内容并构建带层级路径的扁平节点。"""
         content = section["content"]
         level = section["section_level"]
         index = section["section_index"]
@@ -271,6 +285,7 @@ def flatten_sections(hierarchy):
 
 
 def convert_chunks_to_documents(chunks, add_year=False, add_season=False):
+    """将扁平章节块转换为 LangChain Document，叶节点按句子进一步细分，并以生成器方式返回。"""
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=128,
         chunk_overlap=32,

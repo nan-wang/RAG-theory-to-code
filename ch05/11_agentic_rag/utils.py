@@ -1,3 +1,5 @@
+"""Agentic RAG 工具函数：搜索、文档处理、格式化及文本切分。"""
+
 from typing import Any, Dict, List, Union
 from tavily import TavilyClient
 import re
@@ -5,10 +7,12 @@ import json
 
 
 def get_config_value(value: Any) -> str:
+    """将配置值统一转换为字符串，兼容枚举类型和普通字符串。"""
     return value if isinstance(value, str) else value.value
 
 
 def strip_thinking_tokens(text: str) -> str:
+    """移除模型响应中的 <think>...</think> 推理片段。"""
     while "<think>" in text and "</think>" in text:
         start = text.find("<think>")
         end = text.find("</think>") + len("</think>")
@@ -19,6 +23,7 @@ def strip_thinking_tokens(text: str) -> str:
 def tavily_search(
     query: str, fetch_full_page: bool = True, max_results: int = 3
 ) -> Dict[str, List[Dict[str, Any]]]:
+    """使用 Tavily API 执行网络搜索，返回原始搜索结果字典。"""
     client = TavilyClient()
     return client.search(
         query, max_results=max_results, include_full_page=fetch_full_page
@@ -30,6 +35,7 @@ def deduplicate_and_format_sources(
     max_tokens_per_source: int = 1000,
     fetch_full_page: bool = True,
 ) -> str:
+    """对搜索结果去重，并格式化为带来源标题、URL 和内容的文本块。"""
     if isinstance(search_response, dict):
         sources_list = search_response["results"]
     elif isinstance(search_response, list):
@@ -69,6 +75,7 @@ def deduplicate_and_format_sources(
 
 
 def format_sources(search_results: Dict[str, Any]) -> str:
+    """将搜索结果格式化为 '* 标题: URL' 形式的来源列表字符串。"""
     if not search_results:
         return ""
     return "\n".join(
@@ -77,6 +84,7 @@ def format_sources(search_results: Dict[str, Any]) -> str:
 
 
 def extract_json_from_markdown(input_str):
+    """从 Markdown 代码块中提取 JSON 字符串，若无代码块则原样返回。"""
     match = re.search(r"```json\s*(\{.*?\})\s*```", input_str, re.DOTALL)
     if match:
         json_str = match.group(1)
@@ -95,14 +103,17 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 def get_year(fn):
+    """从文件名中解析奥运年份（取文件名前4位）。"""
     return int(Path(fn).stem[:4])
 
 
 def get_season(fn):
+    """从文件名中解析奥运赛季标识（取文件名第6-7位，如 'su' 或 'wi'）。"""
     return Path(fn).stem[5:7]
 
 
 def load_documents(pathname: str, with_metadata=False):
+    """按 glob 路径加载所有文本文档，可选地附加年份和赛季元数据。"""
     docs = []
     for file in glob.glob(pathname):
         loader = TextLoader(file)
@@ -120,6 +131,7 @@ def load_documents(pathname: str, with_metadata=False):
 
 
 def format_docs(docs):
+    """将文档列表格式化为带编号标签的上下文字符串，供 LLM 提示使用。"""
     output_list = []
     for idx, doc in enumerate(docs):
         doc_str = doc.page_content.replace("\n", " ")
@@ -128,6 +140,7 @@ def format_docs(docs):
 
 
 def split_sections(text, source=None, skip_empty_sections=False):
+    """按 Wikipedia 风格的 == 标题 == 语法将文档切分为带层级元数据的章节列表。"""
     sections = []
     pattern = r"(==+)(.*?)==+\s*([^=]*)"
 
@@ -198,6 +211,7 @@ def split_sections(text, source=None, skip_empty_sections=False):
 
 
 def split_chunks(docs: Iterable[Document]):
+    """将章节文档列表进一步切分为固定大小的文本块，并为每块注入文章标题和章节标题前缀。"""
     results = []
     # split the sections into chunks
     text_splitter = RecursiveCharacterTextSplitter(

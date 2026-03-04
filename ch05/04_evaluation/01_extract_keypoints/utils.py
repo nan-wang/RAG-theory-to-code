@@ -1,3 +1,5 @@
+"""文档加载、章节拆分和文本分块的工具函数。"""
+
 import re
 import copy
 from pathlib import Path
@@ -9,6 +11,7 @@ from langchain_core.documents import Document
 
 
 def split_sections(content, skip_empty_sections=True):
+    """将 Wiki 格式文本按 == 标题层级拆分为章节字典列表。"""
     sections = []
     pattern = r"(==+)(.*?)==+\s*([^=]*)"
 
@@ -16,6 +19,7 @@ def split_sections(content, skip_empty_sections=True):
     section_counters = {1: -1, 2: -1, 3: -1}
     parent_section = ""
 
+    # 在文档开头插入虚拟的 summary 节，使正文内容也能被匹配到
     text = f"== summary ==\n\n{content}"
     matches = re.finditer(pattern, text, re.DOTALL)
 
@@ -66,6 +70,7 @@ def split_sections(content, skip_empty_sections=True):
 def create_section_documents(
     section_list, metadatas, add_section_title=True, add_article_title=True
 ):
+    """将章节列表转换为带元数据的 LangChain Document 对象列表。"""
     _metadatas = metadatas
     documents = []
     for i, sec in enumerate(section_list):
@@ -89,6 +94,7 @@ def create_section_documents(
 
 
 def get_chunks(docs: list[Document]):
+    """将文档列表先按章节拆分，再按固定大小切分为文本块。"""
     # split each document into sections
     section_docs = []
     for doc in docs:
@@ -106,6 +112,7 @@ def get_chunks(docs: list[Document]):
 
 
 def load_documents(pathname: str):
+    """按 glob 模式加载所有匹配文件，返回 Document 列表。"""
     docs = []
     for file in glob.glob(pathname):
         loader = TextLoader(file)
@@ -115,4 +122,5 @@ def load_documents(pathname: str):
 
 
 def format_docs(docs):
+    """将多个文档的内容以双换行符拼接为单个字符串。"""
     return "\n\n".join(doc.page_content for doc in docs)

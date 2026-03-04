@@ -1,3 +1,5 @@
+"""Agentic RAG 主模块：构建并运行基于混合检索和多轮反思的 LangGraph 工作流。"""
+
 import argparse
 import json
 from pathlib import Path

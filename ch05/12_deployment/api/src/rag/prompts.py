@@ -1,3 +1,5 @@
+"""RAG 生成阶段使用的提示词模板。"""
+
 GENERATION_PROMPT = """You're a helpful AI assistant. Given a user question related to the Olympic Games and some Wikipedia article snippets, answer the user question and provide citations. If none of the articles answer the question, just say you don't know. 
 Follow the steps,
 Step 1: Read the ``Question``.

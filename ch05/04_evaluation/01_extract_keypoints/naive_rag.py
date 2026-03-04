@@ -63,6 +63,7 @@ llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus")
 
 
 def get_embeddings():
+    """返回配置好的 OpenAI 嵌入模型实例。"""
     return OpenAIEmbeddings(
         model="Qwen/Qwen3-Embedding-0.6B",
         chunk_size=16,
@@ -88,6 +89,7 @@ def index(index_input_dir: str, index_dir: str, collection_name: str):
 
 
 def retrieve(state: State):
+    """根据问题从向量库检索最相关的文档片段。"""
     retrieved_docs = vector_store.as_retriever(
         search_type="similarity", search_kwargs={"k": 4}
     ).invoke(state["question"])
@@ -95,6 +97,7 @@ def retrieve(state: State):
 
 
 def generate(state: State):
+    """将检索到的上下文拼接后调用 LLM 生成回答。"""
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     prompt = prompt_template.invoke(
         {"question": state["question"], "context": docs_content}
@@ -153,6 +156,7 @@ async def query(
 
 
 def main():
+    """解析 CLI 参数，按需执行索引构建和/或检索问答流程。"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--index",

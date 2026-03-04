@@ -1,7 +1,11 @@
+"""定义指标计算阶段使用的关键要点数据模型。"""
+
 from pydantic import BaseModel, Field
 
 
 class KeyPoint(BaseModel):
+    """表示一个带有验证标签的答案关键要点。"""
+
     question: str = Field(..., description="The question.")
     answer: str = Field(..., description="The answer.")
     keypoint: str = Field(

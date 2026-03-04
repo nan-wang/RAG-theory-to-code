@@ -1,3 +1,5 @@
+"""使用三元组数据对 Jina Embeddings v3 模型进行微调的训练脚本。"""
+
 import json
 import random
 
@@ -48,6 +50,7 @@ def create_dataset_from_list(data_list, train_size=10, dev_size=2, test_size=2):
 
 
 def main():
+    """加载三元组数据、配置训练参数并执行 Jina 嵌入模型微调流程。"""
     # load the json file
     with open("qa_triplets.merged.json", "r") as f:
         data_list = json.load(f)

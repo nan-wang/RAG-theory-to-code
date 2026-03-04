@@ -1,3 +1,5 @@
+"""计算 RAG 系统检索阶段的上下文精确率和上下文召回率指标。"""
+
 import argparse
 import json
 import asyncio
@@ -30,6 +32,7 @@ dotenv.load_dotenv()
 
 
 def main():
+    """解析命令行参数并启动异步检索指标计算流程。"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--input_fn", "-i", default=None, help="The input keypoints JSON file."
@@ -65,6 +68,7 @@ def main():
 
 
 async def _main(num_docs, output_dir, precision, recall, max_concurrency, input_fn):
+    """异步计算检索精确率和召回率，并将结果写入文件。"""
     with open(input_fn) as f:
         docs = json.load(f)
         cxt_precision_kp = []
@@ -131,7 +135,8 @@ async def _main(num_docs, output_dir, precision, recall, max_concurrency, input_
             else:
                 print(f"Failed to extract the label for the keypoint: {result}")
 
-        # Reconstruct groups and determine label per group
+        # 重建分组：只要该上下文块中有任意一个要点被标记为 Relevant，该块即为相关
+
         context_precision_list = []
         offset = 0
         for kp_group, size in zip(cxt_precision_kp, group_sizes):

@@ -1,3 +1,5 @@
+"""对合成问答对的质量进行验证，过滤含糊或依赖外部信息的问题。"""
+
 import asyncio
 import argparse
 import json
@@ -29,6 +31,8 @@ prompt_template = ChatPromptTemplate.from_messages(
 
 
 class QAFeedback(BaseModel):
+    """LLM 对问题质量的评估结果，包含反馈说明和 0/1 裁决分数。"""
+
     feedback: str = Field(..., description="Feedback for the question.")
     verdict: int = Field(..., description="Score for the question.")
 
@@ -39,6 +43,8 @@ llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_out
 
 
 class State(TypedDict):
+    """问答验证工作流的状态字典。"""
+
     context: str
     query: str
     answer: str
@@ -49,6 +55,7 @@ class State(TypedDict):
 
 
 def verify(state: State):
+    """调用 LLM 对问答对进行质量验证，返回反馈和裁决分数。"""
     prompt = prompt_template.invoke(
         {
             "context_str": state["context"],
@@ -64,6 +71,7 @@ def verify(state: State):
 
 
 async def main(input_fn: str, output_dir: str, max_concurrency: int = 8):
+    """异步主函数：批量验证问答对质量，结果写入 qa_pairs.validated.json。"""
     graph_builder = StateGraph(State)
     graph_builder.add_node(verify)
     graph_builder.add_edge(START, "verify")
@@ -86,6 +94,7 @@ async def main(input_fn: str, output_dir: str, max_concurrency: int = 8):
     outputs = await graph.abatch(
         inputs, config=RunnableConfig(max_concurrency=max_concurrency)
     )
+    # 用 document_id 作为键，便于后续将验证结果回填到原始文档
     result_dict = {}
     for result in outputs:
         result_dict[result["document_id"]] = result

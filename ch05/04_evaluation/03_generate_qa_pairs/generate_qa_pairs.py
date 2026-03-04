@@ -1,3 +1,5 @@
+"""从 Chroma 向量库中随机抽取文档块，使用 LLM 生成合成问答对。"""
+
 import asyncio
 import argparse
 import json
@@ -24,11 +26,15 @@ dotenv.load_dotenv()
 
 
 class QAPair(BaseModel):
+    """LLM 生成的单条问答对数据模型。"""
+
     question: str = Field(..., description="The question generated from the context.")
     answer: str = Field(..., description="The answer to the question.")
 
 
 class State(TypedDict):
+    """问答生成工作流的状态字典，包含随机采样参数和生成结果。"""
+
     length: int
     clarity: str
     difficulty: str
@@ -39,18 +45,22 @@ class State(TypedDict):
 
 
 def select_length(state: State):
+    """随机选取问题的最短字数要求。"""
     return {"length": random.choice([8, 16, 32])}
 
 
 def select_clarity(state: State):
+    """随机选取问题的清晰度/难度级别。"""
     return {"clarity": random.choice(["简单", "基础", "困难"])}
 
 
 def select_difficulty(state: State):
+    """随机选取问题的目标教育背景。"""
     return {"difficulty": random.choice(["小学", "初中", "高中", "大学", "研究生博士"])}
 
 
 def generate(state: State):
+    """根据上下文及随机采样的参数调用 LLM 生成问答对。"""
     prompt = prompt_template.invoke(
         {
             "context_str": state["context"],
@@ -86,6 +96,7 @@ async def main(
     output_dir: str,
     max_concurrency: int = 8,
 ):
+    """异步主函数：从向量库抽样文档块并批量生成问答对，写入 qa_pairs.raw.json。"""
     graph_builder = StateGraph(State)
     graph_builder.add_node(select_length)
     graph_builder.add_node(select_clarity)
@@ -113,6 +124,7 @@ async def main(
         for k, v in vectorstore.get(ids=ids[:num_docs]).items()
         if k in ("ids", "metadatas", "documents")
     }
+    # 将列字典转换为行字典列表，便于按文档迭代
     selected_docs = [dict(zip(selected_docs, t)) for t in zip(*selected_docs.values())]
 
     inputs = [
