@@ -97,7 +97,7 @@ def tokenize_doc(doc_str: str):
         ll = l.strip()
         if not ll:
             continue
-        split_tokens = [t.strip() for t in seg.cut(ll) if t.strip() != '']
+        split_tokens = [t.strip() for t in seg.cut(ll) if t.strip() != ""]
         result += split_tokens
     return result
 
@@ -136,24 +136,28 @@ async def query(
         collection_name=collection_name,
     )
 
-    vector_retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 10})
+    vector_retriever = vector_store.as_retriever(
+        search_type="similarity", search_kwargs={"k": 10}
+    )
 
     ids = vector_store.get()["ids"]
     logger.info(f"Retrieved {len(ids)} documents from the vector store at {index_dir}")
     raw = {
-        k: v for k, v in vector_store.get(ids=ids).items() if k in ("ids", "metadatas", "documents")
+        k: v
+        for k, v in vector_store.get(ids=ids).items()
+        if k in ("ids", "metadatas", "documents")
     }
     documents = []
     for t in zip(*raw.values()):
         d = dict(zip(raw, t))
         documents.append(
-            Document(
-                page_content=d["documents"],
-                id=d["ids"],
-                metadata=d["metadatas"]))
+            Document(page_content=d["documents"], id=d["ids"], metadata=d["metadatas"])
+        )
 
     seg = pkuseg.pkuseg()
-    bm25_retriever = BM25Retriever.from_documents(documents, preprocess_func=tokenize_doc)
+    bm25_retriever = BM25Retriever.from_documents(
+        documents, preprocess_func=tokenize_doc
+    )
     bm25_retriever.k = 10
 
     ensemble_retriever = EnsembleRetriever(
@@ -171,7 +175,9 @@ async def query(
 
     def generate(state: State):
         docs_content = "\n\n".join(doc.page_content for doc in state["context"])
-        prompt = prompt_template.invoke({"question": state["question"], "context": docs_content})
+        prompt = prompt_template.invoke(
+            {"question": state["question"], "context": docs_content}
+        )
         response_message = llm.invoke(prompt)
         return {"answer": response_message.content}
 
@@ -183,9 +189,13 @@ async def query(
         qa_pairs = json.load(f)
 
     inputs = [{"question": doc["query"]} for doc in qa_pairs]
-    logger.info(f"Processing {len(inputs)} queries with max_concurrency={max_concurrency}...")
+    logger.info(
+        f"Processing {len(inputs)} queries with max_concurrency={max_concurrency}..."
+    )
 
-    outputs = await graph.abatch(inputs, config=RunnableConfig(max_concurrency=max_concurrency))
+    outputs = await graph.abatch(
+        inputs, config=RunnableConfig(max_concurrency=max_concurrency)
+    )
     logger.info("Complete generation")
 
     results = []
@@ -205,22 +215,47 @@ async def query(
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--index', dest='do_index', action=BooleanOptionalAction, default=False,
-                        help='Run indexing step.')
-    parser.add_argument('--query', dest='do_query', action=BooleanOptionalAction, default=False,
-                        help='Run query step.')
-    parser.add_argument('--index_dir', required=True, type=str,
-                        help='Chroma persist directory.')
-    parser.add_argument('--collection_name', required=True, type=str,
-                        help='Chroma collection name.')
-    parser.add_argument('--index_input_dir', default=None, type=str,
-                        help='Directory containing *.txt files for indexing.')
-    parser.add_argument('--query_input_path', default=None, type=str,
-                        help='Path to input JSON file with queries.')
-    parser.add_argument('--output_dir', default=None, type=str,
-                        help='Directory for response.json output.')
-    parser.add_argument('--max_concurrency', default=2, type=int,
-                        help='Batch concurrency for querying.')
+    parser.add_argument(
+        "--index",
+        dest="do_index",
+        action=BooleanOptionalAction,
+        default=False,
+        help="Run indexing step.",
+    )
+    parser.add_argument(
+        "--query",
+        dest="do_query",
+        action=BooleanOptionalAction,
+        default=False,
+        help="Run query step.",
+    )
+    parser.add_argument(
+        "--index_dir", required=True, type=str, help="Chroma persist directory."
+    )
+    parser.add_argument(
+        "--collection_name", required=True, type=str, help="Chroma collection name."
+    )
+    parser.add_argument(
+        "--index_input_dir",
+        default=None,
+        type=str,
+        help="Directory containing *.txt files for indexing.",
+    )
+    parser.add_argument(
+        "--query_input_path",
+        default=None,
+        type=str,
+        help="Path to input JSON file with queries.",
+    )
+    parser.add_argument(
+        "--output_dir",
+        default=None,
+        type=str,
+        help="Directory for response.json output.",
+    )
+    parser.add_argument(
+        "--max_concurrency", default=2, type=int, help="Batch concurrency for querying."
+    )
     args = parser.parse_args()
 
     if not args.do_index and not args.do_query:

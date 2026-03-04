@@ -40,6 +40,7 @@ def warn(msg):
 # 加载 .env
 try:
     import dotenv
+
     dotenv.load_dotenv()
 except ImportError:
     pass
@@ -68,6 +69,7 @@ base_url = os.getenv("OPENAI_API_BASE")
 if api_key and base_url:
     try:
         from langchain_openai import ChatOpenAI
+
         llm = ChatOpenAI(model="Qwen/Qwen2.5-7B-Instruct", max_tokens=16)
         response = llm.invoke("你好")
         if response.content:
@@ -81,5 +83,7 @@ else:
 
 # 汇总
 print(f"\n{'=' * 50}")
-print(f"  {GREEN}通过：{passed}{RESET}  {RED}失败：{failed}{RESET}  {YELLOW}警告：{warned}{RESET}\n")
+print(
+    f"  {GREEN}通过：{passed}{RESET}  {RED}失败：{failed}{RESET}  {YELLOW}警告：{warned}{RESET}\n"
+)
 sys.exit(1 if failed else 0)

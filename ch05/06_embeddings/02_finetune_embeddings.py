@@ -33,18 +33,16 @@ def create_dataset_from_list(data_list, train_size=10, dev_size=2, test_size=2):
     random.shuffle(data_list)  # Shuffle the data to ensure random splits
 
     train_data = data_list[:train_size]
-    dev_data = data_list[train_size:train_size + dev_size]
-    test_data = data_list[train_size + dev_size:train_size + dev_size + test_size]
+    dev_data = data_list[train_size : train_size + dev_size]
+    test_data = data_list[train_size + dev_size : train_size + dev_size + test_size]
 
     train_dataset = Dataset.from_list(train_data)
     dev_dataset = Dataset.from_list(dev_data)
     test_dataset = Dataset.from_list(test_data)
 
-    dataset_dict = DatasetDict({
-        "train": train_dataset,
-        "dev": dev_dataset,
-        "test": test_dataset
-    })
+    dataset_dict = DatasetDict(
+        {"train": train_dataset, "dev": dev_dataset, "test": test_dataset}
+    )
 
     return dataset_dict
 
@@ -139,7 +137,7 @@ def main():
     # CUDA_VISIBLE_DEVICES=0 HF_HOME=/home/jinaai/nanw/finetune_je_v3 NCCL_P2P_DISABLE=1 NCCL_IB_DISABLE=1 python finetune_embeddings.py
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # CUDA_VISIBLE_DEVICES=3,4,5,6,7 HF_HOME=/home/jinaai/nanw/finetune_je_v3 accelerate launch --num_processes 4 finetune_embeddings.py
     # CUDA_VISIBLE_DEVICES=0 HF_HOME=/home/jinaai/nanw/finetune_je_v3 NCCL_P2P_DISABLE=1 NCCL_IB_DISABLE=1 python finetune_embeddings.py
     main()

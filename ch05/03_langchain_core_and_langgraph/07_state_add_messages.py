@@ -24,6 +24,7 @@ class State(TypedDict):
             AnyMessage 是所有消息类型的联合类型，
             包括 HumanMessage、AIMessage、SystemMessage 等。
     """
+
     msg_list: Annotated[list[AnyMessage], add_messages]
 
 

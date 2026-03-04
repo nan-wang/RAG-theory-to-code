@@ -43,18 +43,22 @@ def format_docs(docs):
 
 def split_sections(text, source=None, skip_empty_sections=False):
     sections = []
-    pattern = r'(==+)(.*?)==+\s*([^=]*)'
+    pattern = r"(==+)(.*?)==+\s*([^=]*)"
 
     # This dictionary helps to track the current section level and index
     section_counters = {1: -1, 2: -1, 3: -1}
     parent_title = ""
     prev_level = 0
-    section_title = ["", ]
+    section_title = [
+        "",
+    ]
     text = f"== summary ==\n\n{text}"
     matches = re.finditer(pattern, text, re.DOTALL)
 
     for match in matches:
-        level = len(match.group(1)) - 1  # Determine the section level by the number of '='
+        level = (
+            len(match.group(1)) - 1
+        )  # Determine the section level by the number of '='
         title = match.group(2).strip()
         content = match.group(3).strip()
 
@@ -89,9 +93,17 @@ def split_sections(text, source=None, skip_empty_sections=False):
             "title": title,
             "parent_section": "_".join(section_title[1:-1]),
             "section_level": level,
-            "section_index": section_counters[level]
+            "section_index": section_counters[level],
         }
-        if title in ["注释", "参见", "参考文献", "外部链接", "奖牌榜", "比赛日程", "参考"]:
+        if title in [
+            "注释",
+            "参见",
+            "参考文献",
+            "外部链接",
+            "奖牌榜",
+            "比赛日程",
+            "参考",
+        ]:
             continue
         if skip_empty_sections and not content:
             continue
@@ -106,9 +118,9 @@ def split_chunks(docs: Iterable[Document]):
         chunk_size=512,
         chunk_overlap=128,
         add_start_index=True,
-        separators=['。', '！', '？', '\?', '\n\n', '\n', '\n\n\n'],
+        separators=["。", "！", "？", "\?", "\n\n", "\n", "\n\n\n"],
         is_separator_regex=True,
-        keep_separator="end"
+        keep_separator="end",
     )
 
     for chunk in text_splitter.split_documents(docs):

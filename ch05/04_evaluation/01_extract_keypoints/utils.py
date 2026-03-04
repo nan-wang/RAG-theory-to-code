@@ -10,7 +10,7 @@ from langchain_core.documents import Document
 
 def split_sections(content, skip_empty_sections=True):
     sections = []
-    pattern = r'(==+)(.*?)==+\s*([^=]*)'
+    pattern = r"(==+)(.*?)==+\s*([^=]*)"
 
     # This dictionary helps to track the current section level and index
     section_counters = {1: -1, 2: -1, 3: -1}
@@ -20,7 +20,9 @@ def split_sections(content, skip_empty_sections=True):
     matches = re.finditer(pattern, text, re.DOTALL)
 
     for match in matches:
-        level = len(match.group(1)) - 1  # Determine the section level by the number of '='
+        level = (
+            len(match.group(1)) - 1
+        )  # Determine the section level by the number of '='
         title = match.group(2).strip()
         content = match.group(3).strip()
 
@@ -34,24 +36,36 @@ def split_sections(content, skip_empty_sections=True):
         section_counters[level] += 1
 
         if level == 2:
-            parent_section = sections[-1]["title"]  # The parent section is the last level 1 section
+            parent_section = sections[-1][
+                "title"
+            ]  # The parent section is the last level 1 section
 
         section_info = {
             "title": title,
             "content": content,
             "parent_section": parent_section,
             "section_level": level,
-            "section_index": section_counters[level]
+            "section_index": section_counters[level],
         }
 
-        if title in ["注释", "参见", "参考文献", "外部链接", "奖牌榜", "比赛日程", "参考"]:
+        if title in [
+            "注释",
+            "参见",
+            "参考文献",
+            "外部链接",
+            "奖牌榜",
+            "比赛日程",
+            "参考",
+        ]:
             continue
         sections.append(section_info)
 
     return sections
 
 
-def create_section_documents(section_list, metadatas, add_section_title=True, add_article_title=True):
+def create_section_documents(
+    section_list, metadatas, add_section_title=True, add_article_title=True
+):
     _metadatas = metadatas
     documents = []
     for i, sec in enumerate(section_list):

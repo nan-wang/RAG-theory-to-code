@@ -34,6 +34,7 @@ class State(TypedDict):
         context: 从向量数据库检索到的相关文档列表。
         answer: LLM 生成的回答。
     """
+
     question: str
     context: List[Document]
     answer: str
@@ -45,10 +46,11 @@ vector_store = Chroma(
     embedding_function=OpenAIEmbeddings(
         model=os.getenv("EMBEDDING_MODEL"),
         chunk_size=16,
-        check_embedding_ctx_length=False
+        check_embedding_ctx_length=False,
     ),
     create_collection_if_not_exists=False,  # 不自动创建，确保索引已存在
-    collection_name=COLLECTION_NAME)
+    collection_name=COLLECTION_NAME,
+)
 
 # 定义 RAG 提示模板：指导 LLM 基于检索到的上下文回答问题
 prompt_template = ChatPromptTemplate.from_template(
@@ -76,8 +78,9 @@ def retrieve(state: State):
     Returns:
         dict: 包含检索到的文档列表（context）。
     """
-    retrieved_docs = (
-        vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 4}).invoke(state["question"]))
+    retrieved_docs = vector_store.as_retriever(
+        search_type="similarity", search_kwargs={"k": 4}
+    ).invoke(state["question"])
     return {"context": retrieved_docs}
 
 
@@ -93,7 +96,9 @@ def generate(state: State):
         dict: 包含 LLM 生成的回答（answer）。
     """
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
-    prompt = prompt_template.invoke({"question": state["question"], "context": docs_content})
+    prompt = prompt_template.invoke(
+        {"question": state["question"], "context": docs_content}
+    )
     response_message = llm.invoke(prompt)
     return {"answer": response_message.content}
 

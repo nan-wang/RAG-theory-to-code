@@ -8,7 +8,13 @@ import requests
 import tcvectordb
 from tcvdb_text.encoder import BM25Encoder
 from tcvectordb.model.enum import ReadConsistency, FieldType, IndexType, MetricType
-from tcvectordb.model.index import Index, FilterIndex, VectorIndex, SparseIndex, HNSWParams
+from tcvectordb.model.index import (
+    Index,
+    FilterIndex,
+    VectorIndex,
+    SparseIndex,
+    HNSWParams,
+)
 
 from rag.utils import load_documents, split_sections, split_chunks
 
@@ -48,7 +54,7 @@ def encode_texts(texts, jina_api_key="", batch_size=32):
     Returns:
         embeddings: 与 texts 等长的向量列表
     """
-    url = 'https://api.jina.ai/v1/embeddings'
+    url = "https://api.jina.ai/v1/embeddings"
     jina_api_key = os.environ.get("JINA_API_KEY", jina_api_key)
     session = requests.Session()
     session.headers.update(
@@ -68,7 +74,7 @@ def encode_texts(texts, jina_api_key="", batch_size=32):
             "late_chunking": False,
             "dimensions": 1024,
             "embedding_type": "float",
-            "input": batch
+            "input": batch,
         }
         resp = session.post(url, json=data).json()
         if "data" not in resp:
@@ -118,24 +124,23 @@ def main():
 
     # 定义索引结构（稠密向量 + 稀疏向量 + 过滤字段）
     index = Index(
-        FilterIndex(
-            'id',
-            FieldType.String,
-            IndexType.PRIMARY_KEY),
+        FilterIndex("id", FieldType.String, IndexType.PRIMARY_KEY),
         VectorIndex(
-            'vector',
+            "vector",
             dimension=1024,
             index_type=IndexType.HNSW,
             metric_type=MetricType.COSINE,
-            params=HNSWParams(m=16, efconstruction=200)),
+            params=HNSWParams(m=16, efconstruction=200),
+        ),
         SparseIndex(
-            name='sparse_vector',
+            name="sparse_vector",
             field_type=FieldType.SparseVector,
             index_type=IndexType.SPARSE_INVERTED,
-            metric_type=MetricType.IP),
-        FilterIndex('text', FieldType.String, IndexType.FILTER),
-        FilterIndex('source', FieldType.String, IndexType.FILTER),
-        FilterIndex('title', FieldType.String, IndexType.FILTER),
+            metric_type=MetricType.IP,
+        ),
+        FilterIndex("text", FieldType.String, IndexType.FILTER),
+        FilterIndex("source", FieldType.String, IndexType.FILTER),
+        FilterIndex("title", FieldType.String, IndexType.FILTER),
     )
 
     # 获取或创建集合
@@ -146,13 +151,13 @@ def main():
             name=COLLECTION_NAME,
             shard=1,
             replicas=0,
-            description='this is a collection olympic games',
+            description="this is a collection olympic games",
             index=index,
         )
 
     # 加载并切分文档
     chunks = get_all_splits(args.index_input_dir)
-    bm25 = BM25Encoder.default('zh')
+    bm25 = BM25Encoder.default("zh")
     batch_size = 32
     total_count = len(chunks)
 

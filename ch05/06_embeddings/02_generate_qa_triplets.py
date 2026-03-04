@@ -7,7 +7,11 @@ from pathlib import Path
 import dotenv
 from langchain_chroma import Chroma
 from langchain_core.runnables import RunnableConfig
-from langchain_core.prompts import HumanMessagePromptTemplate, ChatPromptTemplate, SystemMessagePromptTemplate
+from langchain_core.prompts import (
+    HumanMessagePromptTemplate,
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+)
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END
 from pydantic import BaseModel, Field
@@ -24,7 +28,9 @@ class QATriplet(BaseModel):
 
     question: str = Field(..., description="The question generated from the context.")
     answer: str = Field(..., description="The correct answer to the question.")
-    negative_document: str = Field(..., description="The wrong context not related to the question.")
+    negative_document: str = Field(
+        ..., description="The wrong context not related to the question."
+    )
 
 
 class State(TypedDict):
@@ -73,23 +79,26 @@ def generate(state: State):
     }
 
 
-QUESTION_GEN_SYS_TMPL = (
-    SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT))
+QUESTION_GEN_SYS_TMPL = SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT)
 
-QUESTION_GEN_USER_TMPL = (
-    HumanMessagePromptTemplate.from_template(USER_PROMPT))
+QUESTION_GEN_USER_TMPL = HumanMessagePromptTemplate.from_template(USER_PROMPT)
 
 prompt_template = ChatPromptTemplate.from_messages(
-    messages=[
-        QUESTION_GEN_SYS_TMPL,
-        QUESTION_GEN_USER_TMPL
-    ]
+    messages=[QUESTION_GEN_SYS_TMPL, QUESTION_GEN_USER_TMPL]
 )
 
-llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(QATriplet)
+llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(
+    QATriplet
+)
 
 
-async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: str, max_concurrency: int = 8):
+async def main(
+    num_docs: int,
+    index_dir: str,
+    collection_name: str,
+    output_dir: str,
+    max_concurrency: int = 8,
+):
     """Build the generation graph, run it against selected documents, and write outputs.
 
     Args:
@@ -116,7 +125,7 @@ async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: 
     graph = graph_builder.compile()
 
     vectorstore = Chroma(persist_directory=index_dir, collection_name=collection_name)
-    ids = vectorstore.get()['ids']
+    ids = vectorstore.get()["ids"]
     logger.info(f"Total number of documents: {len(ids)}")
     random.shuffle(ids)
 
@@ -126,19 +135,25 @@ async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: 
         num_docs = min(num_docs, len(ids))
 
     logger.info(f"Generating {num_docs} documents...")
-    selected_docs = \
-        {k: v for k, v in vectorstore.get(ids=ids[:num_docs]).items() if k in ("ids", "metadatas", "documents")}
+    selected_docs = {
+        k: v
+        for k, v in vectorstore.get(ids=ids[:num_docs]).items()
+        if k in ("ids", "metadatas", "documents")
+    }
     selected_docs = [dict(zip(selected_docs, t)) for t in zip(*selected_docs.values())]
 
     inputs = [
         {
             "document_id": doc["ids"],
             "context": doc["documents"],
-        } for doc in selected_docs
+        }
+        for doc in selected_docs
     ]
 
     logger.info(f"Total number of selected documents: {len(inputs)}")
-    outputs = await graph.abatch(inputs, config=RunnableConfig(max_concurrency=max_concurrency))
+    outputs = await graph.abatch(
+        inputs, config=RunnableConfig(max_concurrency=max_concurrency)
+    )
     logger.info("Complete generation")
 
     qa_pairs = []
@@ -148,14 +163,14 @@ async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: 
             "query": result["query"],
             "ground_truth": {
                 "contexts": [result["context"]],
-                "content": result["answer"]
+                "content": result["answer"],
             },
             "metadatas": {
                 "length": result["length"],
                 "clarity": result["clarity"],
                 "difficulty": result["difficulty"],
                 "document_id": result["document_id"],
-            }
+            },
         }
         qa_triplet = {
             "anchor": result["query"],
@@ -180,21 +195,43 @@ async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: 
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate QA triplets for embedding fine-tuning.")
-    parser.add_argument("--index_dir", default=None, required=False,
-                        help="Path to the Chroma index directory.")
-    parser.add_argument("--num_docs", "-n", type=int, default=-1,
-                        help="Number of documents to process. -1 means all documents.")
-    parser.add_argument("--output_dir", "-o", default="./data_finetuning",
-                        help="Output directory for qa_pairs.json and qa_triplets.json.")
-    parser.add_argument("--collection_name", default="olympic_games",
-                        help="Chroma collection name.")
-    parser.add_argument("--max_concurrency", type=int, default=8,
-                        help="Maximum number of concurrent LLM calls.")
+    parser = argparse.ArgumentParser(
+        description="Generate QA triplets for embedding fine-tuning."
+    )
+    parser.add_argument(
+        "--index_dir",
+        default=None,
+        required=False,
+        help="Path to the Chroma index directory.",
+    )
+    parser.add_argument(
+        "--num_docs",
+        "-n",
+        type=int,
+        default=-1,
+        help="Number of documents to process. -1 means all documents.",
+    )
+    parser.add_argument(
+        "--output_dir",
+        "-o",
+        default="./data_finetuning",
+        help="Output directory for qa_pairs.json and qa_triplets.json.",
+    )
+    parser.add_argument(
+        "--collection_name", default="olympic_games", help="Chroma collection name."
+    )
+    parser.add_argument(
+        "--max_concurrency",
+        type=int,
+        default=8,
+        help="Maximum number of concurrent LLM calls.",
+    )
     args = parser.parse_args()
 
     if args.index_dir is None:
-        parser.error("--index_dir is required. Please provide the path to the Chroma index directory.")
+        parser.error(
+            "--index_dir is required. Please provide the path to the Chroma index directory."
+        )
 
     asyncio.run(
         main(

@@ -23,6 +23,7 @@ class OverallState(TypedDict):
         subjects: 主题列表，每个主题将生成一个笑话。
         jokes: 生成的笑话列表，使用 add 归约器收集各并行节点的结果。
     """
+
     subjects: list[str]
     jokes: Annotated[list[str], operator.add]
 

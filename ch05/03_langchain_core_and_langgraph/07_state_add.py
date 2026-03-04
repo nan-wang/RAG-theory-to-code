@@ -23,6 +23,7 @@ class State(TypedDict):
             Annotated[list[str], add] 表示节点返回的列表会与已有列表拼接，
             而非覆盖。等效于 old_list + new_list。
     """
+
     msg_list: Annotated[list[str], add]
 
 

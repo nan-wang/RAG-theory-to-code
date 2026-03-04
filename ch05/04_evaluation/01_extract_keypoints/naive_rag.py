@@ -154,22 +154,47 @@ async def query(
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--index', dest='do_index', action=BooleanOptionalAction, default=False,
-                        help='Run indexing step.')
-    parser.add_argument('--query', dest='do_query', action=BooleanOptionalAction, default=False,
-                        help='Run query step.')
-    parser.add_argument('--index_dir', required=True, type=str,
-                        help='Chroma persist directory.')
-    parser.add_argument('--collection_name', required=True, type=str,
-                        help='Chroma collection name.')
-    parser.add_argument('--index_input_dir', default=None, type=str,
-                        help='Directory containing *.txt files for indexing.')
-    parser.add_argument('--query_input_path', default=None, type=str,
-                        help='Path to input JSON file with queries.')
-    parser.add_argument('--output_dir', default=None, type=str,
-                        help='Directory for response.json output.')
-    parser.add_argument('--max_concurrency', default=8, type=int,
-                        help='Batch concurrency for querying.')
+    parser.add_argument(
+        "--index",
+        dest="do_index",
+        action=BooleanOptionalAction,
+        default=False,
+        help="Run indexing step.",
+    )
+    parser.add_argument(
+        "--query",
+        dest="do_query",
+        action=BooleanOptionalAction,
+        default=False,
+        help="Run query step.",
+    )
+    parser.add_argument(
+        "--index_dir", required=True, type=str, help="Chroma persist directory."
+    )
+    parser.add_argument(
+        "--collection_name", required=True, type=str, help="Chroma collection name."
+    )
+    parser.add_argument(
+        "--index_input_dir",
+        default=None,
+        type=str,
+        help="Directory containing *.txt files for indexing.",
+    )
+    parser.add_argument(
+        "--query_input_path",
+        default=None,
+        type=str,
+        help="Path to input JSON file with queries.",
+    )
+    parser.add_argument(
+        "--output_dir",
+        default=None,
+        type=str,
+        help="Directory for response.json output.",
+    )
+    parser.add_argument(
+        "--max_concurrency", default=8, type=int, help="Batch concurrency for querying."
+    )
     args = parser.parse_args()
 
     if not args.do_index and not args.do_query:
@@ -178,7 +203,11 @@ def main():
     if args.do_index:
         if not args.index_input_dir:
             parser.error("--index_input_dir is required when --index is set.")
-        index(index_input_dir=args.index_input_dir, index_dir=args.index_dir, collection_name=args.collection_name)
+        index(
+            index_input_dir=args.index_input_dir,
+            index_dir=args.index_dir,
+            collection_name=args.collection_name,
+        )
 
     if args.do_query:
         if not args.query_input_path:

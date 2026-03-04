@@ -7,7 +7,11 @@ from pathlib import Path
 import dotenv
 from langchain_chroma import Chroma
 from langchain_core.runnables import RunnableConfig
-from langchain_core.prompts import HumanMessagePromptTemplate, ChatPromptTemplate, SystemMessagePromptTemplate
+from langchain_core.prompts import (
+    HumanMessagePromptTemplate,
+    ChatPromptTemplate,
+    SystemMessagePromptTemplate,
+)
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START, END
 from pydantic import BaseModel, Field
@@ -62,23 +66,26 @@ def generate(state: State):
     }
 
 
-QUESTION_GEN_SYS_TMPL = (
-    SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT))
+QUESTION_GEN_SYS_TMPL = SystemMessagePromptTemplate.from_template(SYSTEM_PROMPT)
 
-QUESTION_GEN_USER_TMPL = (
-    HumanMessagePromptTemplate.from_template(USER_PROMPT))
+QUESTION_GEN_USER_TMPL = HumanMessagePromptTemplate.from_template(USER_PROMPT)
 
 prompt_template = ChatPromptTemplate.from_messages(
-    messages=[
-        QUESTION_GEN_SYS_TMPL,
-        QUESTION_GEN_USER_TMPL
-    ]
+    messages=[QUESTION_GEN_SYS_TMPL, QUESTION_GEN_USER_TMPL]
 )
 
-llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(QAPair)
+llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(
+    QAPair
+)
 
 
-async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: str, max_concurrency: int=8):
+async def main(
+    num_docs: int,
+    index_dir: str,
+    collection_name: str,
+    output_dir: str,
+    max_concurrency: int = 8,
+):
     graph_builder = StateGraph(State)
     graph_builder.add_node(select_length)
     graph_builder.add_node(select_clarity)
@@ -96,40 +103,48 @@ async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: 
     graph = graph_builder.compile()
 
     vectorstore = Chroma(persist_directory=index_dir, collection_name=collection_name)
-    ids = vectorstore.get()['ids']
+    ids = vectorstore.get()["ids"]
     logger.info(f"Total number of documents: {len(ids)}")
     random.shuffle(ids)
     num_docs = min(num_docs, len(ids))
     logger.info(f"Generating {num_docs} documents...")
-    selected_docs = \
-        {k: v for k, v in vectorstore.get(ids=ids[:num_docs]).items() if k in ("ids", "metadatas", "documents")}
+    selected_docs = {
+        k: v
+        for k, v in vectorstore.get(ids=ids[:num_docs]).items()
+        if k in ("ids", "metadatas", "documents")
+    }
     selected_docs = [dict(zip(selected_docs, t)) for t in zip(*selected_docs.values())]
 
     inputs = [
         {
             "document_id": doc["ids"],
             "context": doc["documents"],
-        } for doc in selected_docs
+        }
+        for doc in selected_docs
     ]
 
     qa_pairs = []
     logger.info(f"Total number of selected documents: {len(inputs)}")
 
-    outputs = await graph.abatch(inputs, config=RunnableConfig(max_concurrency=max_concurrency))
+    outputs = await graph.abatch(
+        inputs, config=RunnableConfig(max_concurrency=max_concurrency)
+    )
     logger.info(f"Complete generation")
     for result in outputs:
         qa_doc = {
             "query": result["query"],
             "ground_truth": {
-                "contexts": [result["context"], ],
-                "content": result["answer"]
+                "contexts": [
+                    result["context"],
+                ],
+                "content": result["answer"],
             },
             "metadatas": {
                 "length": result["length"],
                 "clarity": result["clarity"],
                 "difficulty": result["difficulty"],
                 "document_id": result["document_id"],
-            }
+            },
         }
         qa_pairs.append(qa_doc)
 
@@ -143,16 +158,22 @@ async def main(num_docs: int, index_dir: str, collection_name: str, output_dir: 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--num_docs", type=int, help="Number of documents to generate.")
-    parser.add_argument("--index_dir", type=str, help="Directory where the index is stored.")
+    parser.add_argument(
+        "--index_dir", type=str, help="Directory where the index is stored."
+    )
     parser.add_argument("--collection_name", type=str, help="Name of the collection.")
-    parser.add_argument("--output_dir", type=str, help="Directory where the output is stored.")
-    parser.add_argument("--max_concurrency", type=int, help="Maximum number of concurrent runs.")
+    parser.add_argument(
+        "--output_dir", type=str, help="Directory where the output is stored."
+    )
+    parser.add_argument(
+        "--max_concurrency", type=int, help="Maximum number of concurrent runs."
+    )
     args = parser.parse_args()
     asyncio.run(
         main(
             num_docs=args.num_docs,
             index_dir=args.index_dir,
             collection_name=args.collection_name,
-            output_dir=args.output_dir
+            output_dir=args.output_dir,
         )
     )

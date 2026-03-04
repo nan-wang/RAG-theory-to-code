@@ -75,7 +75,7 @@ def get_embeddings():
 def split_sections(doc: Document):
     text = doc.page_content
     sections = []
-    pattern = r'(==+)(.*?)==+\s*([^=]*)'
+    pattern = r"(==+)(.*?)==+\s*([^=]*)"
 
     # This dictionary helps to track the current section level and index
     section_counters = {1: -1, 2: -1, 3: -1}
@@ -83,7 +83,9 @@ def split_sections(doc: Document):
 
     cur_metadata = doc.metadata.copy()
     for match in matches:
-        level = len(match.group(1)) - 1  # Determine the section level by the number of '='
+        level = (
+            len(match.group(1)) - 1
+        )  # Determine the section level by the number of '='
         section_title = match.group(2).strip()
         content = match.group(3).strip()
 
@@ -101,9 +103,9 @@ def split_chunks(docs):
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=512,
         chunk_overlap=128,
-        separators=['。', '！', '？', '\?', '\n\n', '\n', '\n\n\n'],
+        separators=["。", "！", "？", "\?", "\n\n", "\n", "\n\n\n"],
         is_separator_regex=True,
-        keep_separator="end"
+        keep_separator="end",
     )
     return text_splitter.split_documents(docs)
 
@@ -196,22 +198,47 @@ async def query(
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--index', dest='do_index', action=BooleanOptionalAction, default=False,
-                        help='Run indexing step.')
-    parser.add_argument('--query', dest='do_query', action=BooleanOptionalAction, default=False,
-                        help='Run query step.')
-    parser.add_argument('--index_dir', required=True, type=str,
-                        help='Chroma persist directory.')
-    parser.add_argument('--collection_name', required=True, type=str,
-                        help='Chroma collection name.')
-    parser.add_argument('--index_input_dir', default=None, type=str,
-                        help='Directory containing *.txt files for indexing.')
-    parser.add_argument('--query_input_path', default=None, type=str,
-                        help='Path to input JSON file with queries.')
-    parser.add_argument('--output_dir', default=None, type=str,
-                        help='Directory for response.json output.')
-    parser.add_argument('--max_concurrency', default=8, type=int,
-                        help='Batch concurrency for querying.')
+    parser.add_argument(
+        "--index",
+        dest="do_index",
+        action=BooleanOptionalAction,
+        default=False,
+        help="Run indexing step.",
+    )
+    parser.add_argument(
+        "--query",
+        dest="do_query",
+        action=BooleanOptionalAction,
+        default=False,
+        help="Run query step.",
+    )
+    parser.add_argument(
+        "--index_dir", required=True, type=str, help="Chroma persist directory."
+    )
+    parser.add_argument(
+        "--collection_name", required=True, type=str, help="Chroma collection name."
+    )
+    parser.add_argument(
+        "--index_input_dir",
+        default=None,
+        type=str,
+        help="Directory containing *.txt files for indexing.",
+    )
+    parser.add_argument(
+        "--query_input_path",
+        default=None,
+        type=str,
+        help="Path to input JSON file with queries.",
+    )
+    parser.add_argument(
+        "--output_dir",
+        default=None,
+        type=str,
+        help="Directory for response.json output.",
+    )
+    parser.add_argument(
+        "--max_concurrency", default=8, type=int, help="Batch concurrency for querying."
+    )
     args = parser.parse_args()
 
     if not args.do_index and not args.do_query:
@@ -220,7 +247,11 @@ def main():
     if args.do_index:
         if not args.index_input_dir:
             parser.error("--index_input_dir is required when --index is set.")
-        index(index_input_dir=args.index_input_dir, index_dir=args.index_dir, collection_name=args.collection_name)
+        index(
+            index_input_dir=args.index_input_dir,
+            index_dir=args.index_dir,
+            collection_name=args.collection_name,
+        )
 
     if args.do_query:
         if not args.query_input_path:

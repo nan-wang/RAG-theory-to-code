@@ -4,7 +4,11 @@ import json
 from pathlib import Path
 
 import dotenv
-from langchain_core.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate, ChatPromptTemplate
+from langchain_core.prompts import (
+    SystemMessagePromptTemplate,
+    HumanMessagePromptTemplate,
+    ChatPromptTemplate,
+)
 from langchain_core.runnables import RunnableConfig
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph, START
@@ -20,10 +24,7 @@ QUESTION_REWRITE_SYS_TMPL = SystemMessagePromptTemplate.from_template(SYSTEM_PRO
 QUESTION_REWRITE_USER_TMPL = HumanMessagePromptTemplate.from_template(USER_PROMPT)
 
 prompt_template = ChatPromptTemplate.from_messages(
-    messages=[
-        QUESTION_REWRITE_SYS_TMPL,
-        QUESTION_REWRITE_USER_TMPL
-    ]
+    messages=[QUESTION_REWRITE_SYS_TMPL, QUESTION_REWRITE_USER_TMPL]
 )
 
 
@@ -41,7 +42,9 @@ class State(TypedDict):
     context: str
 
 
-llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(QAPair)
+llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(
+    QAPair
+)
 
 
 def generate(state: State):
@@ -49,7 +52,7 @@ def generate(state: State):
         {
             "context_str": state["context"],
             "question": state["original_query"],
-            "answer": state["original_answer"]
+            "answer": state["original_answer"],
         }
     )
     qa_pair = llm.invoke(prompt)
@@ -65,7 +68,7 @@ async def main(input_fn: str, output_dir: str, max_concurrency: int = 8):
     graph_builder.add_edge(START, "generate")
     graph = graph_builder.compile()
 
-    with open(input_fn, 'r') as f:
+    with open(input_fn, "r") as f:
         data = json.load(f)
 
     inputs = []
@@ -77,23 +80,27 @@ async def main(input_fn: str, output_dir: str, max_concurrency: int = 8):
         original_query = doc["query"]
         original_answer = doc["ground_truth"]["content"]
         doc_id = doc["metadatas"]["document_id"]
-        inputs.append({
-            "document_id": doc_id,
-            "original_query": original_query,
-            "original_answer": original_answer,
-            "context": doc['ground_truth']['contexts'][0],
-        })
+        inputs.append(
+            {
+                "document_id": doc_id,
+                "original_query": original_query,
+                "original_answer": original_answer,
+                "context": doc["ground_truth"]["contexts"][0],
+            }
+        )
         qa_pair_dict[doc_id] = doc
     logger.info(f"{len(qa_pair_dict)} documents are valid and will be rewritten")
 
-    outputs = await graph.abatch(inputs, config=RunnableConfig(max_concurrency=max_concurrency))
+    outputs = await graph.abatch(
+        inputs, config=RunnableConfig(max_concurrency=max_concurrency)
+    )
     logger.info(f"{len(outputs)} documents generated")
     qa_pairs = []
     for result in outputs:
         doc_id = result["document_id"]
         doc = qa_pair_dict[doc_id]
         doc["query"] = result["query"]
-        doc['ground_truth']['content'] = result["answer"]
+        doc["ground_truth"]["content"] = result["answer"]
         doc["metadatas"]["original_query"] = result["original_query"]
         doc["metadatas"]["original_answer"] = result["original_answer"]
         qa_pairs.append(doc)
@@ -105,7 +112,7 @@ async def main(input_fn: str, output_dir: str, max_concurrency: int = 8):
     logger.info(f"{len(qa_pairs)} documents rewritten to {output_path}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_fn", "-i", default=None)
     parser.add_argument("--output_dir", type=str, required=True)
@@ -114,5 +121,9 @@ if __name__ == '__main__':
     if args.input_fn is None:
         raise RuntimeError("Missing required argument: --input_fn/-i")
     asyncio.run(
-        main(input_fn=args.input_fn, output_dir=args.output_dir, max_concurrency=args.max_concurrency)
+        main(
+            input_fn=args.input_fn,
+            output_dir=args.output_dir,
+            max_concurrency=args.max_concurrency,
+        )
     )

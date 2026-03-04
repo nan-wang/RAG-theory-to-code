@@ -22,11 +22,11 @@ class TencentVectorDBRetriever(BaseRetriever):
     field_sparse_vector: str = "sparse_vector"
 
     def _get_relevant_documents(
-            self,
-            query: str,
-            *,
-            run_manager: CallbackManagerForRetrieverRun,
-            hybrid_search_kwargs: dict[str, Any] = {}
+        self,
+        query: str,
+        *,
+        run_manager: CallbackManagerForRetrieverRun,
+        hybrid_search_kwargs: dict[str, Any] = {}
     ) -> list[Document]:
         dense_embeddings: List[float] = self.embeddings.embed_query(query)
         sparse_embeddings = self.sparse_encoder.encode_queries(query)
@@ -38,14 +38,14 @@ class TencentVectorDBRetriever(BaseRetriever):
                 AnnSearch(
                     field_name=self.field_vector,
                     data=dense_embeddings,
-                    limit=self.limit
+                    limit=self.limit,
                 ),
             ],
             match=[
                 KeywordSearch(
                     field_name=self.field_sparse_vector,
                     data=sparse_embeddings,
-                    limit=self.limit
+                    limit=self.limit,
                 ),
             ],
             rerank=WeightedRerank(

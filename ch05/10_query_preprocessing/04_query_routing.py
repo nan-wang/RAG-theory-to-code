@@ -8,6 +8,7 @@
     python 04_query_routing.py \\
         --question "里约奥运会哪个国家获得的金牌最多?"
 """
+
 import argparse
 from typing import Literal
 from pprint import pprint
@@ -24,6 +25,7 @@ dotenv.load_dotenv()
 
 class State(TypedDict):
     """LangGraph 状态定义，包含原始问题、检索上下文、答案和路由目标数据源。"""
+
     question: str
     context: str
     answer: str
@@ -78,14 +80,15 @@ def main():
         description="查询路由：根据问题意图将用户查询路由到最相关的数据源。"
     )
     parser.add_argument(
-        "--question", required=True, type=str,
-        help="用户输入的查询问题。"
+        "--question", required=True, type=str, help="用户输入的查询问题。"
     )
     args = parser.parse_args()
 
     global llm
 
-    llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus", temperature=0).with_structured_output(RouteQuery)
+    llm = ChatOpenAI(
+        model="deepseek-ai/DeepSeek-V3.1-Terminus", temperature=0
+    ).with_structured_output(RouteQuery)
 
     graph_builder = StateGraph(State)
     graph_builder.add_node(route)

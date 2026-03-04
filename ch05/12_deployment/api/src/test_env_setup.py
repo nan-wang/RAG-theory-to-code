@@ -40,6 +40,7 @@ def warn(msg):
 # 加载 .env
 try:
     import dotenv
+
     dotenv.load_dotenv()
 except ImportError:
     pass
@@ -55,8 +56,7 @@ REQUIRED = [
     ("DB_USERNAME", "腾讯云向量数据库用户名"),
 ]
 
-OPTIONAL = [
-]
+OPTIONAL = []
 
 for var, desc in REQUIRED:
     val = os.getenv(var)
@@ -74,5 +74,7 @@ for var, desc in OPTIONAL:
 
 # 汇总
 print(f"\n{'=' * 50}")
-print(f"  {GREEN}通过：{passed}{RESET}  {RED}失败：{failed}{RESET}  {YELLOW}警告：{warned}{RESET}\n")
+print(
+    f"  {GREEN}通过：{passed}{RESET}  {RED}失败：{failed}{RESET}  {YELLOW}警告：{warned}{RESET}\n"
+)
 sys.exit(1 if failed else 0)

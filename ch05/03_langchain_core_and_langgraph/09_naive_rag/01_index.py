@@ -57,9 +57,9 @@ def get_chunks(doc_list: list[Document]):
         list[Document]: 分割后的文本块列表，每块保留原文档的元数据。
     """
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=512,       # 每个文本块的最大字符数
-        chunk_overlap=128,    # 相邻文本块之间的重叠字符数，确保上下文连贯
-        add_start_index=True, # 在元数据中记录该块在原文中的起始位置
+        chunk_size=512,  # 每个文本块的最大字符数
+        chunk_overlap=128,  # 相邻文本块之间的重叠字符数，确保上下文连贯
+        add_start_index=True,  # 在元数据中记录该块在原文中的起始位置
     )
     return text_splitter.split_documents(doc_list)
 
@@ -77,9 +77,9 @@ vectorstore = Chroma.from_documents(
     documents=chunks,
     embedding=OpenAIEmbeddings(
         model=os.getenv("EMBEDDING_MODEL"),
-        chunk_size=16,                    # 每批发送给嵌入 API 的文档数量
-        check_embedding_ctx_length=False  # 跳过上下文长度检查（兼容第三方 API）
+        chunk_size=16,  # 每批发送给嵌入 API 的文档数量
+        check_embedding_ctx_length=False,  # 跳过上下文长度检查（兼容第三方 API）
     ),
-    persist_directory=VECTOR_DB_DIR,      # 向量数据库的本地持久化目录
-    collection_name=COLLECTION_NAME,      # 集合名称，用于区分不同的索引
+    persist_directory=VECTOR_DB_DIR,  # 向量数据库的本地持久化目录
+    collection_name=COLLECTION_NAME,  # 集合名称，用于区分不同的索引
 )

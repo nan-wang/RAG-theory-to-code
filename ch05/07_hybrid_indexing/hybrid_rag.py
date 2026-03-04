@@ -92,7 +92,7 @@ def tokenize_doc(doc_str: str):
         ll = l.strip()
         if not ll:
             continue
-        split_tokens = [t.strip() for t in seg.cut(ll) if t.strip() != '']
+        split_tokens = [t.strip() for t in seg.cut(ll) if t.strip() != ""]
         result += split_tokens
     return result
 
@@ -150,9 +150,7 @@ async def query(
     # BM25 retriever (needs raw chunks in memory)
     chunks = get_all_splits(index_input_dir)
     logger.info(f"Loaded {len(chunks)} chunks for BM25")
-    bm25_retriever = BM25Retriever.from_documents(
-        chunks, preprocess_func=tokenize_doc
-    )
+    bm25_retriever = BM25Retriever.from_documents(chunks, preprocess_func=tokenize_doc)
     bm25_retriever.k = 10
 
     # Ensemble + Rerank
@@ -198,32 +196,63 @@ async def query(
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--index', dest='do_index', action=BooleanOptionalAction, default=False,
-                        help='Run indexing step.')
-    parser.add_argument('--query', dest='do_query', action=BooleanOptionalAction, default=False,
-                        help='Run query step.')
-    parser.add_argument('--index_dir', required=True, type=str,
-                        help='Chroma persist directory.')
-    parser.add_argument('--collection_name', required=True, type=str,
-                        help='Chroma collection name.')
-    parser.add_argument('--index_input_dir', default=None, type=str,
-                        help='Directory containing *.txt files (required for both --index and --query, as BM25 needs raw documents).')
-    parser.add_argument('--query_input_path', default=None, type=str,
-                        help='Path to input JSON file with queries.')
-    parser.add_argument('--output_dir', default=None, type=str,
-                        help='Directory for response.json output.')
-    parser.add_argument('--max_concurrency', default=2, type=int,
-                        help='Batch concurrency for querying.')
+    parser.add_argument(
+        "--index",
+        dest="do_index",
+        action=BooleanOptionalAction,
+        default=False,
+        help="Run indexing step.",
+    )
+    parser.add_argument(
+        "--query",
+        dest="do_query",
+        action=BooleanOptionalAction,
+        default=False,
+        help="Run query step.",
+    )
+    parser.add_argument(
+        "--index_dir", required=True, type=str, help="Chroma persist directory."
+    )
+    parser.add_argument(
+        "--collection_name", required=True, type=str, help="Chroma collection name."
+    )
+    parser.add_argument(
+        "--index_input_dir",
+        default=None,
+        type=str,
+        help="Directory containing *.txt files (required for both --index and --query, as BM25 needs raw documents).",
+    )
+    parser.add_argument(
+        "--query_input_path",
+        default=None,
+        type=str,
+        help="Path to input JSON file with queries.",
+    )
+    parser.add_argument(
+        "--output_dir",
+        default=None,
+        type=str,
+        help="Directory for response.json output.",
+    )
+    parser.add_argument(
+        "--max_concurrency", default=2, type=int, help="Batch concurrency for querying."
+    )
     args = parser.parse_args()
 
     if not args.do_index and not args.do_query:
         parser.error("At least one of --index or --query must be specified.")
 
     if not args.index_input_dir:
-        parser.error("--index_input_dir is required (BM25 needs raw documents at query time).")
+        parser.error(
+            "--index_input_dir is required (BM25 needs raw documents at query time)."
+        )
 
     if args.do_index:
-        index(index_input_dir=args.index_input_dir, index_dir=args.index_dir, collection_name=args.collection_name)
+        index(
+            index_input_dir=args.index_input_dir,
+            index_dir=args.index_dir,
+            collection_name=args.collection_name,
+        )
 
     if args.do_query:
         if not args.query_input_path:

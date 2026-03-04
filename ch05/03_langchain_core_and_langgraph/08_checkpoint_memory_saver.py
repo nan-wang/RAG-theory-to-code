@@ -23,6 +23,7 @@ class State(TypedDict):
         input: 输入字符串。
         node_trace: 节点执行轨迹，使用 add 归约器记录经过的节点。
     """
+
     input: str
     node_trace: Annotated[list[str], add]
 

@@ -16,18 +16,20 @@ def strip_thinking_tokens(text: str) -> str:
     return text
 
 
-def tavily_search(query: str, fetch_full_page: bool = True, max_results: int = 3) -> Dict[str, List[Dict[str, Any]]]:
+def tavily_search(
+    query: str, fetch_full_page: bool = True, max_results: int = 3
+) -> Dict[str, List[Dict[str, Any]]]:
     client = TavilyClient()
     return client.search(
-        query,
-        max_results=max_results,
-        include_full_page=fetch_full_page)
+        query, max_results=max_results, include_full_page=fetch_full_page
+    )
 
 
 def deduplicate_and_format_sources(
-        search_response: Union[Dict[str, Any], List[Dict[str, Any]]],
-        max_tokens_per_source: int = 1000,
-        fetch_full_page: bool = True) -> str:
+    search_response: Union[Dict[str, Any], List[Dict[str, Any]]],
+    max_tokens_per_source: int = 1000,
+    fetch_full_page: bool = True,
+) -> str:
     if isinstance(search_response, dict):
         sources_list = search_response["results"]
     elif isinstance(search_response, list):
@@ -49,14 +51,16 @@ def deduplicate_and_format_sources(
     for i, source in enumerate(unique_sources.values(), 1):
         formatted_text += f"Source: {source['title']}\n===\n"
         formatted_text += f"URL: {source['url']}\n===\n"
-        formatted_text += f"Most relevant content from source: {source['content']}\n===\n"
+        formatted_text += (
+            f"Most relevant content from source: {source['content']}\n===\n"
+        )
         if fetch_full_page:
             # Using rough estimate of 4 characters per token
             char_limit = max_tokens_per_source * 4
             # Handle None raw_content
-            raw_content = source.get('raw_content', '')
+            raw_content = source.get("raw_content", "")
             if raw_content is None:
-                raw_content = ''
+                raw_content = ""
                 print(f"Warning: No raw_content found for source {source['url']}")
             if len(raw_content) > char_limit:
                 raw_content = raw_content[:char_limit] + "... [truncated]"
@@ -73,7 +77,7 @@ def format_sources(search_results: Dict[str, Any]) -> str:
 
 
 def extract_json_from_markdown(input_str):
-    match = re.search(r'```json\s*(\{.*?\})\s*```', input_str, re.DOTALL)
+    match = re.search(r"```json\s*(\{.*?\})\s*```", input_str, re.DOTALL)
     if match:
         json_str = match.group(1)
         return json_str
@@ -125,18 +129,22 @@ def format_docs(docs):
 
 def split_sections(text, source=None, skip_empty_sections=False):
     sections = []
-    pattern = r'(==+)(.*?)==+\s*([^=]*)'
+    pattern = r"(==+)(.*?)==+\s*([^=]*)"
 
     # This dictionary helps to track the current section level and index
     section_counters = {1: -1, 2: -1, 3: -1}
     parent_title = ""
     prev_level = 0
-    section_title = ["", ]
+    section_title = [
+        "",
+    ]
     text = f"== summary ==\n\n{text}"
     matches = re.finditer(pattern, text, re.DOTALL)
 
     for match in matches:
-        level = len(match.group(1)) - 1  # Determine the section level by the number of '='
+        level = (
+            len(match.group(1)) - 1
+        )  # Determine the section level by the number of '='
         title = match.group(2).strip()
         content = match.group(3).strip()
 
@@ -171,9 +179,17 @@ def split_sections(text, source=None, skip_empty_sections=False):
             "title": title,
             "parent_section": "_".join(section_title[1:-1]),
             "section_level": level,
-            "section_index": section_counters[level]
+            "section_index": section_counters[level],
         }
-        if title in ["注释", "参见", "参考文献", "外部链接", "奖牌榜", "比赛日程", "参考"]:
+        if title in [
+            "注释",
+            "参见",
+            "参考文献",
+            "外部链接",
+            "奖牌榜",
+            "比赛日程",
+            "参考",
+        ]:
             continue
         if skip_empty_sections and not content:
             continue
@@ -188,9 +204,9 @@ def split_chunks(docs: Iterable[Document]):
         chunk_size=512,
         chunk_overlap=128,
         add_start_index=True,
-        separators=['。', '！', '？', '\?', '\n\n', '\n', '\n\n\n'],
+        separators=["。", "！", "？", "\?", "\n\n", "\n", "\n\n\n"],
         is_separator_regex=True,
-        keep_separator="end"
+        keep_separator="end",
     )
 
     for chunk in text_splitter.split_documents(docs):
@@ -205,5 +221,3 @@ def split_chunks(docs: Iterable[Document]):
         results.append(Document(page_content=content, metadata=metadata))
 
     return results
-
-

@@ -11,6 +11,7 @@
         --collection_name olympic_games \\
         --question "北京申办过几次奥运会?"
 """
+
 import argparse
 from pprint import pprint
 
@@ -27,6 +28,7 @@ dotenv.load_dotenv()
 
 class State(TypedDict):
     """LangGraph 状态定义，包含原始问题、退一步问题、检索上下文和最终答案。"""
+
     question: str
     stepback_question: str
     context: List[Document]
@@ -111,9 +113,7 @@ def generate(state: State):
     """将合并后的上下文传入 LLM，针对原始问题生成最终答案。"""
     docs_content = "\n\n".join(doc.page_content for doc in state["context"])
     prompt = prompt_template.invoke(
-        {
-            "question": state["question"], "context": docs_content
-        }
+        {"question": state["question"], "context": docs_content}
     )
     response_message = llm.invoke(prompt)
     return {"answer": response_message.content}
@@ -124,16 +124,19 @@ def main():
         description="退一步提问 RAG：将具体问题抽象化后检索更广泛的上下文并生成答案。"
     )
     parser.add_argument(
-        "--index_dir", required=True, type=str,
-        help="Chroma 向量数据库的本地存储路径（替代环境变量 VECTOR_DB_DIR）。"
+        "--index_dir",
+        required=True,
+        type=str,
+        help="Chroma 向量数据库的本地存储路径（替代环境变量 VECTOR_DB_DIR）。",
     )
     parser.add_argument(
-        "--collection_name", required=True, type=str,
-        help="Chroma 集合名称（替代环境变量 COLLECTION_NAME）。"
+        "--collection_name",
+        required=True,
+        type=str,
+        help="Chroma 集合名称（替代环境变量 COLLECTION_NAME）。",
     )
     parser.add_argument(
-        "--question", required=True, type=str,
-        help="用户输入的查询问题。"
+        "--question", required=True, type=str, help="用户输入的查询问题。"
     )
     args = parser.parse_args()
 
@@ -141,16 +144,19 @@ def main():
 
     vector_store = Chroma(
         persist_directory=args.index_dir,
-        embedding_function=OpenAIEmbeddings(model="Qwen/Qwen3-Embedding-0.6B",
-                                             chunk_size=16,
-                                             check_embedding_ctx_length=False),
+        embedding_function=OpenAIEmbeddings(
+            model="Qwen/Qwen3-Embedding-0.6B",
+            chunk_size=16,
+            check_embedding_ctx_length=False,
+        ),
         create_collection_if_not_exists=False,
         collection_name=args.collection_name,
     )
 
     llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus", temperature=0)
     retriever = vector_store.as_retriever(
-        search_type="similarity", search_kwargs={"k": 4})
+        search_type="similarity", search_kwargs={"k": 4}
+    )
 
     graph_builder = StateGraph(State)
     graph_builder.add_node(stepback)

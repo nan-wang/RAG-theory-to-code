@@ -6,11 +6,9 @@ CHATBOT_URL = os.getenv("CHATBOT_URL", "http://localhost:8000/ask")
 
 with st.sidebar:
     st.header("About")
-    st.markdown(
-        """
+    st.markdown("""
         基于LangChain的奥运会问答机器人，可以解答关于1984年到2024年期间历届奥运会的问题。 
-        """
-    )
+        """)
 
     st.header("你可以这样问")
     st.markdown("- 巴黎奥运会的吉祥物是什么?")
@@ -39,33 +37,36 @@ if "messages" not in st.session_state:
         {
             "role": "assistant",
             "output": "你想了解关于奥运会的什么知识？我知道关于1984年到2024年期间历届奥运会的很多信息",
-            "explanation": "N/A"
+            "explanation": "N/A",
         },
     ]
 
 import re
 
+
 def get_explanation(text):
-  """
-  Extracts article title, section title, and content from a text using regex.
+    """
+    Extracts article title, section title, and content from a text using regex.
 
-  Args:
-    text: The input text in the format "[doc_X]article_title: ... section_title: ... content: ...".
+    Args:
+      text: The input text in the format "[doc_X]article_title: ... section_title: ... content: ...".
 
-  Returns:
-    A dictionary containing the extracted article_title, section_title, and content.
-    Returns None if the input format is invalid.
-  """
-  pattern = r"\[doc_\d+\]article_title:\s*(.*?)\s*section_title:\s*(.*?)\s*content:\s*(.*)"
-  match = re.search(pattern, text)
+    Returns:
+      A dictionary containing the extracted article_title, section_title, and content.
+      Returns None if the input format is invalid.
+    """
+    pattern = (
+        r"\[doc_\d+\]article_title:\s*(.*?)\s*section_title:\s*(.*?)\s*content:\s*(.*)"
+    )
+    match = re.search(pattern, text)
 
-  if match:
-    article_title = match.group(1).strip()
-    section_title = match.group(2).strip()
-    content = match.group(3).strip()
-    return article_title, section_title, content
-  else:
-    return None
+    if match:
+        article_title = match.group(1).strip()
+        section_title = match.group(2).strip()
+        content = match.group(3).strip()
+        return article_title, section_title, content
+    else:
+        return None
 
 
 for message in st.session_state.messages:

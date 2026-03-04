@@ -16,17 +16,17 @@ def build_hierarchy(data):
 
     # Step 1: Create initial dictionary with sections at top-level
     for item in data:
-        title = item['title']
-        section_level = item['section_level']
-        parent_section = item['parent_section']
+        title = item["title"]
+        section_level = item["section_level"]
+        parent_section = item["parent_section"]
 
         # Add item to the dictionary
         item_copy = {
-            'title': title,
-            'content': item['content'],
-            'subsections': [],
-            'section_index': item['section_index'],
-            'section_level': item['section_level'],
+            "title": title,
+            "content": item["content"],
+            "subsections": [],
+            "section_index": item["section_index"],
+            "section_level": item["section_level"],
         }
 
         if section_level == 0:
@@ -38,9 +38,9 @@ def build_hierarchy(data):
 
     # Step 2: Assign subsections to their parent sections
     for item in data:
-        if item['section_level'] > 0:
-            title = item['title']
-            parent_title = item['parent_section']
+        if item["section_level"] > 0:
+            title = item["title"]
+            parent_title = item["parent_section"]
 
             # Find the parent section and add current section as a subsection
             if parent_title in hierarchy:
@@ -50,14 +50,14 @@ def build_hierarchy(data):
             else:
                 continue
 
-            parent_section['subsections'].append(sections_by_title[title])
+            parent_section["subsections"].append(sections_by_title[title])
 
     return [v for v in hierarchy.values()]
 
 
 def split_sections(content, skip_empty_sections=True, root_title=""):
     sections = defaultdict(list)
-    pattern = r'(==+)(.*?)==+\s*([^=]*)'
+    pattern = r"(==+)(.*?)==+\s*([^=]*)"
 
     # This dictionary helps to track the current section level and index
     section_counters = {1: -1, 2: -1, 3: -1}
@@ -67,14 +67,16 @@ def split_sections(content, skip_empty_sections=True, root_title=""):
             "content": "",
             "parent_section": "",
             "section_level": 0,
-            "section_index": 0
+            "section_index": 0,
         }
     )
     text = f"== summary ==\n\n{content}"
     matches = re.finditer(pattern, text, re.DOTALL)
 
     for match in matches:
-        level = len(match.group(1)) - 1  # Determine the section level by the number of '='
+        level = (
+            len(match.group(1)) - 1
+        )  # Determine the section level by the number of '='
         title = match.group(2).strip()
         content = match.group(3).strip()
 
@@ -84,7 +86,9 @@ def split_sections(content, skip_empty_sections=True, root_title=""):
             section_counters[3] = -1
         elif level == 2:
             section_counters[3] = -1
-        parent_section = sections[level-1][-1]["title"]  # The parent section is the last level 1 section
+        parent_section = sections[level - 1][-1][
+            "title"
+        ]  # The parent section is the last level 1 section
         section_counters[level] += 1
 
         section_info = {
@@ -92,10 +96,19 @@ def split_sections(content, skip_empty_sections=True, root_title=""):
             "content": content,
             "parent_section": parent_section,
             "section_level": level,
-            "section_index": section_counters[level]
+            "section_index": section_counters[level],
         }
 
-        if title in ["注释", "参见", "参考文献", "外部链接", "奖牌榜", "比赛日程", "参考", "外部连结"]:
+        if title in [
+            "注释",
+            "参见",
+            "参考文献",
+            "外部链接",
+            "奖牌榜",
+            "比赛日程",
+            "参考",
+            "外部连结",
+        ]:
             continue
         sections[level].append(section_info)
 
@@ -108,7 +121,9 @@ def split_sections(content, skip_empty_sections=True, root_title=""):
     return build_hierarchy(result)
 
 
-def create_section_documents(section_list, metadatas, add_section_title=True, add_article_title=True):
+def create_section_documents(
+    section_list, metadatas, add_section_title=True, add_article_title=True
+):
     _metadatas = metadatas
     documents = []
     for i, sec in enumerate(section_list):
@@ -131,12 +146,13 @@ def create_section_documents(section_list, metadatas, add_section_title=True, ad
     return documents
 
 
-
 def get_chunks_at_multi_levels(docs):
     section_docs = []
     for doc in docs:
         section_list = split_sections(doc.page_content)
-        section_docs += create_section_documents(section_list, doc.metadata, False, False)
+        section_docs += create_section_documents(
+            section_list, doc.metadata, False, False
+        )
 
 
 def get_chunks(docs: list[Document]):
@@ -144,7 +160,9 @@ def get_chunks(docs: list[Document]):
     section_docs = []
     for doc in docs:
         section_list = split_sections(doc.page_content)
-        section_docs += create_section_documents(section_list, doc.metadata, False, False)
+        section_docs += create_section_documents(
+            section_list, doc.metadata, False, False
+        )
 
     # split the sections into chunks
     text_splitter = RecursiveCharacterTextSplitter(
@@ -201,7 +219,7 @@ def format_docs(docs):
 
 
 def split_contexts(contexts):
-    pattern = r'(?=article_title:)'
+    pattern = r"(?=article_title:)"
     # Split the text using the regex pattern
     return [part.strip() for part in re.split(pattern, contexts) if part.strip()]
 
@@ -210,26 +228,38 @@ def flatten_sections(hierarchy):
     flattened_list = []
 
     def flatten_helper(section, parents, content_list):
-        content = section['content']
-        level = section['section_level']
-        index = section['section_index']
-        title = section['title']
+        content = section["content"]
+        level = section["section_level"]
+        index = section["section_index"]
+        title = section["title"]
         title_md = f"{'#' * (level + 1)} {title}"
-        current_content_list = [f'{title_md}', ]
+        current_content_list = [
+            f"{title_md}",
+        ]
         if content:
             current_content_list.append(content)
-        for subsection in section['subsections']:
-            current_content_list += flatten_helper(subsection, parents + [title,], content_list + [f'{title_md}', ])
+        for subsection in section["subsections"]:
+            current_content_list += flatten_helper(
+                subsection,
+                parents
+                + [
+                    title,
+                ],
+                content_list
+                + [
+                    f"{title_md}",
+                ],
+            )
         content_list += current_content_list
-        if section['subsections']:
+        if section["subsections"]:
             content = "\n".join(content_list)
         flattened_section = {
-            'title': title,
-            'level': level,
-            'index': index,
-            'content': content,
-            'parents': parents,
-            'is_leaf': not section['subsections'],
+            "title": title,
+            "level": level,
+            "index": index,
+            "content": content,
+            "parents": parents,
+            "is_leaf": not section["subsections"],
         }
         flattened_list.append(flattened_section)
         return current_content_list
@@ -245,9 +275,9 @@ def convert_chunks_to_documents(chunks, add_year=False, add_season=False):
         chunk_size=128,
         chunk_overlap=32,
         add_start_index=True,
-        separators=['。', '！', '？', '\?', '\n\n', '\n', '\n\n\n'],
+        separators=["。", "！", "？", "\?", "\n\n", "\n", "\n\n\n"],
         is_separator_regex=True,
-        keep_separator="end"
+        keep_separator="end",
     )
     # split the leaf chunks into sentences
     _chunks = []
@@ -274,14 +304,16 @@ def convert_chunks_to_documents(chunks, add_year=False, add_season=False):
         chunk["content"] = "\n".join(content)
         _chunks.append(chunk)
         for i, sentence in enumerate(sentences):
-            _chunks.append({
-                "content": sentence,
-                "title": chunk["title"],
-                "level": chunk["level"] + 1,
-                "index": i,
-                "parents": chunk["parents"],
-                "is_leaf": True,
-            })
+            _chunks.append(
+                {
+                    "content": sentence,
+                    "title": chunk["title"],
+                    "level": chunk["level"] + 1,
+                    "index": i,
+                    "parents": chunk["parents"],
+                    "is_leaf": True,
+                }
+            )
 
     # construct documents
     for chunk in _chunks:
@@ -309,5 +341,3 @@ def convert_chunks_to_documents(chunks, add_year=False, add_season=False):
         if add_season:
             metadata["season"] = chunk["season"]
         yield Document(page_content="\n".join(content), metadata=metadata)
-
-

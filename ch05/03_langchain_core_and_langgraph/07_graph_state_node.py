@@ -20,6 +20,7 @@ class State(TypedDict):
         step_counter: 记录已执行的节点数量。
         step_list: 记录已执行节点的名称列表。
     """
+
     step_counter: int
     step_list: list[str]
 
@@ -33,7 +34,10 @@ def node_1(state: State):
     Returns:
         dict: 更新后的状态字段（覆盖原值）。
     """
-    return {"step_counter": state.get("step_counter", 0) + 1, "step_list": state.get("step_list", []) + [f"node_1"]}
+    return {
+        "step_counter": state.get("step_counter", 0) + 1,
+        "step_list": state.get("step_list", []) + [f"node_1"],
+    }
 
 
 def node_2(state: State):
@@ -45,7 +49,10 @@ def node_2(state: State):
     Returns:
         dict: 更新后的状态字段（覆盖原值）。
     """
-    return {"step_counter": state.get("step_counter", 0) + 1, "step_list": state.get("step_list", []) + [f"node_2"]}
+    return {
+        "step_counter": state.get("step_counter", 0) + 1,
+        "step_list": state.get("step_list", []) + [f"node_2"],
+    }
 
 
 # 构建状态图

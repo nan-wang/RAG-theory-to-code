@@ -39,7 +39,12 @@ from langchain_community.embeddings import JinaEmbeddings
 from langchain_community.retrievers import BM25Retriever
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
-from langchain_core.runnables import RunnablePassthrough, RunnableParallel, RunnablePick, RunnableConfig
+from langchain_core.runnables import (
+    RunnablePassthrough,
+    RunnableParallel,
+    RunnablePick,
+    RunnableConfig,
+)
 from langchain_openai import ChatOpenAI
 from loguru import logger
 
@@ -51,7 +56,10 @@ seg = pkuseg.pkuseg()
 
 
 class Response(BaseModel):
-    selected_content: str = Field(..., description="selected content from the context that is useful to answer the question.")
+    selected_content: str = Field(
+        ...,
+        description="selected content from the context that is useful to answer the question.",
+    )
     answer: str = Field(..., description="the final answer to the question.")
 
 
@@ -61,7 +69,7 @@ def tokenize_doc(doc_str: str):
         ll = l.strip()
         if not ll:
             continue
-        split_tokens = [t.strip() for t in seg.cut(ll) if t.strip() != '']
+        split_tokens = [t.strip() for t in seg.cut(ll) if t.strip() != ""]
         result += split_tokens
     return result
 
@@ -136,38 +144,46 @@ async def query(
     )
     logger.info(f"{vectorstore._chroma_collection.count()} documents loaded")
 
-    vector_retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
+    vector_retriever = vectorstore.as_retriever(
+        search_type="similarity", search_kwargs={"k": 10}
+    )
 
     chunks = get_all_splits(index_input_dir)
     bm25_retriever = BM25Retriever.from_documents(chunks, preprocess_func=tokenize_doc)
     bm25_retriever.k = 10
 
-    ensemble_retriever = EnsembleRetriever(retrievers=[vector_retriever, bm25_retriever], weights=[0.5, 0.5])
+    ensemble_retriever = EnsembleRetriever(
+        retrievers=[vector_retriever, bm25_retriever], weights=[0.5, 0.5]
+    )
 
     compressor = JinaRerank(model="jina-reranker-v2-base-multilingual", top_n=10)
     retriever = ContextualCompressionRetriever(
         base_compressor=compressor, base_retriever=ensemble_retriever
     )
 
-    llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(Response)
+    llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(
+        Response
+    )
 
-    rag_chain = (
-        RunnableParallel(
-            context=retriever | format_docs,
-            question=RunnablePassthrough())
-        | RunnableParallel(
-            context=RunnablePick("context"),
-            question=RunnablePick("question"),
-            response=prompt_template | llm)
+    rag_chain = RunnableParallel(
+        context=retriever | format_docs, question=RunnablePassthrough()
+    ) | RunnableParallel(
+        context=RunnablePick("context"),
+        question=RunnablePick("question"),
+        response=prompt_template | llm,
     )
 
     with open(query_input_path, "r") as f:
         qa_pairs = json.load(f)
 
     inputs = [doc["query"] for doc in qa_pairs]
-    logger.info(f"Processing {len(inputs)} queries with max_concurrency={max_concurrency}...")
+    logger.info(
+        f"Processing {len(inputs)} queries with max_concurrency={max_concurrency}..."
+    )
 
-    outputs = await rag_chain.abatch(inputs, config=RunnableConfig(max_concurrency=max_concurrency))
+    outputs = await rag_chain.abatch(
+        inputs, config=RunnableConfig(max_concurrency=max_concurrency)
+    )
     logger.info("Complete generation")
 
     results = []
@@ -188,22 +204,47 @@ async def query(
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--index', dest='do_index', action=BooleanOptionalAction, default=False,
-                        help='Run indexing step.')
-    parser.add_argument('--query', dest='do_query', action=BooleanOptionalAction, default=False,
-                        help='Run query step.')
-    parser.add_argument('--index_dir', required=True, type=str,
-                        help='Chroma persist directory.')
-    parser.add_argument('--collection_name', required=True, type=str,
-                        help='Chroma collection name.')
-    parser.add_argument('--index_input_dir', default=None, type=str,
-                        help='Directory containing *.txt files for indexing and BM25.')
-    parser.add_argument('--query_input_path', default=None, type=str,
-                        help='Path to input JSON file with queries.')
-    parser.add_argument('--output_dir', default=None, type=str,
-                        help='Directory for response.json output.')
-    parser.add_argument('--max_concurrency', default=2, type=int,
-                        help='Batch concurrency for querying.')
+    parser.add_argument(
+        "--index",
+        dest="do_index",
+        action=BooleanOptionalAction,
+        default=False,
+        help="Run indexing step.",
+    )
+    parser.add_argument(
+        "--query",
+        dest="do_query",
+        action=BooleanOptionalAction,
+        default=False,
+        help="Run query step.",
+    )
+    parser.add_argument(
+        "--index_dir", required=True, type=str, help="Chroma persist directory."
+    )
+    parser.add_argument(
+        "--collection_name", required=True, type=str, help="Chroma collection name."
+    )
+    parser.add_argument(
+        "--index_input_dir",
+        default=None,
+        type=str,
+        help="Directory containing *.txt files for indexing and BM25.",
+    )
+    parser.add_argument(
+        "--query_input_path",
+        default=None,
+        type=str,
+        help="Path to input JSON file with queries.",
+    )
+    parser.add_argument(
+        "--output_dir",
+        default=None,
+        type=str,
+        help="Directory for response.json output.",
+    )
+    parser.add_argument(
+        "--max_concurrency", default=2, type=int, help="Batch concurrency for querying."
+    )
     args = parser.parse_args()
 
     if not args.do_index and not args.do_query:
@@ -212,7 +253,11 @@ def main():
     if args.do_index:
         if not args.index_input_dir:
             parser.error("--index_input_dir is required when --index is set.")
-        index(index_input_dir=args.index_input_dir, index_dir=args.index_dir, collection_name=args.collection_name)
+        index(
+            index_input_dir=args.index_input_dir,
+            index_dir=args.index_dir,
+            collection_name=args.collection_name,
+        )
 
     if args.do_query:
         if not args.query_input_path:
@@ -220,7 +265,9 @@ def main():
         if not args.output_dir:
             parser.error("--output_dir is required when --query is set.")
         if not args.index_input_dir:
-            parser.error("--index_input_dir is required when --query is set (needed for BM25).")
+            parser.error(
+                "--index_input_dir is required when --query is set (needed for BM25)."
+            )
         asyncio.run(
             query(
                 query_input_path=args.query_input_path,

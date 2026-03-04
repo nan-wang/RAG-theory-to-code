@@ -18,6 +18,7 @@ class State(TypedDict):
         input: 输入值，用于路由判断。
         msg: 记录执行路径的消息字符串。
     """
+
     input: int
     msg: str
 

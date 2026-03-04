@@ -16,10 +16,24 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langgraph.graph import StateGraph, START, END
 
 from configuration import Configuration
-from prompts import query_writer_instructions, get_current_date, summarizer_instructions, reflection_instructions
+from prompts import (
+    query_writer_instructions,
+    get_current_date,
+    summarizer_instructions,
+    reflection_instructions,
+)
 from state import SummaryState, SummaryStateInput, SummaryStateOutput
-from utils import strip_thinking_tokens, get_config_value, tavily_search, format_sources, \
-    deduplicate_and_format_sources, extract_json_from_markdown, load_documents, split_chunks, split_sections
+from utils import (
+    strip_thinking_tokens,
+    get_config_value,
+    tavily_search,
+    format_sources,
+    deduplicate_and_format_sources,
+    extract_json_from_markdown,
+    load_documents,
+    split_chunks,
+    split_sections,
+)
 
 dotenv.load_dotenv()
 
@@ -56,7 +70,7 @@ def tokenize_doc(doc_str: str):
         ll = l.strip()
         if not ll:
             continue
-        split_tokens = [t.strip() for t in seg.cut(ll) if t.strip() != '']
+        split_tokens = [t.strip() for t in seg.cut(ll) if t.strip() != ""]
         result += split_tokens
     return result
 
@@ -82,20 +96,22 @@ def setup_retriever(index_dir: str, collection_name: str, input_dir: str):
             persist_directory=index_dir,
             embedding_function=OpenAIEmbeddings(model="Qwen/Qwen3-Embedding-0.6B"),
             create_collection_if_not_exists=False,
-            collection_name=collection_name)
+            collection_name=collection_name,
+        )
         print(f"{vectorstore._chroma_collection.count()} documents loaded")
     else:
         raise FileNotFoundError(f"向量数据库目录不存在: {index_dir}")
 
-    vector_retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+    vector_retriever = vectorstore.as_retriever(
+        search_type="similarity", search_kwargs={"k": 5}
+    )
 
     chunks = get_all_splits(input_dir)
     bm25_retriever = BM25Retriever.from_documents(chunks, preprocess_func=tokenize_doc)
     bm25_retriever.k = 5
 
     ensemble_retriever = EnsembleRetriever(
-        retrievers=[vector_retriever, bm25_retriever],
-        weights=[0.5, 0.5]
+        retrievers=[vector_retriever, bm25_retriever], weights=[0.5, 0.5]
     )
 
     compressor = JinaRerank(model="jina-reranker-v2-base-multilingual", top_n=3)
@@ -115,15 +131,17 @@ def generate_query(state: SummaryState, config: RunnableConfig):
     """
     current_date = get_current_date()
     formatted_prompt = query_writer_instructions.format(
-        current_date=current_date,
-        user_query=state.user_query
+        current_date=current_date, user_query=state.user_query
     )
 
     configurable = Configuration.from_runnable_config(config)
     llm = ChatOpenAI(model=configurable.reasoning_llm, temperature=0)
 
     result = llm.invoke(
-        [SystemMessage(content=formatted_prompt), HumanMessage(content=f"Generate a query for web search:")]
+        [
+            SystemMessage(content=formatted_prompt),
+            HumanMessage(content=f"Generate a query for web search:"),
+        ]
     )
 
     content = result.content
@@ -157,19 +175,16 @@ def search(state: SummaryState, config: RunnableConfig):
         content = doc.page_content.replace("\n", " ")
         url = doc.metadata.get("source", "")
         title = doc.metadata.get("title", "")
-        search_results["results"].append({
-            "url": url,
-            "content": content,
-            "title": title
-        })
-    search_str = deduplicate_and_format_sources(
-        search_results,
-        fetch_full_page=False
-    )
+        search_results["results"].append(
+            {"url": url, "content": content, "title": title}
+        )
+    search_str = deduplicate_and_format_sources(search_results, fetch_full_page=False)
     return {
         "sources_gathered": [format_sources(search_results)],
         "search_loop_count": state.search_loop_count + 1,
-        "web_search_results": [search_str, ]
+        "web_search_results": [
+            search_str,
+        ],
     }
 
 
@@ -191,12 +206,12 @@ def web_search(state: SummaryState, config: RunnableConfig):
         search_results = tavily_search(
             state.search_query,
             fetch_full_page=configurable.fetch_full_page,
-            max_results=configurable.max_web_search_results
+            max_results=configurable.max_web_search_results,
         )
         search_str = deduplicate_and_format_sources(
             search_results,
             max_tokens_per_source=1000,
-            fetch_full_page=configurable.fetch_full_page
+            fetch_full_page=configurable.fetch_full_page,
         )
     elif search_api == "duckduckgo":
         ...
@@ -205,7 +220,9 @@ def web_search(state: SummaryState, config: RunnableConfig):
     return {
         "sources_gathered": [format_sources(search_results)],
         "search_loop_count": state.search_loop_count + 1,
-        "web_search_results": [search_str, ]
+        "web_search_results": [
+            search_str,
+        ],
     }
 
 
@@ -241,7 +258,10 @@ def summarize_sources(state: SummaryState, config: RunnableConfig):
     llm = ChatOpenAI(model=configurable.reasoning_llm, temperature=0)
 
     result = llm.invoke(
-        [SystemMessage(content=summarizer_instructions), HumanMessage(content=human_message_content)]
+        [
+            SystemMessage(content=summarizer_instructions),
+            HumanMessage(content=human_message_content),
+        ]
     )
     running_summary = result.content
 
@@ -263,10 +283,17 @@ def reflect_on_summary(state: SummaryState, config: RunnableConfig):
 
     llm = ChatOpenAI(model=configurable.reasoning_llm, temperature=0)
     result = llm.invoke(
-        [SystemMessage(content=reflection_instructions.format(user_query=state.user_query)),
-         HumanMessage(content=(
-             f"Reflect on our existing knowledge: \n === \n {state.running_summary}, \n === \n "
-             f"And now identify a knowledge gap and generate a follow-up web search query:"))]
+        [
+            SystemMessage(
+                content=reflection_instructions.format(user_query=state.user_query)
+            ),
+            HumanMessage(
+                content=(
+                    f"Reflect on our existing knowledge: \n === \n {state.running_summary}, \n === \n "
+                    f"And now identify a knowledge gap and generate a follow-up web search query:"
+                )
+            ),
+        ]
     )
     content = result.content
     try:
@@ -299,11 +326,15 @@ def finalize_summary(state: SummaryState):
                 unique_sources.append(line)
 
     all_sources = "\n".join(unique_sources)
-    state.running_summary = f"## Summary\n{state.running_summary}\n\n## Sources\n{all_sources}"
+    state.running_summary = (
+        f"## Summary\n{state.running_summary}\n\n## Sources\n{all_sources}"
+    )
     return {"running_summary": state.running_summary}
 
 
-def route_search(state: SummaryState, config: RunnableConfig) -> Literal["finalize_summary", "search"]:
+def route_search(
+    state: SummaryState, config: RunnableConfig
+) -> Literal["finalize_summary", "search"]:
     """路由决策：继续搜索或结束。
 
     根据已执行的搜索次数决定是继续循环搜索还是进入最终摘要节点。
@@ -326,7 +357,12 @@ def build_graph():
 
     :return: 编译后的 LangGraph 图
     """
-    builder = StateGraph(SummaryState, input=SummaryStateInput, output=SummaryStateOutput, config_schema=Configuration)
+    builder = StateGraph(
+        SummaryState,
+        input=SummaryStateInput,
+        output=SummaryStateOutput,
+        config_schema=Configuration,
+    )
     builder.add_node("generate_query", generate_query)
     builder.add_node("search", search)
     builder.add_node("summarize_sources", summarize_sources)
@@ -349,17 +385,17 @@ def main():
     parser.add_argument(
         "--index_dir",
         default="data_chroma",
-        help="Chroma向量数据库目录路径（默认：data_chroma）"
+        help="Chroma向量数据库目录路径（默认：data_chroma）",
     )
     parser.add_argument(
         "--collection_name",
         default="olympic_games",
-        help="Chroma集合名称（默认：olympic_games）"
+        help="Chroma集合名称（默认：olympic_games）",
     )
     parser.add_argument(
         "--index_input_dir",
         default="../data",
-        help="包含 .txt 原始文档的目录路径（默认：../data）"
+        help="包含 .txt 原始文档的目录路径（默认：../data）",
     )
     args = parser.parse_args()
 

@@ -40,16 +40,14 @@ def warn(msg):
 # 加载 .env
 try:
     import dotenv
+
     dotenv.load_dotenv()
 except ImportError:
     pass
 
 print("\n检查环境变量（10_query_preprocessing）\n")
 
-REQUIRED = [
-    ("OPENAI_API_KEY", "LLM API 密钥"),
-    ("OPENAI_API_BASE", "LLM API 地址")
-]
+REQUIRED = [("OPENAI_API_KEY", "LLM API 密钥"), ("OPENAI_API_BASE", "LLM API 地址")]
 
 for var, desc in REQUIRED:
     val = os.getenv(var)
@@ -65,6 +63,7 @@ base_url = os.getenv("OPENAI_API_BASE")
 if api_key and base_url:
     try:
         from langchain_openai import ChatOpenAI
+
         llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus", max_tokens=16)
         response = llm.invoke("你好")
         if response.content:
@@ -78,5 +77,7 @@ else:
 
 # 汇总
 print(f"\n{'=' * 50}")
-print(f"  {GREEN}通过：{passed}{RESET}  {RED}失败：{failed}{RESET}  {YELLOW}警告：{warned}{RESET}\n")
+print(
+    f"  {GREEN}通过：{passed}{RESET}  {RED}失败：{failed}{RESET}  {YELLOW}警告：{warned}{RESET}\n"
+)
 sys.exit(1 if failed else 0)

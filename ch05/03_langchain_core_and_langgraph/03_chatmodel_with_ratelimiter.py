@@ -12,7 +12,6 @@ from langchain_core.rate_limiters import InMemoryRateLimiter
 from langchain_core.language_models import ParrotFakeChatModel
 from time import time
 
-
 # 配置速率限制器参数
 rate_limiter = InMemoryRateLimiter(
     requests_per_second=0.25,  # 每4秒发送一个请求

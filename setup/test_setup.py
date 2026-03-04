@@ -117,9 +117,11 @@ else:
 # ── 汇总 ──────────────────────────────────────────────────────────
 
 print(f"\n{'=' * 50}")
-print(f"  {GREEN}通过：{passed}{RESET}  "
-      f"{RED}失败：{failed}{RESET}  "
-      f"{YELLOW}警告：{warned}{RESET}")
+print(
+    f"  {GREEN}通过：{passed}{RESET}  "
+    f"{RED}失败：{failed}{RESET}  "
+    f"{YELLOW}警告：{warned}{RESET}"
+)
 
 if failed == 0:
     print(f"\n  {GREEN}环境配置检查通过！{RESET}")

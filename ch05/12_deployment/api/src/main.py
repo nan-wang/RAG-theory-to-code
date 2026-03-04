@@ -5,7 +5,6 @@ from rag.rag_query import rag_graph
 from models.query import QueryInput, QueryOutput
 from utils.async_utils import async_retry
 
-
 app = FastAPI(
     title="1980-2024年奥运会问答机器人",
     description="1980-2024年奥运会问答机器人API",

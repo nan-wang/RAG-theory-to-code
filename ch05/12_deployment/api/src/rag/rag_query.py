@@ -29,8 +29,10 @@ COLLECTION_NAME = "olympic-games-hybrid"
 
 
 class Response(BaseModel):
-    selected_content: str = Field(...,
-                                  description="selected content from the context that is useful to answer the question.")
+    selected_content: str = Field(
+        ...,
+        description="selected content from the context that is useful to answer the question.",
+    )
     answer: str = Field(..., description="the final answer to the question.")
 
 
@@ -46,12 +48,13 @@ client = tcvectordb.RPCVectorDBClient(
     key=DB_KEY,
     username=DB_USERNAME,
     read_consistency=ReadConsistency.EVENTUAL_CONSISTENCY,
-    timeout=30)
+    timeout=30,
+)
 
 ensemble_retriever = TencentVectorDBRetriever(
     client=client,
     embeddings=JinaEmbeddings(model_name="jina-embeddings-v3"),
-    sparse_encoder=BM25Encoder.default('zh'),
+    sparse_encoder=BM25Encoder.default("zh"),
     database_name=DB_NAME,
     collection_name=COLLECTION_NAME,
     limit=10,
@@ -62,10 +65,12 @@ ensemble_retriever = TencentVectorDBRetriever(
 
 retriever = ContextualCompressionRetriever(
     base_compressor=JinaRerank(model="jina-reranker-v2-base-multilingual", top_n=10),
-    base_retriever=ensemble_retriever
+    base_retriever=ensemble_retriever,
 )
 
-llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(Response)
+llm = ChatOpenAI(model="deepseek-ai/DeepSeek-V3.1-Terminus").with_structured_output(
+    Response
+)
 prompt_template = ChatPromptTemplate.from_template(GENERATION_PROMPT)
 
 
@@ -76,13 +81,13 @@ def retrieve(state: State):
 
 def generate(state: State):
     prompt = prompt_template.invoke(
-        {
-            "question": state["question"],
-            "context": format_docs(state["context"])
-        }
+        {"question": state["question"], "context": format_docs(state["context"])}
     )
     response_message = llm.invoke(prompt)
-    return {"answer": response_message.answer, "selected_content": response_message.selected_content}
+    return {
+        "answer": response_message.answer,
+        "selected_content": response_message.selected_content,
+    }
 
 
 graph_builder = StateGraph(State).add_sequence([retrieve, generate])
